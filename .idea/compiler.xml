@@ -2,12 +2,44 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="question-bank-service" />
+        <module name="file-upload-service" />
+        <module name="user-service" />
+        <module name="message-service" />
+        <module name="feign-api" />
+        <module name="course-service" />
+        <module name="homework-service" />
+        <module name="common" />
+        <module name="sign-in-service" />
+        <module name="model" />
         <module name="eaxm" />
+        <module name="gateway" />
+        <module name="admin-service" />
+        <module name="exam-service" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="admin-service" options="-parameters" />
+      <module name="common" options="-parameters" />
+      <module name="course-service" options="-parameters" />
+      <module name="exam-service" options="-parameters" />
+      <module name="feign-api" options="-parameters" />
+      <module name="file-upload-service" options="-parameters" />
+      <module name="gateway" options="-parameters" />
+      <module name="homework-service" options="-parameters" />
+      <module name="message-service" options="-parameters" />
+      <module name="model" options="-parameters" />
+      <module name="question-bank-service" options="-parameters" />
+      <module name="service" options="-parameters" />
+      <module name="sign-in-service" options="-parameters" />
+      <module name="user-service" options="-parameters" />
+    </option>
   </component>
 </project>
