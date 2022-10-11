@@ -1,0 +1,14 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: fet-api
+feign:
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic

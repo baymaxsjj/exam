@@ -7,39 +7,31 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="question-bank-service" />
-        <module name="file-upload-service" />
-        <module name="user-service" />
-        <module name="message-service" />
-        <module name="feign-api" />
-        <module name="course-service" />
-        <module name="homework-service" />
-        <module name="common" />
-        <module name="sign-in-service" />
-        <module name="model" />
-        <module name="eaxm" />
-        <module name="gateway" />
-        <module name="admin-service" />
-        <module name="exam-service" />
+        <module name="fte-exam-service" />
+        <module name="fte-user-service" />
+        <module name="fte-auth" />
+        <module name="fte-common-jwt" />
+        <module name="fte-api" />
+        <module name="fte-gateway" />
+        <module name="fte-admin-service" />
+        <module name="fte-mbg" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="fte-course-service" target="11" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="admin-service" options="-parameters" />
-      <module name="common" options="-parameters" />
-      <module name="course-service" options="-parameters" />
-      <module name="exam-service" options="-parameters" />
-      <module name="feign-api" options="-parameters" />
-      <module name="file-upload-service" options="-parameters" />
-      <module name="gateway" options="-parameters" />
-      <module name="homework-service" options="-parameters" />
-      <module name="message-service" options="-parameters" />
-      <module name="model" options="-parameters" />
-      <module name="question-bank-service" options="-parameters" />
-      <module name="service" options="-parameters" />
-      <module name="sign-in-service" options="-parameters" />
-      <module name="user-service" options="-parameters" />
+      <module name="fte-admin-service" options="-parameters" />
+      <module name="fte-api" options="-parameters" />
+      <module name="fte-auth" options="-parameters" />
+      <module name="fte-common-jwt" options="-parameters" />
+      <module name="fte-course-service" options="-parameters" />
+      <module name="fte-exam-service" options="-parameters" />
+      <module name="fte-gateway" options="-parameters" />
+      <module name="fte-mbg" options="-parameters" />
+      <module name="fte-user-service" options="-parameters" />
     </option>
   </component>
 </project>
