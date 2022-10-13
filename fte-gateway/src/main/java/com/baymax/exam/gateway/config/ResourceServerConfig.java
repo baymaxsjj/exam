@@ -39,6 +39,7 @@ public class ResourceServerConfig {
     private final AuthorizationManager authorizationManager;
     private final RestfulAccessDeniedHandler restfulAccessDeniedHandler;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final IgnoreUrlsConfig ignoreUrlsConfig;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -47,7 +48,7 @@ public class ResourceServerConfig {
         //自定义处理JWT请求头过期或签名错误的结果
         http.oauth2ResourceServer().authenticationEntryPoint(restAuthenticationEntryPoint);
         http.authorizeExchange()
-                .pathMatchers(ExamAuth.API_OPEN_PRE+"/**").permitAll()//白名单配置
+                .pathMatchers(ArrayUtil.toArray(ignoreUrlsConfig.getUrls(),String.class)).permitAll()//白名单配置
                 .anyExchange().access(authorizationManager)//鉴权管理器配置
                 .and().exceptionHandling()
                 .accessDeniedHandler(restfulAccessDeniedHandler)//处理未授权

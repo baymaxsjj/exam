@@ -10,14 +10,15 @@
         <module name="fte-exam-service" />
         <module name="fte-user-service" />
         <module name="fte-auth" />
-        <module name="fte-common-jwt" />
         <module name="fte-api" />
+        <module name="fte-common-web" />
         <module name="fte-gateway" />
         <module name="fte-admin-service" />
         <module name="fte-mbg" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="fte-common-jwt" target="11" />
       <module name="fte-course-service" target="11" />
     </bytecodeTargetLevel>
   </component>
@@ -27,6 +28,7 @@
       <module name="fte-api" options="-parameters" />
       <module name="fte-auth" options="-parameters" />
       <module name="fte-common-jwt" options="-parameters" />
+      <module name="fte-common-web" options="-parameters" />
       <module name="fte-course-service" options="-parameters" />
       <module name="fte-exam-service" options="-parameters" />
       <module name="fte-gateway" options="-parameters" />

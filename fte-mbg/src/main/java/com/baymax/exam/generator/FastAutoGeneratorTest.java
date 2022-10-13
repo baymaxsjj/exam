@@ -24,7 +24,7 @@ public class FastAutoGeneratorTest {
     private static final DataSourceConfig.Builder DATA_SOURCE_CONFIG = new DataSourceConfig
             .Builder("jdbc:mysql://localhost:3306/wk_school?characterEncoding=utf-8&serverTimezone=Asia/Shanghai", "root", "123456");
     private static String author="baymax";
-    private static String myPackage="com.baymax.exam";
+    private static String myPackage="com.baymax.exam.user";
     private static String path=System.getProperty("user.dir");;
 
     /**

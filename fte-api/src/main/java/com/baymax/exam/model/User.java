@@ -3,6 +3,7 @@ package com.baymax.exam.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baymax.exam.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 @Setter
 @TableName("es_user")
 @Schema(name = "User", description = "用户信息")
-public class User implements Serializable {
+public class User extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -81,12 +81,6 @@ public class User implements Serializable {
 
     @Schema(description = "状态，0：启用，>0:封禁")
     private Byte enable;
-
-    @Schema(description = "创建时间")
-    private LocalDateTime createdAt;
-
-    @Schema(description = "修改时间")
-    private LocalDateTime updatedAt;
 
     /**
      * 编码密码

@@ -12,6 +12,6 @@
     <artifactId>fte-common</artifactId>
     <modules>
         <module>fte-common-core</module>
-        <module>fte-common-jwt</module>
+        <module>fte-common-web</module>
     </modules>
 </project>

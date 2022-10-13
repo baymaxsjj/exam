@@ -3,9 +3,11 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/fte-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/fte-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fte-common-web/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/fte-common/fte-common-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/fte-common/fte-common-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/fte-common/fte-common-jwt/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fte-common/fte-common-web/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/fte-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/fte-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/fte-gateway/src/main/java" charset="UTF-8" />

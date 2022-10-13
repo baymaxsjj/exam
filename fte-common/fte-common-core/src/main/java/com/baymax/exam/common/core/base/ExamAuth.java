@@ -9,21 +9,13 @@ package com.baymax.exam.common.core.base;
  */
 public interface  ExamAuth {
     /**
-     * 用户api前前缀
-     */
-     String API_USER_PRE="/api/user";
-    /**
-     * 管理api前缀
-     */
-     String API_ADMIN_PRE="/api/admin";
-    /**
      * 内部api前缀
      */
-    String API_INNER_PRE="/api/inner";
+    String API_INNER_PRE="/inner";
     /**
-     * 内部api前缀
+     * 公开api前缀
      */
-    String API_OPEN_PRE="/api/open";
+    String API_OPEN_PRE="/open";
     /**
      * JWT存储权限前缀
      */

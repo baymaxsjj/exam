@@ -2,7 +2,7 @@ server:
   port: 8081
 spring:
   application:
-    name: user-service
+    name: exam-user
   datasource:
     url: jdbc:mysql://localhost:3306/wk_school?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
@@ -24,6 +24,10 @@ spring:
       port: 6379 # Redis服务器连接端口
       password:  # Redis服务器连接密码（默认为空）
       timeout: 3000ms # 连接超时时间（毫秒）
+mybatis-plus:
+  mapper-locations: classpath*:com/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #  cloud:
 #    nacos:
 #      server-addr: 127.0.0.1:8848

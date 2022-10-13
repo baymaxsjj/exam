@@ -8,14 +8,15 @@ package com.baymax.exam.user.controller;
  * @version:
  */
 
+import com.baymax.exam.common.core.base.ExamAuth;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.model.User;
 import com.baymax.exam.user.service.impl.UserServiceImpl;
+import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,10 +32,17 @@ public class UserController {
     @Operation(summary = "获取用户信息")
     @GetMapping("/user/info")
     Result getUserInfo(){
-        return Result.success("hello0");
+        return Result.success(userService.getById(UserAuthUtil.getUserId()));
+    }
+    @Operation(summary = "获取用户信息")
+    @PostMapping("/user/update")
+    Result updateUser(@RequestBody @Validated({User.UpdateUserRequestValid.class}) User user){
+//        =userService.updateUser(user);
+//        userService.up
+        return Result.success(userService.getById(UserAuthUtil.getUserId()));
     }
     @Operation(summary = "注册信息")
-    @PostMapping("/register")
+    @PostMapping(ExamAuth.API_OPEN_PRE+"/register")
     Result register(@RequestBody @Validated({User.RegisterRequestValid.class}) User user){
         // TODO: 邮箱验证码校验
         return userService.addUser(user);

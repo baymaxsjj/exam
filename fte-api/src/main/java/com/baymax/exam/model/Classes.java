@@ -8,6 +8,10 @@ import java.time.LocalDateTime;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>
@@ -27,11 +31,14 @@ public class Classes implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    @NotBlank(message = "班级名称不能为空")
+    @Length(min = 3,max = 20,message = "班级名称应在3~20字符")
     @Schema(description = "班级名称")
     private String name;
 
-    @Schema(description = "老师")
-    private Integer userId;
+    @NotNull(message = "课程id不能为空")
+    @Schema(description = "课程id")
+    private Integer courseId;
 
     private LocalDateTime createdAt;
 

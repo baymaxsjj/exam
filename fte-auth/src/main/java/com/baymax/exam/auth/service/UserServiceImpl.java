@@ -1,7 +1,7 @@
 package com.baymax.exam.auth.service;
 
-import com.baymax.exam.auth.model.LoginUser;
-import com.baymax.exam.auth.model.SecurityUser;
+import com.baymax.exam.common.core.base.LoginUser;
+import com.baymax.exam.auth.base.SecurityUser;
 import com.baymax.exam.common.core.base.ExamAuth;
 import com.baymax.exam.feign.UserServiceClient;
 import com.baymax.exam.model.User;

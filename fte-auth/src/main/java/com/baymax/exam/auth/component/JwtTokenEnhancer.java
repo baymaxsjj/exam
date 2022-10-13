@@ -1,6 +1,6 @@
 package com.baymax.exam.auth.component;
 
-import com.baymax.exam.auth.model.SecurityUser;
+import com.baymax.exam.auth.base.SecurityUser;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -24,8 +24,8 @@ public class JwtTokenEnhancer implements TokenEnhancer {
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
         Map<String, Object> info = new HashMap<>();
         //把用户ID设置到JWT中
-        info.put("id", securityUser.getId());
-        info.put("client_id",securityUser.getClientId());
+        info.put("id", securityUser.getUserInfo().getId());
+        info.put("client_id",securityUser.getUserInfo().getClientId());
         ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(info);
         return accessToken;
     }

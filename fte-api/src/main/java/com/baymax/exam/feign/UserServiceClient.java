@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @modified By：
  * @version:
  */
-@FeignClient(value = "user-service")
+@FeignClient(value = "exam-user")
 public interface UserServiceClient {
     @GetMapping("/findUser")
      User findUser(@RequestParam String username);

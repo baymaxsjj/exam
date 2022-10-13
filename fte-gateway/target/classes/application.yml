@@ -8,7 +8,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: 'http://localhost:10020/mall-auth/rsa/publicKey' #配置RSA的公钥访问地址
+          jwk-set-uri: 'http://localhost:10020/rsa/publicKey' #配置RSA的公钥访问地址
     redis:
       database: 0
       port: 6379
@@ -45,4 +45,15 @@ springdoc:
   swagger-ui:
     use-root-path: true
     path: scholl
+secure:
+  ignore:
+    urls: #配置白名单路径
+      - "/doc.html"
+      - "/*/v3/api-docs/**"
+      - "/v3/api-docs/**"
+      - "/*/*.js"
+      - "/*/*.css"
+      - "/*/*.png"
+      - "/*/*.ico"
+      - "/webjars/**"
 
