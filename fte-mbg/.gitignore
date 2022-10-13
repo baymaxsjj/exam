@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 自定义忽略文件 ###
+/src/main/resources
