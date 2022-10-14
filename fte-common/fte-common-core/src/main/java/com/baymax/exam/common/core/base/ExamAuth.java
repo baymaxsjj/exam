@@ -39,15 +39,17 @@ public interface  ExamAuth {
     /**
      * Redis缓存权限规则key
      */
-    String RESOURCE_ROLES_MAP_KEY = "auth:resourceRolesMap";
+    String REDIS_ROLES_MAP_KEY = "auth:resourceRolesMap";
     /**
      * 考试答题key
      */
-    String EXAM_SUBJECT_MAP_KEY="exam:userIdMap:";
+    String REDIS_SUBJECT_MAP_KEY="exam:userIdMap:";
     /**
      * 电子邮件代码key
      */
-    String EMAIL_CODE_KEY="email:email";
+    String REDIS_EMAIL_CODE_KEY="email:code:";
+    String REDIS_CLASS_CODE_KEY="class:code:";
+    String REDIS_CODE_CLASS_KEY="code:class::";
 
     /**
      * 认证信息Http请求头

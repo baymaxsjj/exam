@@ -2,4 +2,26 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.baymax.exam.user.mapper.JoinClassMapper">
 
+    <select id="getJoinClassUser" resultType="com.baymax.exam.model.User">
+        SELECT
+            u.id,
+            u.nickname,
+            u.username,
+            u.picture
+        FROM
+            ec_join_class jc
+                INNER JOIN es_user u ON (
+                jc.student_id = u.id)
+            ${ew.customSqlSegment}
+    </select>
+    <select id="getJoinByCourseId" resultType="com.baymax.exam.model.JoinClass">
+        SELECT
+            jc.*
+        FROM
+            ec_join_class jc
+                INNER JOIN ec_classes c ON ( jc.class_id = c.id )
+        WHERE
+            jc.student_id = #{studentId}
+          AND c.course_id =#{courseId}
+    </select>
 </mapper>

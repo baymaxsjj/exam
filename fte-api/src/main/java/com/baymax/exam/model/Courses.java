@@ -61,4 +61,5 @@ public class Courses implements Serializable {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
 }

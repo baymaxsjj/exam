@@ -13,5 +13,6 @@
     <modules>
         <module>fte-common-core</module>
         <module>fte-common-web</module>
+        <module>fte-common-redis</module>
     </modules>
 </project>

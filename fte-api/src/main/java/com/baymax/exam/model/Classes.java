@@ -40,6 +40,9 @@ public class Classes implements Serializable {
     @Schema(description = "课程id")
     private Integer courseId;
 
+    @Schema(description = "老师id/为了方便查找")
+    private Integer teacherId;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

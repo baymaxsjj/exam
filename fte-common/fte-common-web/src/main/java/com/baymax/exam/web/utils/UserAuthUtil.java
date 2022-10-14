@@ -2,6 +2,8 @@ package com.baymax.exam.web.utils;
 
 import com.baymax.exam.common.core.base.LoginUser;
 
+import java.util.function.IntSupplier;
+
 /**
  * @author ：Baymax
  * @date ：Created in 2022/10/12 17:49

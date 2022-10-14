@@ -77,10 +77,10 @@ public class User extends BaseEntity implements Serializable {
     private Integer schoolId;
 
     @Schema(description = "0：学生 1：教师")
-    private Byte role;
+    private String role;
 
     @Schema(description = "状态，0：启用，>0:封禁")
-    private Byte enable;
+    private String enable;
 
     /**
      * 编码密码

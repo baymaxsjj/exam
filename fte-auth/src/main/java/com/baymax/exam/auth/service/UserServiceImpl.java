@@ -1,5 +1,6 @@
 package com.baymax.exam.auth.service;
 
+import cn.hutool.json.JSONUtil;
 import com.baymax.exam.common.core.base.LoginUser;
 import com.baymax.exam.auth.base.SecurityUser;
 import com.baymax.exam.common.core.base.ExamAuth;
@@ -49,13 +50,14 @@ public class UserServiceImpl implements UserDetailsService {
                loginUser.setPassword(user.getPassword());
                loginUser.setId(user.getId());
                loginUser.setRoles(new ArrayList<>());
-               loginUser.setEnabled(user.getEnable()==0);
+               loginUser.setEnabled(user.getEnable().equals("0"));
            }
         }
         if (loginUser==null) {
             throw new UsernameNotFoundException("用户名或密码错误");
         }
         loginUser.setClientId(clientId);
+        log.info(loginUser.toString());
         SecurityUser securityUser=new SecurityUser(loginUser);
         if (!securityUser.isEnabled()) {
             throw new DisabledException("账号已禁用！");

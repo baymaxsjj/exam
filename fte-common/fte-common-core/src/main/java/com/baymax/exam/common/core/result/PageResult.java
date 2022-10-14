@@ -14,33 +14,20 @@ import java.util.List;
  */
 @Data
 public class PageResult<T> implements Serializable {
+    private List<T> list;
+    private long total;
 
-    private String code;
-
-    private Data data;
-
-    private String msg;
-
-    public static <T> PageResult<T> success(IPage<T> page) {
+    /**
+     * 设置结果
+     *
+     * @param page 页面
+     * @return {@link PageResult}<{@link T}>
+     */
+    public static <T> PageResult<T> setResult(IPage<T> page) {
         PageResult<T> result = new PageResult<>();
-        result.setCode(ResultCode.SUCCESS.getCode());
-
-        Data data = new Data<T>();
-        data.setList(page.getRecords());
-        data.setTotal(page.getTotal());
-
-        result.setData(data);
-        result.setMsg(ResultCode.SUCCESS.getMsg());
+        result.setList(page.getRecords());
+        result.setTotal(page.getTotal());
         return result;
-    }
-
-    @lombok.Data
-    public static class Data<T> {
-
-        private List<T> list;
-
-        private long total;
-
     }
 
 }

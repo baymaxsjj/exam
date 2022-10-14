@@ -12,6 +12,7 @@
         <module name="fte-auth" />
         <module name="fte-api" />
         <module name="fte-common-web" />
+        <module name="fte-common-redis" />
         <module name="fte-gateway" />
         <module name="fte-admin-service" />
         <module name="fte-mbg" />
@@ -28,6 +29,7 @@
       <module name="fte-api" options="-parameters" />
       <module name="fte-auth" options="-parameters" />
       <module name="fte-common-jwt" options="-parameters" />
+      <module name="fte-common-redis" options="-parameters" />
       <module name="fte-common-web" options="-parameters" />
       <module name="fte-course-service" options="-parameters" />
       <module name="fte-exam-service" options="-parameters" />

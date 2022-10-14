@@ -41,6 +41,7 @@
         <druid.version>1.2.8</druid.version>
         <oauth2.version>2.2.5.RELEASE</oauth2.version>
         <josejwt.version>9.25.4</josejwt.version>
+        <redis.version>2.7.4</redis.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -88,6 +89,12 @@
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${redis.version}</version>
+            </dependency>
+
             <!--jwt-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -149,6 +156,11 @@
             <dependency>
                 <groupId>com.baymax</groupId>
                 <artifactId>fte-common-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baymax</groupId>
+                <artifactId>fte-common-redis</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
