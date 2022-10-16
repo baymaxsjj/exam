@@ -7,7 +7,10 @@ import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.model.Courses;
+import com.baymax.exam.model.JoinClass;
+import com.baymax.exam.model.User;
 import com.baymax.exam.user.service.impl.CoursesServiceImpl;
+import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
 import com.baymax.exam.vo.CourseInfoVo;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +39,8 @@ import javax.websocket.server.PathParam;
 public class CoursesController {
     @Autowired
     CoursesServiceImpl coursesService;
+    @Autowired
+    JoinClassServiceImpl joinClassService;
 
     @Operation(summary = "创建课程")
     @PostMapping("/update")
@@ -43,22 +48,37 @@ public class CoursesController {
         //更新判断
         Integer courseId = courses.getId();
         Integer userId = UserAuthUtil.getUserId();
+        String info="创建成功";
         //更新判断：是不是自己的课程
         if(courseId!=null){
             Courses cour = coursesService.getById(courseId);
             if(cour==null||cour.getUserId()!=userId){
                 return Result.failed(ResultCode.PARAM_ERROR);
             }
+            info="更新成功";
         }
         courses.setUserId(userId);
         coursesService.saveOrUpdate(courses);
-        return Result.success("创建成功");
+        return Result.msgSuccess(info);
     }
 
     @Operation(summary = "获取课程课程")
-    @GetMapping("/get")
+    @GetMapping("/getInfo")
     public Result<Courses> getCourse(@RequestParam Integer courseId) {
-        return Result.success(coursesService.getCourse(courseId, UserAuthUtil.getUserId()));
+        //
+        Courses course = coursesService.getById(courseId);
+        Integer userId = UserAuthUtil.getUserId();
+        // 未公开:未登录/未加入 禁止获取课程信息
+        if("0".equals(course.getIsPublic())&&!userId.equals(course.getUserId())){
+            if(userId==null){
+                return Result.failed(ResultCode.PARAM_ERROR);
+            }
+            JoinClass joinInfo = joinClassService.getJoinByCourseId(userId, courseId);
+            if(joinInfo==null){
+                return Result.msgWaring("未加入该课程~");
+            }
+        }
+        return Result.success(coursesService.getCourseInfo(courseId));
     }
 
     @Operation(summary = "分页获取课程列表")
@@ -98,6 +118,6 @@ public class CoursesController {
             courses.setIsPublic(isPublic);
         }
         coursesService.updateById(courses);
-        return Result.success("修改成功");
+        return Result.msgSuccess("修改成功");
     }
 }

@@ -24,13 +24,12 @@ public interface ICoursesService extends IService<Courses> {
     boolean updateCourse(Courses courses);
 
     /**
-     * 得到课程
+     * 获取课程信息
      *
-     * @param id     id
-     * @param userId 用户id
-     * @return {@link Courses}
+     * @param id id
+     * @return {@link CourseInfoVo}
      */
-    Courses getCourse(Integer id,Integer userId);
+    CourseInfoVo getCourseInfo(Integer id);
 
     /**
      * 获得课程列表

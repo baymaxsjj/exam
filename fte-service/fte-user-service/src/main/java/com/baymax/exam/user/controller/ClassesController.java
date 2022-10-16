@@ -62,8 +62,8 @@ public class ClassesController {
         }
         String info="班级创建成功";
         //的要是自己的班级，才能更新
-        if(course.getId()!=null){
-            Classes clas = classesService.getById(course.getId());
+        if(classes.getId()!=null){
+            Classes clas = classesService.getById(classes.getId());
             if (clas==null||clas.getTeacherId()!=userId){
                 return  Result.failed(ResultCode.PARAM_ERROR);
             }
@@ -73,7 +73,7 @@ public class ClassesController {
         }
         classes.setTeacherId(UserAuthUtil.getUserId());
         classesService.saveOrUpdate(classes);
-        return Result.success(info);
+        return Result.msgSuccess(info);
     }
     @Operation(summary = "删除班级")
     @PostMapping("/delete/{classId}")
@@ -84,7 +84,7 @@ public class ClassesController {
             return  Result.failed(ResultCode.PARAM_ERROR);
         }
         classesService.removeById(classId);
-        return Result.success("删除成功");
+        return Result.msgSuccess("删除成功");
     }
     @Operation(summary = "获取班级列表")
     @GetMapping("/{courseId}/list")
@@ -92,8 +92,11 @@ public class ClassesController {
         Integer userId = UserAuthUtil.getUserId();
         Courses courses = coursesService.getById(courseId);
         List<Classes> list = null;
+        if(courses==null){
+            return  Result.failed(ResultCode.PARAM_ERROR);
+        }
         //老师获取班级列表;
-        if(courses==null||courses.getUserId()!=userId){
+        if(courses.getUserId()==userId){
             list=classesService.getClassByCourseId(courseId);
         }else{
             JoinClass joinClass = joinClassService.getJoinByCourseId(userId, courseId);
@@ -118,7 +121,6 @@ public class ClassesController {
         }
         //班级码是否存在
         String code = null;
-        LocalDateTime localDateTime=LocalDateTime.now();
         if(!anew){
             code=classesService.getCodeById(classId);
         }
@@ -126,8 +128,11 @@ public class ClassesController {
         if(code==null){
             code=classesService.generateCode(classId);
         }
+        long validTime=classesService.getCodeValidTime(classId);
+        log.info("班级码:"+code+"时间"+validTime);
+        LocalDateTime localDateTime=LocalDateTime.now();
         //获取失效时间
-        localDateTime.plusSeconds(classesService.getCodeValidTime(classId));
+        localDateTime=localDateTime.plusSeconds(validTime);
         ClassCodeVo classCode = new ClassCodeVo();
         classCode.setCode(code);
         classCode.setExpirationTime(localDateTime);
@@ -142,14 +147,17 @@ public class ClassesController {
             return Result.msgInfo("班级码不存在");
         }
         Integer userId = UserAuthUtil.getUserId();
-        JoinClass isJoinClass = joinClassService.getJoinByClassId(userId, classId);
+        //班级id查找课程
+        Classes classes = classesService.getById(classId);
+        JoinClass isJoinClass = joinClassService.getJoinByCourseId(userId, classes.getCourseId());
         if(isJoinClass!=null){
             return Result.msgInfo("请勿重复加入班级");
         }
+        //TODO:禁止套娃（老师加入自己的课程）
         JoinClass joinClass=new JoinClass();
         joinClass.setClassId(classId);
         joinClass.setStudentId(userId);
         joinClassService.save(joinClass);
-        return Result.success("加入成功~");
+        return Result.msgSuccess("加入成功~");
     }
 }

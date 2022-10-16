@@ -56,4 +56,5 @@ secure:
       - "/*/*.png"
       - "/*/*.ico"
       - "/webjars/**"
+      - "/*/oauth/token/**"
 

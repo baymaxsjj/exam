@@ -37,8 +37,8 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
      */
     @Override
     public JoinClass getJoinByClassId(Integer userId, Integer classId) {
-        LambdaQueryWrapper<JoinClass> queryWrapper=new LambdaQueryWrapper<>();
-        Map map=new HashMap();
+        QueryWrapper<JoinClass> queryWrapper=new QueryWrapper<>();
+        Map<String,Object> map=new HashMap();
         map.put("student_id",userId);
         map.put("class_id",classId);
         queryWrapper.allEq(map);
@@ -70,8 +70,6 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
         Page<User> page=new Page<>(currentPage,pageSize);
         LambdaQueryWrapper<JoinClass> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(JoinClass::getClassId,classId);
-
-        joinClassMapper.getJoinClassUser(page,queryWrapper);
-        return null;
+        return joinClassMapper.getJoinClassUser(page,queryWrapper);
     }
 }

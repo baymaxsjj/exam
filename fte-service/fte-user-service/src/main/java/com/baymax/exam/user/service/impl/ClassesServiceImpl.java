@@ -83,7 +83,7 @@ public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> impl
      */
     @Override
     public Integer getClassByCode(String code) {
-        return redisUtil.<Integer>getCacheObject(ExamAuth.REDIS_CLASS_CODE_KEY+code);
+        return redisUtil.<Integer>getCacheObject(ExamAuth.REDIS_CODE_CLASS_KEY+code);
     }
 
     /**

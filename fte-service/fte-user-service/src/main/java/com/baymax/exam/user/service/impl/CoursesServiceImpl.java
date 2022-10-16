@@ -46,19 +46,16 @@ public class CoursesServiceImpl extends ServiceImpl<CoursesMapper, Courses> impl
     }
 
     /**
-     * 得到课程
+     * 获取课程信息
      *
-     * @param id     id
-     * @param userId 用户id
-     * @return {@link Courses}
+     * @param id id
+     * @return {@link CourseInfoVo}
      */
     @Override
-    public Courses getCourse(Integer id, Integer userId) {
-        Map<String , Object> queryMap = new HashMap<>();
-        queryMap.put("id" , id);
-        queryMap.put("user_id" ,  userId);
-        return getOne(new QueryWrapper<Courses>().allEq(queryMap));
+    public CourseInfoVo getCourseInfo(Integer id) {
+        return coursesMapper.getCourseInfo(id);
     }
+
 
     /**
      * 获得课程列表

@@ -21,7 +21,7 @@
             ec_join_class jc
                 INNER JOIN ec_classes c ON ( jc.class_id = c.id )
         WHERE
-            jc.student_id = #{studentId}
+            jc.student_id = #{userId}
           AND c.course_id =#{courseId}
     </select>
 </mapper>

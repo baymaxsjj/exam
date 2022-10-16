@@ -15,6 +15,7 @@ import java.io.Serializable;
 public enum ResultCode implements IResultCode, Serializable {
 
     SUCCESS("00000", "一切ok"),
+    SUCCESS_MSG("00001","成功消息"),
     MESSAGE_INFO("A0000","提示信息"),
     MESSAGE_WARING("B0000","警告信息"),
     MESSAGE_ERROR("C0000","危险信息"),

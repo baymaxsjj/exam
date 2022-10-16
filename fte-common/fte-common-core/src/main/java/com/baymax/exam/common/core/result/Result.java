@@ -19,32 +19,31 @@ public class Result<T> implements Serializable {
     private T data;
 
     private String msg;
-
+    //正常：啥也不提示
     public static <T> Result<T> success() {
         return success(null);
     }
-
+    //正常：有数据
     public static <T> Result<T> success(T data) {
-        Result<T> result = new Result<>();
-        result.setCode(ResultCode.SUCCESS.getCode());
-        result.setMsg(ResultCode.SUCCESS.getMsg());
-        result.setData(data);
-        return result;
+        return result(ResultCode.SUCCESS.getCode(),ResultCode.SUCCESS.getMsg(), data);
     }
+    //正常，有数据和消息
+    public static <T> Result<T> success(String msg,T data) {
+        return result(ResultCode.SUCCESS_MSG.getCode(),msg,data);
+    }
+    // 正常：有消息
+    public static Result msgSuccess(String msg){
+        return result(ResultCode.SUCCESS_MSG.getCode(),msg,null);
+    }
+    //异常：有消息
     public static Result msgInfo(String msg){
-        return message(msg,ResultCode.MESSAGE_INFO);
+        return result(ResultCode.MESSAGE_INFO.getCode(),msg,null);
     }
     public static Result msgWaring(String msg){
-        return message(msg,ResultCode.MESSAGE_WARING);
+        return result(ResultCode.MESSAGE_WARING.getCode(),msg,null);
     }
     public static Result msgError(String msg){
-        return message(msg,ResultCode.MESSAGE_ERROR);
-    }
-    private static  Result message(String msg,IResultCode resultCode){
-        Result result = new Result<>();
-        result.setCode(resultCode.getCode());
-        result.setMsg(msg);
-        return result;
+        return result(ResultCode.MESSAGE_ERROR.getCode(),msg,null);
     }
 
     public static <T> Result<T> failed() {

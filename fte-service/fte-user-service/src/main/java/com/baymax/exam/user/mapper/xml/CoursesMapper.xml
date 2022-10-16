@@ -19,10 +19,22 @@
             ec_courses c
                 JOIN es_user u ON ( c.user_id = u.id )
                 <if test="isStudent">
+                    JOIN ec_classes cl ON ( cl.course_id = c.id )
                     JOIN ec_join_class jc ON (
-                    jc.class_id = c.id)
+                    jc.class_id = cl.id)
                 </if>
                 ${ew.customSqlSegment}
 
+    </select>
+    <select id="getCourseInfo" resultMap="courseInfoMap">
+        SELECT
+            c.*,
+            u.nickname,
+            u.username,
+            u.picture
+        FROM
+            ec_courses c
+                JOIN es_user u ON ( c.user_id = u.id )
+        where c.id=#{id}
     </select>
 </mapper>
