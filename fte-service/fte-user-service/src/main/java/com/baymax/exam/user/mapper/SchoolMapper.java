@@ -1,6 +1,6 @@
 package com.baymax.exam.user.mapper;
 
-import com.baymax.exam.model.School;
+import com.baymax.exam.user.model.School;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

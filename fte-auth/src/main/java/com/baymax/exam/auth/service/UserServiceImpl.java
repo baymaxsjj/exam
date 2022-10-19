@@ -1,11 +1,10 @@
 package com.baymax.exam.auth.service;
 
-import cn.hutool.json.JSONUtil;
 import com.baymax.exam.common.core.base.LoginUser;
 import com.baymax.exam.auth.base.SecurityUser;
 import com.baymax.exam.common.core.base.ExamAuth;
-import com.baymax.exam.feign.UserServiceClient;
-import com.baymax.exam.model.User;
+import com.baymax.exam.user.feign.UserServiceClient;
+import com.baymax.exam.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountExpiredException;

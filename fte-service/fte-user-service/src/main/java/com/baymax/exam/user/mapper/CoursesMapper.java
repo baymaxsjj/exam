@@ -1,14 +1,11 @@
 package com.baymax.exam.user.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baymax.exam.model.Courses;
+import com.baymax.exam.user.model.Courses;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baymax.exam.vo.CourseInfoVo;
+import com.baymax.exam.user.vo.CourseInfoVo;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>

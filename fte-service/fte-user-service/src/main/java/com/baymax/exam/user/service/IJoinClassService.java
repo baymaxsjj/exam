@@ -1,9 +1,9 @@
 package com.baymax.exam.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baymax.exam.model.JoinClass;
+import com.baymax.exam.user.model.JoinClass;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.baymax.exam.model.User;
+import com.baymax.exam.user.model.User;
 
 /**
  * <p>

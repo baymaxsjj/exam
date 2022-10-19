@@ -2,7 +2,7 @@ package com.baymax.exam.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baymax.exam.common.core.result.Result;
-import com.baymax.exam.model.User;
+import com.baymax.exam.user.model.User;
 
 /**
  * <p>

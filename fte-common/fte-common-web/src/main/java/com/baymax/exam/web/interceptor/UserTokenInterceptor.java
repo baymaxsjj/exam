@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author ：Baymax
@@ -24,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class  UserTokenInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request, javax.servlet.http.HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String userStr=request.getHeader(ExamAuth.USER_TOKEN_HEADER);
         log.info(userStr);
         //未登录的公开接口

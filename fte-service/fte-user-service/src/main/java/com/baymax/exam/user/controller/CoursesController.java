@@ -1,17 +1,14 @@
 package com.baymax.exam.user.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.model.Courses;
-import com.baymax.exam.model.JoinClass;
-import com.baymax.exam.model.User;
+import com.baymax.exam.user.model.Courses;
+import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.user.service.impl.CoursesServiceImpl;
 import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
-import com.baymax.exam.vo.CourseInfoVo;
+import com.baymax.exam.user.vo.CourseInfoVo;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,10 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.websocket.server.PathParam;
 
 /**
  * <p>

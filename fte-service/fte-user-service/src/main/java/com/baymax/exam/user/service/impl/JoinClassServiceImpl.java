@@ -4,12 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baymax.exam.model.JoinClass;
-import com.baymax.exam.model.User;
+import com.baymax.exam.user.model.JoinClass;
+import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.mapper.JoinClassMapper;
 import com.baymax.exam.user.service.IJoinClassService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.baymax.exam.vo.CourseInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

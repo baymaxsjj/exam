@@ -3,7 +3,7 @@ package com.baymax.exam.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baymax.exam.common.core.base.ExamAuth;
 import com.baymax.exam.common.redis.utils.RedisUtil;
-import com.baymax.exam.model.Classes;
+import com.baymax.exam.user.model.Classes;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baymax.exam.user.mapper.ClassesMapper;
 import com.baymax.exam.user.service.IClassesService;

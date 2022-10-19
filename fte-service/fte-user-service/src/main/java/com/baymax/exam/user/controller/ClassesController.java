@@ -1,17 +1,14 @@
 package com.baymax.exam.user.controller;
 
-import com.baymax.exam.common.core.base.ExamAuth;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.common.redis.utils.RedisUtil;
-import com.baymax.exam.model.Classes;
-import com.baymax.exam.model.Courses;
-import com.baymax.exam.model.JoinClass;
+import com.baymax.exam.user.model.Classes;
+import com.baymax.exam.user.model.Courses;
+import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.user.service.impl.ClassesServiceImpl;
 import com.baymax.exam.user.service.impl.CoursesServiceImpl;
 import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
-import com.baymax.exam.user.utils.RandomUtil;
-import com.baymax.exam.vo.ClassCodeVo;
+import com.baymax.exam.user.vo.ClassCodeVo;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -113,7 +109,7 @@ public class ClassesController {
     @GetMapping("/classCode/{classId}")
     public Result getClassCode(
             @Schema(description = "班级号") @PathVariable Integer classId,
-            @Schema(description = "true:重新生成") @RequestParam Boolean anew){
+            @Schema(description = "true:重新生成") @RequestParam(required = false) Boolean anew){
         //判断是不是我的课
         Classes myClass = classesService.getById(classId);
         if(myClass==null||myClass.getTeacherId()!=UserAuthUtil.getUserId()){

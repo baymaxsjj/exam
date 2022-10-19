@@ -27,6 +27,7 @@ public class KeyPairController {
     @Autowired
     private KeyPair keyPair;
 
+
     @GetMapping("/publicKey")
     public Map<String, Object> getKey() {
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();

@@ -10,8 +10,7 @@ package com.baymax.exam.user.controller;
 
 import com.baymax.exam.common.core.base.ExamAuth;
 import com.baymax.exam.common.core.result.Result;
-import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.model.User;
+import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.service.impl.UserServiceImpl;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;

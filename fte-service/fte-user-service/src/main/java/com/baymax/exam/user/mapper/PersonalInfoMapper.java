@@ -1,6 +1,6 @@
 package com.baymax.exam.user.mapper;
 
-import com.baymax.exam.model.PersonalInfo;
+import com.baymax.exam.user.model.PersonalInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

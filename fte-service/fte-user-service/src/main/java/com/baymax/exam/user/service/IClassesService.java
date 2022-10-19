@@ -1,6 +1,6 @@
 package com.baymax.exam.user.service;
 
-import com.baymax.exam.model.Classes;
+import com.baymax.exam.user.model.Classes;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

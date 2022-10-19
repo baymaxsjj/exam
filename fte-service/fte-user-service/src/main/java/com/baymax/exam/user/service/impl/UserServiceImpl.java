@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.user.mapper.UserMapper;
-import com.baymax.exam.model.User;
+import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

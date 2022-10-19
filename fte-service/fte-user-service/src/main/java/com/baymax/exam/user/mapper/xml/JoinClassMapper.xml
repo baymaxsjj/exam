@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.baymax.exam.user.mapper.JoinClassMapper">
 
-    <select id="getJoinClassUser" resultType="com.baymax.exam.model.User">
+    <select id="getJoinClassUser" resultType="com.baymax.exam.user.model.User">
         SELECT
             u.id,
             u.nickname,
@@ -14,7 +14,7 @@
                 jc.student_id = u.id)
             ${ew.customSqlSegment}
     </select>
-    <select id="getJoinByCourseId" resultType="com.baymax.exam.model.JoinClass">
+    <select id="getJoinByCourseId" resultType="com.baymax.exam.user.model.JoinClass">
         SELECT
             jc.*
         FROM

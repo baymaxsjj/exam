@@ -1,6 +1,6 @@
 package com.baymax.exam.auth;
 
-import com.baymax.exam.feign.UserServiceClient;
+import com.baymax.exam.user.feign.UserServiceClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;

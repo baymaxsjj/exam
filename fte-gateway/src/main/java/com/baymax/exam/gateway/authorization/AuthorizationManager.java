@@ -77,7 +77,7 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
             if (ExamAuth.ADMIN_CLIENT_ID.equals(loginUser.getClientId()) && !pathMatcher.match("/exam-admin/**", uri.getPath())) {
                 return Mono.just(new AuthorizationDecision(false));
             }
-            if (ExamAuth.PORTAL_CLIENT_ID.equals(loginUser.getClientId()) && !pathMatcher.match("/exam-user/**", uri.getPath())) {
+            if (ExamAuth.PORTAL_CLIENT_ID.equals(loginUser.getClientId()) && pathMatcher.match("/exam-admin/**", uri.getPath())) {
                 return Mono.just(new AuthorizationDecision(false));
             }
         } catch ( ParseException e) {

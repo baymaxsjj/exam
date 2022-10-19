@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baymax.exam.center.mapper.TagsMapper">
+
+    <select id="getCoursePublicTags" resultType="com.baymax.exam.center.model.Tags">
+        SELECT
+            t.*
+        FROM
+            eq_tags t
+                JOIN eq_question q ON ( t.id = q.tag_id )
+        WHERE
+            q.is_public > 0
+          AND course_id =#{courseId}
+        <if test="parentId!=null">
+            AND t.parent_id =#{parentId}
+        </if>
+    </select>
+</mapper>

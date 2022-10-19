@@ -1,18 +1,16 @@
 package com.baymax.exam.user.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baymax.exam.model.Courses;
+import com.baymax.exam.user.model.Courses;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baymax.exam.user.mapper.CoursesMapper;
 import com.baymax.exam.user.service.ICoursesService;
-import com.baymax.exam.vo.CourseInfoVo;
+import com.baymax.exam.user.vo.CourseInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

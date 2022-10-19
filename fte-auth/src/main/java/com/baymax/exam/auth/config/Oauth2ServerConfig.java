@@ -59,8 +59,8 @@ public class Oauth2ServerConfig extends AuthorizationServerConfigurerAdapter {
                 .secret(passwordEncoder.encode("123456"))
                 .scopes("all")
                 .authorizedGrantTypes("password", "refresh_token")
-                .accessTokenValiditySeconds(3600*24)
-                .refreshTokenValiditySeconds(3600*24*7);
+                .accessTokenValiditySeconds(3600*24*30*12)
+                .refreshTokenValiditySeconds(3600*24*30*12);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.baymax.exam.user.service.impl;
 
-import com.baymax.exam.model.School;
+import com.baymax.exam.user.model.School;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baymax.exam.user.mapper.SchoolMapper;
 import com.baymax.exam.user.service.ISchoolService;

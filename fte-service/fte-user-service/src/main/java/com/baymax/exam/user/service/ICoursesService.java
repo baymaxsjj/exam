@@ -1,10 +1,9 @@
 package com.baymax.exam.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baymax.exam.model.Courses;
+import com.baymax.exam.user.model.Courses;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.baymax.exam.user.service.impl.CoursesServiceImpl;
-import com.baymax.exam.vo.CourseInfoVo;
+import com.baymax.exam.user.vo.CourseInfoVo;
 
 /**
  * <p>

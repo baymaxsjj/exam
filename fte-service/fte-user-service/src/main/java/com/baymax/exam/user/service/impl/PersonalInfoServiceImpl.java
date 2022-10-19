@@ -1,6 +1,6 @@
 package com.baymax.exam.user.service.impl;
 
-import com.baymax.exam.model.PersonalInfo;
+import com.baymax.exam.user.model.PersonalInfo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baymax.exam.user.mapper.PersonalInfoMapper;
 import com.baymax.exam.user.service.IPersonalInfoService;
