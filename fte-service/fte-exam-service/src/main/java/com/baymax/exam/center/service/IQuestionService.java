@@ -1,8 +1,12 @@
 package com.baymax.exam.center.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baymax.exam.center.model.Question;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baymax.exam.center.vo.QuestionInfoVo;
+import com.baymax.exam.user.vo.CourseInfoVo;
 
 /**
  * <p>
@@ -15,10 +19,18 @@ import com.baymax.exam.center.vo.QuestionInfoVo;
 public interface IQuestionService extends IService<Question> {
 
     /**
-     * 更新题目
+     * 添加题目
      *
      * @param questionInfo 问题信息
      * @return boolean
      */
-    boolean updateQuestion(QuestionInfoVo questionInfo);
+    boolean addQuestion(QuestionInfoVo questionInfo);
+
+    /**
+     * 问题信息列表
+     *
+     * @param wrapper 包装器
+     * @return {@link IPage}<{@link QuestionInfoVo}>
+     */
+    IPage<QuestionInfoVo> questionInfoList(long currentPage,long pageSize,QueryWrapper<QuestionInfoVo> wrapper);
 }

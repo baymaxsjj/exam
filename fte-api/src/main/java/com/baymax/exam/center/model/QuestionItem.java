@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * <p>
  * 题目选择表
@@ -26,7 +28,6 @@ public class QuestionItem extends BaseEntity {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
       private Integer id;
-
     @Schema(description = "选择内容")
     private String content;
 

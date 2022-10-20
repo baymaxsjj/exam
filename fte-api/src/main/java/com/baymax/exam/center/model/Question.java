@@ -46,6 +46,9 @@ public class Question extends BaseEntity {
     @Schema(description = "是否公开：0:自己、1：课程、2：公开")
     private QuestionVisibleEnum isPublic;
 
+    @Schema(description = "课程id")
+    private Integer courseId;
+
     @Schema(description = "题目标签id")
     private Integer tagId;
 

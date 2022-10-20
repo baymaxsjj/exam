@@ -2,6 +2,7 @@ package com.baymax.exam.common.core.base;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.EnumSet;
 import java.util.Objects;
@@ -30,7 +31,11 @@ public interface IBaseEnum<T> {
         Objects.requireNonNull(value);
         EnumSet<E> allEnums = EnumSet.allOf(clazz); // 获取类型下的所有枚举
         E matchEnum = allEnums.stream()
-                .filter(e -> ObjectUtil.equal(e.getValue(), value))
+                .filter(e -> {
+                    boolean equal =ObjectUtil.equal(e.getValue().toString(),value);
+                    System.out.println(equal+"..."+value+"..."+e.getValue());
+                    return equal;
+                })
                 .findFirst()
                 .orElse(null);
         return matchEnum;

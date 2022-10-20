@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @Slf4j
 @Validated
-@Tag(name = "题目标签")
+@Tag(name = "题目分组")
 @RestController
 @RequestMapping("/tags")
 public class TagsController {

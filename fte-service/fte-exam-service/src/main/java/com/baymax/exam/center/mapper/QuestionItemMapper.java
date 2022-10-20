@@ -2,6 +2,7 @@ package com.baymax.exam.center.mapper;
 
 import com.baymax.exam.center.model.QuestionItem;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author baymax
  * @since 2022-10-18
  */
+@Mapper
 public interface QuestionItemMapper extends BaseMapper<QuestionItem> {
 
 }
