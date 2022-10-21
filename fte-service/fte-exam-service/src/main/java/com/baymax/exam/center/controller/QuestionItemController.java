@@ -14,6 +14,7 @@ import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
  * @author baymax
  * @since 2022-10-18
  */
+@Slf4j
 @Tag(name = "题目选项")
 @RestController
 @Validated
@@ -89,25 +91,26 @@ public class QuestionItemController {
             LambdaUpdateWrapper<QuestionItem> updateWrapper=new LambdaUpdateWrapper<>();
             updateWrapper.eq(QuestionItem::getQuestionId,question.getId());
             questionItemService.update(questionItem,updateWrapper);
-
             questionItem.setCorrect("1");
-            questionItem.setId(itemId);
 
         }else if(enumByValue==QuestionTypeEnum.MULTIPLE_CHOICE){
             //多选题取反
             if(item.getCorrect()==null){
                 questionItem.setCorrect("1");
+                log.info("修改成正确答案"+questionItem.getCorrect());
             }else{
                 //判断多选个数，如果就一个答案禁止取消
-                LambdaQueryWrapper<QuestionItem> queryWrapper=new LambdaQueryWrapper<>();
-                queryWrapper.eq(QuestionItem::getQuestionId,question.getId());
-                long count = questionItemService.count(queryWrapper);
-                if(count==1){
-                    return Result.msgError("多选答案不能为空");
-                }
+//                LambdaQueryWrapper<QuestionItem> queryWrapper=new LambdaQueryWrapper<>();
+//                queryWrapper.eq(QuestionItem::getQuestionId,question.getId());
+//                long count = questionItemService.count(queryWrapper);
+//                if(count==1){
+//                    return Result.msgError("多选答案不能为空");
+//                }
+                log.info("修改成错误答案");
                 questionItem.setCorrect(null);
             }
         }
+        questionItem.setId(itemId);
         questionItemService.updateById(questionItem);
         return Result.msgSuccess("更新成功");
         // 单选，判断，唯一

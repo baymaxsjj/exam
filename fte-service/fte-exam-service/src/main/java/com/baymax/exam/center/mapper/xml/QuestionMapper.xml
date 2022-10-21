@@ -17,7 +17,7 @@
             qi.correct AS item_correct
         FROM
             eq_question q
-                JOIN eq_question_item qi ON (q.id = qi.question_id)
+                LEFT JOIN eq_question_item qi ON (q.id = qi.question_id)
             ${ew.customSqlSegment}
     </select>
 </mapper>

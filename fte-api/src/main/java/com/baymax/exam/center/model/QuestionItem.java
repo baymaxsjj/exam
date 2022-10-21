@@ -1,8 +1,6 @@
 package com.baymax.exam.center.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import com.baymax.exam.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,7 +31,7 @@ public class QuestionItem extends BaseEntity {
 
     @Schema(description = "题目id")
     private Integer questionId;
-
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     @Schema(description = "是否正确：null:不正确、！null:正确")
     private String correct;
 }

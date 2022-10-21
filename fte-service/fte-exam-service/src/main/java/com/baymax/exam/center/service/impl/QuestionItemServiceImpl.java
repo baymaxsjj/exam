@@ -4,6 +4,7 @@ import com.baymax.exam.center.model.QuestionItem;
 import com.baymax.exam.center.mapper.QuestionItemMapper;
 import com.baymax.exam.center.service.IQuestionItemService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
