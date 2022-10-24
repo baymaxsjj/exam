@@ -27,10 +27,11 @@ public interface IQuestionService extends IService<Question> {
     boolean addQuestion(QuestionInfoVo questionInfo);
 
     /**
-     * 问题信息列表
+     * 问题信息
      *
-     * @param wrapper 包装器
-     * @return {@link IPage}<{@link QuestionInfoVo}>
+     * @param questionId 问题id
+     * @return {@link QuestionInfoVo}
      */
-    IPage<QuestionInfoVo> questionInfoList(long currentPage,long pageSize,QueryWrapper<QuestionInfoVo> wrapper);
+    QuestionInfoVo questionInfo(Integer questionId);
+
 }

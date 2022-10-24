@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.center.model.Question;
 import com.baymax.exam.center.model.Tags;
 import com.baymax.exam.center.service.impl.QuestionServiceImpl;
@@ -69,12 +70,12 @@ public class QuestionController {
     @PostMapping("/update")
     public Result update(@RequestBody Question question){
         //判断题目是不是自己的
-        Question qu = questionService.getById(question.getCourseId());
+        Question qu = questionService.getById(question.getId());
         Integer userId = UserAuthUtil.getUserId();
         if(qu==null||qu.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
-        question.setId(qu.getId());
+        question.setCourseId(null);
         question.setTeacherId(null);
         questionService.updateById(question);
         return Result.msgSuccess("更新成功");
@@ -103,11 +104,11 @@ public class QuestionController {
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         // 不需要查分组是不是自己的，因为，下面查询时课程id 和分组id 同时成立才行
-        QueryWrapper<QuestionInfoVo> queryWrapper=new QueryWrapper<>();
+        LambdaQueryWrapper<Question> queryWrapper=new LambdaQueryWrapper<>();
         //老师
-        Map<String,Object> queryMap=new HashMap<>();
-        queryMap.put("tag_id",tagId);
-        queryMap.put("course_id",courseId);
+        Map<SFunction<Question, ?>, Object> queryMap=new HashMap<>();
+        queryMap.put(Question::getTagId,tagId);
+        queryMap.put(Question::getCourseId,courseId);
         if(course.getUserId()!=userId){
             //1.判断是否课程班级中
             JoinClass joinClass = userServiceClient.joinCourseByStuId(courseId, userId);
@@ -116,10 +117,30 @@ public class QuestionController {
             }
             //TODO:判断该班级是否在考试，如果考试禁止获取
             //2.查找有公开题目的分类
-            queryWrapper.gt("is_public",0);
+            queryWrapper.gt(Question::getIsPublic,0);
         }
-        queryWrapper.allEq(queryMap).orderByDesc("created_at");
-        IPage<QuestionInfoVo> list = questionService.questionInfoList(currentPage, 10, queryWrapper);
+        queryWrapper.allEq(queryMap).orderByDesc(Question::getCreatedAt);
+        IPage<Question> page=new Page<>(currentPage,10);
+        IPage<Question> list = questionService.page(page,queryWrapper);
         return Result.success(PageResult.setResult(list));
+    }
+    @Operation(summary = "题目详情")
+    @GetMapping("/detail/{questionId}")
+    public Result<QuestionInfoVo> detail(
+            @PathVariable Integer questionId){
+        Question question = questionService.getById(questionId);
+        Integer userId = UserAuthUtil.getUserId();
+        // 是否有查看权限
+        if(question.getTeacherId()!=userId){
+            //1.判断是否课程班级中
+            JoinClass joinClass = userServiceClient.joinCourseByStuId(question.getCourseId(), userId);
+            if(joinClass==null){
+                return Result.failed(ResultCode.PARAM_ERROR);
+            }
+            //TODO:判断该班级是否在考试，如果考试禁止获取
+            //2.查找有公开题目的分类
+        }
+        QuestionInfoVo questionInfo = questionService.questionInfo(questionId);
+        return Result.success(questionInfo);
     }
 }

@@ -7,17 +7,19 @@
             <id property="id" column="item_id"/>
             <result property="content" column="item_content"/>
             <result property="correct" column="item_correct"/>
+            <result property="questionId" column="question_id"/>
         </collection>
     </resultMap>
-    <select id="questionInfoList" resultMap="questionInfo">
+    <select id="questionInfo" resultMap="questionInfo">
         SELECT
             q.*,
             qi.id AS item_id,
             qi.content AS item_content,
-            qi.correct AS item_correct
+            qi.correct AS item_correct,
+            qi.question_id
         FROM
             eq_question q
                 LEFT JOIN eq_question_item qi ON (q.id = qi.question_id)
-            ${ew.customSqlSegment}
+            where q.id=#{id}
     </select>
 </mapper>

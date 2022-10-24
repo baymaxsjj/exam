@@ -10,9 +10,12 @@ import com.baymax.exam.center.enums.QuestionVisibleEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  * <p>
@@ -36,12 +39,16 @@ public class Question extends BaseEntity {
     @Schema(description = "题目名称")
     private String content;
 
-    @NotBlank(message = "题目名称不能空~")
+    @NotNull(message = "题目名称不能空~")
     @Schema(description = "题目类型：0：单选、1：多选、2：判断、3：填空、4：主观")
     private QuestionTypeEnum type;
 
     @Schema(description = "题目解析")
     private String analysis;
+
+    @Range(min = 0,max = 5,message = "题目难度应在0~5之间")
+    @Schema(description = "题目难度")
+    private Integer difficulty;
 
     @Schema(description = "是否公开：0:自己、1：课程、2：公开")
     private QuestionVisibleEnum isPublic;

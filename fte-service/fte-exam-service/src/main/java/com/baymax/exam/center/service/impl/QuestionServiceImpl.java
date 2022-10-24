@@ -1,5 +1,6 @@
 package com.baymax.exam.center.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -65,9 +66,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
             }
         }
         //3.创建题目
-        int questionId = questionMapper.insert((Question) questionInfo);
+        questionMapper.insert((Question) questionInfo);
         List<QuestionItem> topicItems = questionInfo.getTopicItems().stream().map(tem->{
-            tem.setQuestionId(questionId);
+            tem.setQuestionId(questionInfo.getId());
             //填空题选择 就是答案
             if(enumByValue==QuestionTypeEnum.COMPLETION){
                 tem.setCorrect("1");
@@ -80,16 +81,13 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     }
 
     /**
-     * 问题信息列表
+     * 问题信息
      *
-     * @param currentPage
-     * @param pageSize
-     * @param wrapper     包装器
-     * @return {@link IPage}<{@link QuestionInfoVo}>
+     * @param questionId 问题id
+     * @return {@link QuestionInfoVo}
      */
     @Override
-    public IPage<QuestionInfoVo> questionInfoList(long currentPage, long pageSize, QueryWrapper<QuestionInfoVo> wrapper) {
-        IPage<QuestionInfoVo> page=new Page<>(currentPage,pageSize);
-        return questionMapper.questionInfoList(page,wrapper);
+    public QuestionInfoVo questionInfo(Integer questionId) {
+        return questionMapper.questionInfo(questionId);
     }
 }

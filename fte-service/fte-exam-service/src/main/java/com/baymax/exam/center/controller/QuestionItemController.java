@@ -3,7 +3,9 @@ package com.baymax.exam.center.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baymax.exam.center.enums.QuestionTypeEnum;
+import com.baymax.exam.center.mapper.QuestionItemMapper;
 import com.baymax.exam.center.model.Question;
 import com.baymax.exam.center.model.QuestionItem;
 import com.baymax.exam.center.service.impl.QuestionItemServiceImpl;
@@ -18,6 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -37,6 +42,8 @@ public class QuestionItemController {
     QuestionItemServiceImpl questionItemService;
     @Autowired
     QuestionServiceImpl questionService;
+    @Autowired
+    QuestionItemMapper questionItemMapper;
     @Operation(summary = "删除选项")
     @PostMapping("/delete/{itemId}")
     public Result delete(@PathVariable String itemId){
@@ -53,27 +60,33 @@ public class QuestionItemController {
     }
     @Operation(summary = "添加/更新选项")
     @PostMapping("/update")
-    public Result delete(@RequestBody @Validated QuestionItem questionItem){
+    public Result update(@RequestBody @Validated QuestionItem questionItem){
         Question question = questionService.getById(questionItem.getQuestionId());
         if(question==null||question.getTeacherId()!=UserAuthUtil.getUserId()){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         //修改时防止篡改id
-        String info="添加成功";
         if(questionItem.getId()!=null){
-            questionItem.setId(question.getId());
+            LambdaUpdateWrapper<QuestionItem> updateWrapper=new LambdaUpdateWrapper<>();
+//            questionItem.setId(question.getId());
             //更新时：这里不能修改正确选项
+            Map<SFunction<QuestionItem, ?>, Object> queryMap=new HashMap<>();
+            queryMap.put(QuestionItem::getId,questionItem.getId());
+            queryMap.put(QuestionItem::getQuestionId,questionItem.getQuestionId());
+            updateWrapper.allEq(queryMap);
             questionItem.setCorrect(null);
-            info="更新成功";
+            questionItemService.update(questionItem,updateWrapper);
+            return Result.msgSuccess("更新成功");
+
         }else{
             //填空题，该选项时就是答案
             QuestionTypeEnum enumByValue = IBaseEnum.getEnumByValue(question.getType(), QuestionTypeEnum.class);
             if(enumByValue==QuestionTypeEnum.COMPLETION){
                 questionItem.setCorrect("1");
             }
+            questionItemMapper.insert(questionItem);
+            return Result.success("添加成功",questionItem.getId());
         }
-        questionItemService.saveOrUpdate(questionItem);
-        return Result.msgSuccess(info);
     }
     @Operation(summary = "更新题目正确选项")
     @PostMapping("/correct/{itemId}")

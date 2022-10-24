@@ -71,12 +71,14 @@ public class CoursesServiceImpl extends ServiceImpl<CoursesMapper, Courses> impl
         Map<String,Object> queryMap=new HashMap<>();
         if(isStudent){
             queryMap.put("student_id",userId);
+            queryWrapper.orderByDesc("jc.created_at");
+
         }else{
             queryMap.put("user_id",userId);
+            queryWrapper.orderByDesc("created_at");
         }
         queryMap.put("status",status);
         queryWrapper.allEq(queryMap);
-        queryWrapper.orderByDesc("created_at");
         return coursesMapper.getCourseList(page,queryWrapper,isStudent);
     }
 
