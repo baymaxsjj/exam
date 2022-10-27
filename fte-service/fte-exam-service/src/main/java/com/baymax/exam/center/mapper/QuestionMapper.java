@@ -9,6 +9,8 @@ import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.user.vo.CourseInfoVo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 题目信息 Mapper 接口
@@ -20,4 +22,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface QuestionMapper extends BaseMapper<Question> {
     QuestionInfoVo questionInfo(Integer id);
+    List<QuestionInfoVo> examQuestionInfo(Integer examId);
 }

@@ -45,7 +45,7 @@ public class FastAutoGeneratorTest {
                 // 策略配置
                 .strategyConfig((scanner, builder) -> builder.
                         addInclude(getTables(scanner.apply("请输入表名，多个英文逗号分隔？所有输入 all")))
-                        .addTablePrefix("es_", "ec_","eq_")
+                        .addTablePrefix("es_", "ec_","eq_","ee_")
                         .controllerBuilder()
                         .enableFileOverride()
                         .enableRestStyle()

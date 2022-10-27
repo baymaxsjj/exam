@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.user.vo.CourseInfoVo;
 
+import java.util.List;
+
 /**
  * <p>
  * 题目信息 服务类
@@ -34,4 +36,5 @@ public interface IQuestionService extends IService<Question> {
      */
     QuestionInfoVo questionInfo(Integer questionId);
 
+    List<QuestionInfoVo> examQuestionInfo(Integer examId);
 }

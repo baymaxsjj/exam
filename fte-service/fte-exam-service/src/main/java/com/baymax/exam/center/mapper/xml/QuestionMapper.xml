@@ -22,4 +22,17 @@
                 LEFT JOIN eq_question_item qi ON (q.id = qi.question_id)
             where q.id=#{id}
     </select>
+    <select id="examQuestionInfo" resultMap="questionInfo">
+        SELECT
+            q.*,
+            qi.content AS item_content,
+            qi.id AS item_id,
+            qi.correct AS item_correct
+        FROM
+            ee_exam_question eq
+                JOIN eq_question q ON ( eq.question_id = q.id )
+                LEFT JOIN eq_question_item qi ON ( eq.question_id = qi.question_id )
+        WHERE
+            eq.exam_id =#{examId}
+    </select>
 </mapper>

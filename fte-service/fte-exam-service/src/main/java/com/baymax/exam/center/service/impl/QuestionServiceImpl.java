@@ -90,4 +90,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     public QuestionInfoVo questionInfo(Integer questionId) {
         return questionMapper.questionInfo(questionId);
     }
+
+    @Override
+    public List<QuestionInfoVo> examQuestionInfo(Integer examId) {
+        return questionMapper.examQuestionInfo(examId);
+    }
 }
