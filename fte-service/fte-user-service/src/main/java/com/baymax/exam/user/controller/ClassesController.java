@@ -82,6 +82,16 @@ public class ClassesController {
         classesService.removeById(classId);
         return Result.msgSuccess("删除成功");
     }
+    @Operation(summary = "获取班级信息")
+    @GetMapping("/info/{classId}")
+    public Result info(
+            @Schema(description = "班级id")@PathVariable Integer classId){
+        Classes classes = classesService.getById(classId);
+        if(classes==null||classes.getTeacherId()!=UserAuthUtil.getUserId()){
+            return  Result.failed(ResultCode.PARAM_ERROR);
+        }
+        return Result.success(classes);
+    }
     @Operation(summary = "获取班级列表")
     @GetMapping("/{courseId}/list")
     public Result<List<Classes>> getClassList(@PathVariable Integer courseId){

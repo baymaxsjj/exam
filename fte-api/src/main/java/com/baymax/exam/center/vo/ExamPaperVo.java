@@ -4,6 +4,8 @@ import com.baymax.exam.center.model.Exam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -16,6 +18,8 @@ import java.util.Set;
 @Data
 @Schema(name = "ExamPaperVo", description = "试卷题目具体信息")
 public class ExamPaperVo {
+    @Valid
+    @NotNull(message = "试卷信息不能为空")
     Exam exam;
     Set<Integer> questions;
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.center.model.Exam;
+import com.baymax.exam.center.model.ExamInfo;
 import com.baymax.exam.center.model.ExamQuestion;
 import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
 import com.baymax.exam.center.service.impl.ExamServiceImpl;
@@ -104,9 +105,9 @@ public class ExamController {
         examService.removeById(examId);
         return Result.msgSuccess("删除成功");
     }
-    @Operation(summary = "获取试卷信息")
+    @Operation(summary = "获取试卷题目信息")
     @GetMapping("/detail/{examId}")
-    public Result info(@PathVariable Integer examId){
+    public Result detail(@PathVariable Integer examId){
         Exam exam = examService.getById(examId);
         Integer userId = UserAuthUtil.getUserId();
         if(exam==null||exam.getTeacherId()!=userId){
@@ -119,6 +120,16 @@ public class ExamController {
         paper.setExam(exam);
         paper.setQuestions(list.stream().map(item->item.getQuestionId()).collect(Collectors.toSet()));
         return Result.success(paper);
+    }
+    @Operation(summary = "获取试卷信息")
+    @GetMapping("/info/{examId}")
+    public Result info(@PathVariable Integer examId){
+        Exam exam = examService.getById(examId);
+        Integer userId = UserAuthUtil.getUserId();
+        if(exam==null||exam.getTeacherId()!=userId){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        return Result.success(exam);
     }
     @Operation(summary = "获取试卷题目信息")
     @GetMapping("/quesiton/{examId}")
@@ -142,6 +153,7 @@ public class ExamController {
         queryMap.put(Exam::getCourseId,courseId);
         queryMap.put(Exam::getTeacherId,userId);
         queryWrapper.allEq(queryMap);
+        queryWrapper.orderByDesc(Exam::getCreatedAt);
         Page<Exam> pa=new Page(page,pageSize);
         Page<Exam> record = examService.page(pa, queryWrapper);
         return Result.success(PageResult.setResult(record));
