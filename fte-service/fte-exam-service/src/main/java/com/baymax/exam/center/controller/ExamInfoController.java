@@ -1,6 +1,9 @@
 package com.baymax.exam.center.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.center.model.Exam;
@@ -17,6 +20,7 @@ import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.user.feign.UserServiceClient;
 import com.baymax.exam.user.model.Courses;
+import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -104,8 +108,8 @@ public class ExamInfoController {
         return Result.msgSuccess(info);
     }
     @Operation(summary = "获取考试信息")
-    @GetMapping("/detail/{examInfoid}")
-    public Result detail(@PathVariable Integer examInfoId){
+    @GetMapping("/detail/{examInfoId}")
+    public Result<ExamInfoVo> detail(@PathVariable Integer examInfoId){
         ExamInfo examInfo = examInfoService.getById(examInfoId);
         Integer userId = UserAuthUtil.getUserId();
         if(examInfo==null||examInfo.getTeacherId()!=userId){
@@ -142,28 +146,49 @@ public class ExamInfoController {
                        @RequestParam(defaultValue = "10",required = false) Integer pageSize
                        ){
         Integer userId = UserAuthUtil.getUserId();
-        LambdaQueryWrapper<ExamInfo> queryWrapper=new LambdaQueryWrapper();
-        Map<SFunction<ExamInfo, ?>, Object> queryMap=new HashMap<>();
-        queryMap.put(ExamInfo::getCourseId,courseId);
-        queryMap.put(ExamInfo::getTeacherId,userId);
+        Courses course = userServiceClient.findCourse(courseId);
+        if(course==null){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+
+        QueryWrapper<ExamInfo> queryWrapper=new QueryWrapper();
         switch (status){
             case 1:
                 //未开始
-                queryWrapper.lt(ExamInfo::getStartTime, LocalDateTime.now());
+                queryWrapper.apply(true,
+                                "date_format (start_time,'%Y-%m-%d %H:%i:%S') > date_format(now(),'%Y-%m-%d %H:%i:%S')");
+
                 break;
             case 2:
                 //进行中
-                queryWrapper.gt(ExamInfo::getStartTime, LocalDateTime.now()).and(w->w.lt(ExamInfo::getEndTime, LocalDateTime.now()));
+                queryWrapper.apply(true,
+                        "date_format (start_time,'%Y-%m-%d %H:%i:%S')<= date_format(now(),'%Y-%m-%d %H:%i:%S')")
+                .apply(true,
+                        "date_format (end_time,'%Y-%m-%d %H:%i:%S') >= date_format(now(),'%Y-%m-%d %H:%i:%S')");
                 break;
             case 3:
                 //结束
-                queryWrapper.gt(ExamInfo::getEndTime, LocalDateTime.now());
+                queryWrapper.apply(true,
+                        "date_format (end_time,'%Y-%m-%d %H:%i:%S') < date_format(now(),'%Y-%m-%d %H:%i:%S')");
                 break;
         }
-        queryWrapper.allEq(queryMap);
-        queryWrapper.orderByDesc(ExamInfo::getCreatedAt);
-        Page<ExamInfo> pa=new Page(page,pageSize);
-        Page<ExamInfo> record = examInfoService.page(pa, queryWrapper);
+        queryWrapper.orderByDesc("created_at");
+        Page<ExamInfo> pa =new Page(page,pageSize);
+        IPage<ExamInfo> record;
+        if(course.getUserId()==userId){
+            Map<String, Object> queryMap=new HashMap<>();
+            queryMap.put("course_id",courseId);
+            queryMap.put("teacher_id",userId);
+            queryWrapper.allEq(queryMap);
+            record= examInfoService.page(pa, queryWrapper);
+        }else{
+            JoinClass joinClass = userServiceClient.joinCourseByStuId(courseId, userId);
+            if(joinClass==null){
+                return Result.failed(ResultCode.PARAM_ERROR);
+            }
+            queryWrapper.eq("class_id",joinClass.getClassId());
+            record=examInfoService.getSutExamInfo(pa,queryWrapper);
+        }
         return Result.success(PageResult.setResult(record));
     }
 }

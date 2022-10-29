@@ -2,4 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.baymax.exam.center.mapper.ExamInfoMapper">
 
+    <select id="getSutExamInfo" resultType="com.baymax.exam.center.model.ExamInfo">
+        SELECT
+            ei.*
+        FROM
+            ee_exam_info ei
+                JOIN ee_exam_class ec ON ( ei.id = ec.exam_info_id )
+        ${ew.customSqlSegment}
+    </select>
 </mapper>
