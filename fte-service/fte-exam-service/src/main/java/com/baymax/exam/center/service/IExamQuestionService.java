@@ -5,6 +5,8 @@ import com.baymax.exam.center.model.ExamQuestion;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baymax.exam.center.model.Question;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -20,5 +22,5 @@ public interface IExamQuestionService extends IService<ExamQuestion> {
      * @param id id
      * @return {@link Question}
      */
-    Question getQuestionByExamId(Integer id);
+    List<Question> getQuestionByExamId(Integer id);
 }

@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务实现类
@@ -27,7 +29,7 @@ public class ExamQuestionServiceImpl extends ServiceImpl<ExamQuestionMapper, Exa
      * @return {@link Question}
      */
     @Override
-    public Question getQuestionByExamId(Integer id) {
-        return null;
+    public List<Question> getQuestionByExamId(Integer id) {
+        return examQuestionMapper.getQuestion(id);
     }
 }

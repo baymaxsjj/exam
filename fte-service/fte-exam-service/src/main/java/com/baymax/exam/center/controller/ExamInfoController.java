@@ -6,12 +6,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baymax.exam.center.model.Exam;
-import com.baymax.exam.center.model.ExamClass;
-import com.baymax.exam.center.model.ExamInfo;
-import com.baymax.exam.center.model.ExamQuestion;
+import com.baymax.exam.center.enums.QuestionTypeEnum;
+import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.service.impl.ExamClassServiceImpl;
 import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
+import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
 import com.baymax.exam.center.service.impl.ExamServiceImpl;
 import com.baymax.exam.center.vo.ExamInfoVo;
 import com.baymax.exam.center.vo.ExamPaperVo;
@@ -30,9 +29,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +55,8 @@ public class ExamInfoController {
     ExamClassServiceImpl examClassService;
     @Autowired
     ExamServiceImpl examService;
+    @Autowired
+    ExamQuestionServiceImpl examQuestionService;
 
     @Autowired
     UserServiceClient userServiceClient;
@@ -87,6 +90,7 @@ public class ExamInfoController {
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         //TODO:班级是不是我的＞﹏＜
+        //TODO:如果考试开始了，就不能更改试卷了
 
         //删除试卷考试班级，然后在添加
         if (examInfo.getId()  != null) {
@@ -190,5 +194,33 @@ public class ExamInfoController {
             record=examInfoService.getSutExamInfo(pa,queryWrapper);
         }
         return Result.success(PageResult.setResult(record));
+    }
+    @Operation(summary = "开始考试")
+    @GetMapping("/start/{examInfoId}")
+    public Result startExam(@PathVariable Integer examInfoId){
+        //获取考试信息
+        ExamInfo examInfo = examInfoService.getById(examInfoId);
+
+        Integer courseId = examInfo.getCourseId();
+        //试卷id
+        Integer userId = UserAuthUtil.getUserId();
+        JoinClass joinClass = userServiceClient.joinCourseByStuId(courseId, userId);
+        if(joinClass==null){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        Integer examId = examInfo.getExamId();
+        //1. 查询 试卷题目
+        List<Question> questionList = examQuestionService.getQuestionByExamId(examId);
+        if(examInfo.getQuestionDisorder()){
+            //打乱集合
+            Collections.shuffle(questionList);
+        }
+        //2.题目类型分类
+        Map<QuestionTypeEnum,List<Question>> questionTypeList=questionList.stream().collect(Collectors.groupingBy(Question::getType));
+        // 存入缓存
+        Map<String,Object> result=new HashMap<>();
+        result.put("examInfo",examInfo);
+        result.put("questionList",questionTypeList);
+        return  Result.success(result);
     }
 }
