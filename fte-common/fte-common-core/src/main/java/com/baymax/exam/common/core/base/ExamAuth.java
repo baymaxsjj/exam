@@ -49,7 +49,16 @@ public interface  ExamAuth {
      */
     String REDIS_EMAIL_CODE_KEY="email:code:";
     String REDIS_CLASS_CODE_KEY="class:code:";
-    String REDIS_CODE_CLASS_KEY="code:class::";
+    String REDIS_CODE_CLASS_KEY="code:class:";
+    /**
+     * rds课程班级码缓存  规则：
+     */
+    String rds_course_class_code_key="course:class:code:";
+
+    /**
+     * rds在线考试缓存  规则：:${examId}:信息/:${stuId}:作答信息/题目/选项
+     */
+    String RDS_EXAM_ONLINE_KEY="exam:online:info:";
 
     /**
      * 认证信息Http请求头

@@ -26,7 +26,7 @@ public interface IQuestionService extends IService<Question> {
      * @param questionInfo 问题信息
      * @return boolean
      */
-    boolean addQuestion(QuestionInfoVo questionInfo);
+    String addQuestion(QuestionInfoVo questionInfo);
 
     /**
      * 问题信息

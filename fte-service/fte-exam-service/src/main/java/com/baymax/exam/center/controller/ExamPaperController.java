@@ -3,11 +3,10 @@ package com.baymax.exam.center.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baymax.exam.center.model.Exam;
-import com.baymax.exam.center.model.ExamInfo;
+import com.baymax.exam.center.model.ExamPaper;
 import com.baymax.exam.center.model.ExamQuestion;
 import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
-import com.baymax.exam.center.service.impl.ExamServiceImpl;
+import com.baymax.exam.center.service.impl.ExamPaperServiceImpl;
 import com.baymax.exam.center.service.impl.QuestionServiceImpl;
 import com.baymax.exam.center.vo.ExamPaperVo;
 import com.baymax.exam.center.vo.QuestionInfoVo;
@@ -23,11 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,12 +38,12 @@ import java.util.stream.Collectors;
 @Tag(name = "试卷管理")
 @Validated
 @RestController
-@RequestMapping("/exam")
-public class ExamController {
+@RequestMapping("/exam-paper")
+public class ExamPaperController {
     @Autowired
     UserServiceClient userServiceClient;
     @Autowired
-    ExamServiceImpl examService;
+    ExamPaperServiceImpl examService;
     @Autowired
     ExamQuestionServiceImpl examQuestionService;
     @Autowired
@@ -55,18 +52,18 @@ public class ExamController {
     @Operation(summary = "添加/更新试卷")
     @PostMapping("/update")
     public Result update(@RequestBody @Validated ExamPaperVo paperVo) {
-        Exam exam=paperVo.getExam();
+        ExamPaper examPaper =paperVo.getExamPaper();
         String info = "添加成功";
         Integer teacherId = null;
         //更改，以前那种可能会查询两次数据库
-        if (exam.getId() != null) {
-            Exam temExam = examService.getById(exam.getId());
-            if (temExam != null) {
-                teacherId = temExam.getTeacherId();
+        if (examPaper.getId() != null) {
+            ExamPaper temExamPaper = examService.getById(examPaper.getId());
+            if (temExamPaper != null) {
+                teacherId = temExamPaper.getTeacherId();
             }
             info = "更新成功";
         } else {
-            Courses course = userServiceClient.findCourse(exam.getCourseId());
+            Courses course = userServiceClient.findCourse(examPaper.getCourseId());
             if (course != null) {
                 teacherId = course.getUserId();
             }
@@ -76,19 +73,19 @@ public class ExamController {
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         //删除试卷题目，然后在添加
-        if (exam.getId() != null) {
+        if (examPaper.getId() != null) {
             LambdaQueryWrapper<ExamQuestion> queryWrapper=new LambdaQueryWrapper<>();
-            queryWrapper.eq(ExamQuestion::getExamId,exam.getId());
+            queryWrapper.eq(ExamQuestion::getExamId, examPaper.getId());
             examQuestionService.remove(queryWrapper);
         }
-        exam.setTeacherId(userId);
+        examPaper.setTeacherId(userId);
         //更新试卷选项
-        examService.saveOrUpdate(exam);
+        examService.saveOrUpdate(examPaper);
         //重新添加题目
         List<ExamQuestion> list=paperVo.getQuestions().stream().map(integer ->{
             ExamQuestion examQuestion = new ExamQuestion();
             examQuestion.setQuestionId(integer);
-            examQuestion.setExamId(exam.getId());
+            examQuestion.setExamId(examPaper.getId());
             return examQuestion;
         }).collect(Collectors.toList());
         examQuestionService.saveBatch(list);
@@ -97,9 +94,9 @@ public class ExamController {
     @Operation(summary = "删除试卷")
     @PostMapping("/delete/{examId}")
     public Result delete(@PathVariable Integer examId){
-        Exam exam = examService.getById(examId);
+        ExamPaper examPaper = examService.getById(examId);
         Integer userId = UserAuthUtil.getUserId();
-        if(exam==null||exam.getTeacherId()!=userId){
+        if(examPaper ==null|| examPaper.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         examService.removeById(examId);
@@ -108,35 +105,35 @@ public class ExamController {
     @Operation(summary = "获取试卷题目信息")
     @GetMapping("/detail/{examId}")
     public Result detail(@PathVariable Integer examId){
-        Exam exam = examService.getById(examId);
+        ExamPaper examPaper = examService.getById(examId);
         Integer userId = UserAuthUtil.getUserId();
-        if(exam==null||exam.getTeacherId()!=userId){
+        if(examPaper ==null|| examPaper.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         LambdaQueryWrapper<ExamQuestion> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(ExamQuestion::getExamId,examId);
         List<ExamQuestion> list = examQuestionService.list(queryWrapper);
         ExamPaperVo paper=new ExamPaperVo();
-        paper.setExam(exam);
+        paper.setExamPaper(examPaper);
         paper.setQuestions(list.stream().map(item->item.getQuestionId()).collect(Collectors.toSet()));
         return Result.success(paper);
     }
     @Operation(summary = "获取试卷信息")
     @GetMapping("/info/{examId}")
     public Result info(@PathVariable Integer examId){
-        Exam exam = examService.getById(examId);
+        ExamPaper examPaper = examService.getById(examId);
         Integer userId = UserAuthUtil.getUserId();
-        if(exam==null||exam.getTeacherId()!=userId){
+        if(examPaper ==null|| examPaper.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
-        return Result.success(exam);
+        return Result.success(examPaper);
     }
     @Operation(summary = "获取试卷题目信息")
     @GetMapping("/quesiton/{examId}")
     public Result quesiton(@PathVariable Integer examId){
-        Exam exam = examService.getById(examId);
+        ExamPaper examPaper = examService.getById(examId);
         Integer userId = UserAuthUtil.getUserId();
-        if(exam==null||exam.getTeacherId()!=userId){
+        if(examPaper ==null|| examPaper.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         List<QuestionInfoVo> questionInfos = questionService.examQuestionInfo(examId);
@@ -148,14 +145,14 @@ public class ExamController {
                        @RequestParam(defaultValue = "1",required = false) Integer page,
                        @RequestParam(defaultValue = "10",required = false) Integer pageSize){
         Integer userId = UserAuthUtil.getUserId();
-        LambdaQueryWrapper<Exam> queryWrapper=new LambdaQueryWrapper();
-        Map<SFunction<Exam, ?>, Object> queryMap=new HashMap<>();
-        queryMap.put(Exam::getCourseId,courseId);
-        queryMap.put(Exam::getTeacherId,userId);
+        LambdaQueryWrapper<ExamPaper> queryWrapper=new LambdaQueryWrapper();
+        Map<SFunction<ExamPaper, ?>, Object> queryMap=new HashMap<>();
+        queryMap.put(ExamPaper::getCourseId,courseId);
+        queryMap.put(ExamPaper::getTeacherId,userId);
         queryWrapper.allEq(queryMap);
-        queryWrapper.orderByDesc(Exam::getCreatedAt);
-        Page<Exam> pa=new Page(page,pageSize);
-        Page<Exam> record = examService.page(pa, queryWrapper);
+        queryWrapper.orderByDesc(ExamPaper::getCreatedAt);
+        Page<ExamPaper> pa=new Page(page,pageSize);
+        Page<ExamPaper> record = examService.page(pa, queryWrapper);
         return Result.success(PageResult.setResult(record));
     }
 }

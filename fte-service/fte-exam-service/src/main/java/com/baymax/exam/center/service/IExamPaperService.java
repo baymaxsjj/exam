@@ -1,8 +1,7 @@
 package com.baymax.exam.center.service;
 
-import com.baymax.exam.center.model.Exam;
+import com.baymax.exam.center.model.ExamPaper;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.baymax.exam.center.vo.ExamPaperVo;
 
 /**
  * <p>
@@ -12,5 +11,5 @@ import com.baymax.exam.center.vo.ExamPaperVo;
  * @author baymax
  * @since 2022-10-26
  */
-public interface IExamService extends IService<Exam> {
+public interface IExamPaperService extends IService<ExamPaper> {
 }

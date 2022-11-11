@@ -1,8 +1,8 @@
 package com.baymax.exam.center.service.impl;
 
-import com.baymax.exam.center.model.Exam;
+import com.baymax.exam.center.model.ExamPaper;
 import com.baymax.exam.center.mapper.ExamMapper;
-import com.baymax.exam.center.service.IExamService;
+import com.baymax.exam.center.service.IExamPaperService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-10-26
  */
 @Service
-public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements IExamService {
+public class ExamPaperServiceImpl extends ServiceImpl<ExamMapper, ExamPaper> implements IExamPaperService {
 
 }

@@ -50,6 +50,10 @@ public class Question extends BaseEntity {
     @Schema(description = "题目难度")
     private Integer difficulty;
 
+    @Range(min = 1,max = 100,message = "题目分值应在1~100分之间")
+    @Schema(description = "题目分值")
+    private Integer score;
+
     @Schema(description = "是否公开：0:自己、1：课程、2：公开")
     private QuestionVisibleEnum isPublic;
 

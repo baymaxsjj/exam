@@ -6,7 +6,7 @@
         <collection property="topicItems" javaType="java.util.List" ofType="com.baymax.exam.center.model.QuestionItem">
             <id property="id" column="item_id"/>
             <result property="content" column="item_content"/>
-            <result property="correct" column="item_correct"/>
+            <result property="answer" column="item_answer"/>
             <result property="questionId" column="question_id"/>
         </collection>
     </resultMap>
@@ -15,7 +15,7 @@
             q.*,
             qi.id AS item_id,
             qi.content AS item_content,
-            qi.correct AS item_correct,
+            qi.answer AS item_answer,
             qi.question_id
         FROM
             eq_question q
@@ -27,7 +27,7 @@
             q.*,
             qi.content AS item_content,
             qi.id AS item_id,
-            qi.correct AS item_correct
+            qi.answer AS item_answer
         FROM
             ee_exam_question eq
                 JOIN eq_question q ON ( eq.question_id = q.id )

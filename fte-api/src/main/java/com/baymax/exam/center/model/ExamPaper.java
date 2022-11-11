@@ -3,8 +3,6 @@ package com.baymax.exam.center.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import com.baymax.exam.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,9 +23,9 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
-@TableName("ee_exam")
-@Schema(name = "Exam", description = "考试试卷信息表")
-public class Exam extends BaseEntity {
+@TableName("ee_exam_paper")
+@Schema(name = "ExamPaper", description = "试卷信息表")
+public class ExamPaper extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

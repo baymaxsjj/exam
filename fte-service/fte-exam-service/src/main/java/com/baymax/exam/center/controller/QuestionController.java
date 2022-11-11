@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.model.Question;
 import com.baymax.exam.center.model.Tags;
 import com.baymax.exam.center.service.impl.QuestionServiceImpl;
+import com.baymax.exam.center.utils.ParseQuestionText;
+import com.baymax.exam.center.utils.QuestionExtractionRules;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
@@ -18,21 +21,24 @@ import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * <p>
  * 题目信息 前端控制器
  * </p>
- *
+ *规定：所有类型题目至少要有一下选项，如主观题，就算没有答案，都要给一个选项
  * @author baymax
  * @since 2022-10-18
  */
+@Slf4j
 @Validated
 @Tag(name = "题目管理")
 @RestController
@@ -53,17 +59,34 @@ public class QuestionController {
         }
         questionInfo.setTeacherId(userId);
         questionInfo.setId(null);
-        boolean boo = questionService.addQuestion(questionInfo);
-        if(!boo){
-            return Result.msgSuccess("创建题目失败");
+        String result = questionService.addQuestion(questionInfo);
+        if("".equals(result)){
+            return Result.msgSuccess("创建题目成功");
+        }else{
+            return Result.msgError(result);
         }
-        return Result.msgSuccess("创建题目成功");
     }
     @Operation(summary = "批量创建题目")
-    @PostMapping("/batchAdd/{courseId}")
-    public Result batchAdd(@RequestBody @Validated QuestionInfoVo questionInfo,@PathVariable String courseId){
-        // TODO:前端处理呢！还是后端呢？
+    @PostMapping("/batchAdd/{tagId}")
+    public Result batchAdd(@RequestBody @Validated List<QuestionInfoVo> questionInfo, @PathVariable String tagId){
+        // TODO:还是后端呢？
         return Result.msgSuccess("更新成功");
+    }
+    @Operation(summary = "解析题目文本")
+    @PostMapping("/analyze")
+    public Result analyze(@RequestBody Map<String,String> map){
+        // TODO:还是后端呢？
+        QuestionExtractionRules studyRule = new QuestionExtractionRules();
+        studyRule.setDivisionRule("\\d{1,3}\\s*[、]");
+        studyRule.setQuestionRule("");
+        studyRule.setAnswerRule("答案：\\s*([\\s\\S]*)");
+        studyRule.setAnswerSplit("；");
+        studyRule.setOptionRule("\\n\\s*[A-Z]\\s*[、]\\s*");
+        //将富文本换行改成\n
+        String text=map.get("questionText").replaceAll("<br\\/?>","\n");
+        //去除富文本最外层p
+        text=text.replaceAll("^<p>|<\\/p>$","");
+        return Result.success( ParseQuestionText.parse(text,studyRule));
     }
 
     @Operation(summary = "更新题目")
@@ -138,6 +161,7 @@ public class QuestionController {
                 return Result.failed(ResultCode.PARAM_ERROR);
             }
             //TODO:判断该班级是否在考试，如果考试禁止获取
+
             //2.查找有公开题目的分类
         }
         QuestionInfoVo questionInfo = questionService.questionInfo(questionId);

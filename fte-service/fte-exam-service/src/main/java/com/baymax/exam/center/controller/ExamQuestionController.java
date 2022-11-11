@@ -2,11 +2,10 @@ package com.baymax.exam.center.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baymax.exam.center.model.Exam;
+import com.baymax.exam.center.model.ExamPaper;
 import com.baymax.exam.center.model.ExamQuestion;
 import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
-import com.baymax.exam.center.service.impl.ExamServiceImpl;
+import com.baymax.exam.center.service.impl.ExamPaperServiceImpl;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.web.utils.UserAuthUtil;
@@ -16,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/exam-question")
 public class ExamQuestionController {
     @Autowired
-    ExamServiceImpl examService;
+    ExamPaperServiceImpl examService;
 
     @Autowired
     ExamQuestionServiceImpl examQuestionService;
@@ -43,9 +40,9 @@ public class ExamQuestionController {
     @Operation(summary = "批量添加试卷题目")
     @PostMapping("/{examId}/batchAdd")
     public Result batchAdd(@RequestBody Set<Integer> examQuestions, @PathVariable Integer examId){
-        Exam exam = examService.getById(examId);
+        ExamPaper examPaper = examService.getById(examId);
         Integer userId = UserAuthUtil.getUserId();
-        if(exam==null||exam.getTeacherId()!=userId){
+        if(examPaper ==null|| examPaper.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         //TODO:判断：题目是不是自己的呢
@@ -55,9 +52,9 @@ public class ExamQuestionController {
     @Operation(summary = "添加试卷题目")
     @PostMapping("/delete")
     public Result delete(@RequestBody @Validated ExamQuestion examQuestion){
-        Exam exam = examService.getById(examQuestion.getExamId());
+        ExamPaper examPaper = examService.getById(examQuestion.getExamId());
         Integer userId = UserAuthUtil.getUserId();
-        if(exam==null||exam.getTeacherId()!=userId){
+        if(examPaper ==null|| examPaper.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         LambdaQueryWrapper<ExamQuestion> queryWrapper=new LambdaQueryWrapper();

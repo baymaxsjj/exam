@@ -1,6 +1,6 @@
 package com.baymax.exam.center.vo;
 
-import com.baymax.exam.center.model.Exam;
+import com.baymax.exam.center.model.ExamPaper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -20,6 +20,6 @@ import java.util.Set;
 public class ExamPaperVo {
     @Valid
     @NotNull(message = "试卷信息不能为空")
-    Exam exam;
+    ExamPaper examPaper;
     Set<Integer> questions;
 }

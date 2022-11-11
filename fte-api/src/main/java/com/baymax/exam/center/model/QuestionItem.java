@@ -26,12 +26,20 @@ public class QuestionItem extends BaseEntity {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
       private Integer id;
-    @Schema(description = "选择内容")
+    @Schema(description = "选项内容\n" +
+            "选择性题目：为选项\n" +
+            "填空题/客观题：null\n" +
+            "文件题：为文件类型\n" +
+            "代码题：为语言类型\n")
     private String content;
 
     @Schema(description = "题目id")
     private Integer questionId;
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    @Schema(description = "是否正确：null:不正确、！null:正确")
-    private String correct;
+    @Schema(description = "选项答案：\n" +
+            "选择性题目：非null就是正确答案\n" +
+            "填空题/客观题：为正确答案\n" +
+            "文件题：为文件答案\n" +
+            "代码题：为代码执行结果")
+    private String answer;
 }

@@ -17,7 +17,7 @@ import javax.validation.ConstraintViolationException;
  * @version:
  */
 @RestControllerAdvice
-public class ValidatelExceptionHandler {
+public class ValidExceptionHandler {
     /**
      * 方法参数校验
      */

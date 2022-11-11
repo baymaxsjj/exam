@@ -42,42 +42,39 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
      * @return boolean
      */
     @Override
-    public boolean addQuestion(QuestionInfoVo questionInfo) {
+    public String addQuestion(QuestionInfoVo questionInfo) {
         //1.判断题目是否合法
         QuestionTypeEnum enumByValue =questionInfo.getType();
         log.info(enumByValue.getValue().toString());
         if(enumByValue==null){
             log.info("题目类型不存在");
-            return false;
+            return "题目类型不存在";
         }
         int itemMin = enumByValue.getItemMin();
         int itemMax = enumByValue.getItemMax();
         int itemSize = questionInfo.getTopicItems().size();
-        if(itemSize<itemMin||(itemSize>itemMax&&itemMax>=0)){
+        if(itemSize<itemMin||(itemSize>itemMax)){
             log.info("题目项个数不合法");
-            return false;
+            return "题目项个数不合法";
         }
         //2.单选，判断，答案只能是一个
         if(enumByValue==QuestionTypeEnum.SIGNAL_CHOICE||enumByValue==QuestionTypeEnum.JUDGMENTAL){
-            long count = questionInfo.getTopicItems().stream().filter(el -> el.getCorrect() != null).count();
+            long count = questionInfo.getTopicItems().stream().filter(el -> el.getAnswer() != null).count();
             if(count!=1){
                 log.info("题目正确选择个数不正确");
-                return false;
+                return "题目正确选择个数不正确";
             }
         }
         //3.创建题目
         questionMapper.insert((Question) questionInfo);
+
         List<QuestionItem> topicItems = questionInfo.getTopicItems().stream().map(tem->{
             tem.setQuestionId(questionInfo.getId());
-            //填空题选择 就是答案
-            if(enumByValue==QuestionTypeEnum.COMPLETION){
-                tem.setCorrect("1");
-            }
             return tem;
         }).collect(Collectors.toList());
         //4.创建选项
         questionItemService.saveBatch(topicItems);
-        return true;
+        return "";
     }
 
     /**

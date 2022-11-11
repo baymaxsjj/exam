@@ -55,6 +55,13 @@ public class QuestionItemController {
         if(question.getTeacherId()!=UserAuthUtil.getUserId()){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
+        //判断删除数目,是否符合标准
+        QuestionTypeEnum type = question.getType();
+        int itemMin = type.getItemMin();
+        long count = questionItemService.count(new LambdaQueryWrapper<QuestionItem>().eq(QuestionItem::getQuestionId, question.getId()));
+        if(count<=itemMin){
+            return Result.msgError("删除失败，达到选项个数最小限制");
+        }
         questionItemService.removeById(itemId);
         return Result.msgSuccess("删除成功");
     }
@@ -74,16 +81,20 @@ public class QuestionItemController {
             queryMap.put(QuestionItem::getId,questionItem.getId());
             queryMap.put(QuestionItem::getQuestionId,questionItem.getQuestionId());
             updateWrapper.allEq(queryMap);
-            questionItem.setCorrect(null);
             questionItemService.update(questionItem,updateWrapper);
             return Result.msgSuccess("更新成功");
 
         }else{
+            //题目选择个数限制
+            QuestionTypeEnum type = question.getType();
+            int itemMax= type.getItemMax();
+            long count = questionItemService.count(new LambdaQueryWrapper<QuestionItem>().eq(QuestionItem::getQuestionId, question.getId()));
+
+            if(count>=itemMax){
+                return Result.msgError("添加失败，达到选项个数最大限制");
+            }
             //填空题，该选项时就是答案
             QuestionTypeEnum enumByValue = IBaseEnum.getEnumByValue(question.getType(), QuestionTypeEnum.class);
-            if(enumByValue==QuestionTypeEnum.COMPLETION){
-                questionItem.setCorrect("1");
-            }
             questionItemMapper.insert(questionItem);
             return Result.success("添加成功",questionItem.getId());
         }
@@ -100,17 +111,17 @@ public class QuestionItemController {
         QuestionItem questionItem = new QuestionItem();
         if(enumByValue==QuestionTypeEnum.SIGNAL_CHOICE||enumByValue==QuestionTypeEnum.JUDGMENTAL){
             //先把其他选项，去了
-            questionItem.setCorrect(null);
+            questionItem.setAnswer(null);
             LambdaUpdateWrapper<QuestionItem> updateWrapper=new LambdaUpdateWrapper<>();
             updateWrapper.eq(QuestionItem::getQuestionId,question.getId());
             questionItemService.update(questionItem,updateWrapper);
-            questionItem.setCorrect("1");
+            questionItem.setAnswer("1");
 
         }else if(enumByValue==QuestionTypeEnum.MULTIPLE_CHOICE){
             //多选题取反
-            if(item.getCorrect()==null){
-                questionItem.setCorrect("1");
-                log.info("修改成正确答案"+questionItem.getCorrect());
+            if(item.getAnswer()==null){
+                questionItem.setAnswer("1");
+                log.info("修改成正确答案"+questionItem.getAnswer());
             }else{
                 //判断多选个数，如果就一个答案禁止取消
 //                LambdaQueryWrapper<QuestionItem> queryWrapper=new LambdaQueryWrapper<>();
@@ -120,7 +131,7 @@ public class QuestionItemController {
 //                    return Result.msgError("多选答案不能为空");
 //                }
                 log.info("修改成错误答案");
-                questionItem.setCorrect(null);
+                questionItem.setAnswer(null);
             }
         }
         questionItem.setId(itemId);

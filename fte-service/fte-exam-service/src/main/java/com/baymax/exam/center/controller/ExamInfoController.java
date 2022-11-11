@@ -1,19 +1,16 @@
 package com.baymax.exam.center.controller;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.service.impl.ExamClassServiceImpl;
 import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
 import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
-import com.baymax.exam.center.service.impl.ExamServiceImpl;
+import com.baymax.exam.center.service.impl.ExamPaperServiceImpl;
 import com.baymax.exam.center.vo.ExamInfoVo;
-import com.baymax.exam.center.vo.ExamPaperVo;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
@@ -33,7 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +50,7 @@ public class ExamInfoController {
     @Autowired
     ExamClassServiceImpl examClassService;
     @Autowired
-    ExamServiceImpl examService;
+    ExamPaperServiceImpl examService;
     @Autowired
     ExamQuestionServiceImpl examQuestionService;
 
@@ -85,8 +81,8 @@ public class ExamInfoController {
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         //试卷是不是我的
-        Exam exam = examService.getById(examInfo.getExamId());
-        if(exam.getTeacherId()!=userId){
+        ExamPaper examPaper = examService.getById(examInfo.getExamId());
+        if(examPaper.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         //TODO:班级是不是我的＞﹏＜
@@ -195,32 +191,5 @@ public class ExamInfoController {
         }
         return Result.success(PageResult.setResult(record));
     }
-    @Operation(summary = "开始考试")
-    @GetMapping("/start/{examInfoId}")
-    public Result startExam(@PathVariable Integer examInfoId){
-        //获取考试信息
-        ExamInfo examInfo = examInfoService.getById(examInfoId);
 
-        Integer courseId = examInfo.getCourseId();
-        //试卷id
-        Integer userId = UserAuthUtil.getUserId();
-        JoinClass joinClass = userServiceClient.joinCourseByStuId(courseId, userId);
-        if(joinClass==null){
-            return Result.failed(ResultCode.PARAM_ERROR);
-        }
-        Integer examId = examInfo.getExamId();
-        //1. 查询 试卷题目
-        List<Question> questionList = examQuestionService.getQuestionByExamId(examId);
-        if(examInfo.getQuestionDisorder()){
-            //打乱集合
-            Collections.shuffle(questionList);
-        }
-        //2.题目类型分类
-        Map<QuestionTypeEnum,List<Question>> questionTypeList=questionList.stream().collect(Collectors.groupingBy(Question::getType));
-        // 存入缓存
-        Map<String,Object> result=new HashMap<>();
-        result.put("examInfo",examInfo);
-        result.put("questionList",questionTypeList);
-        return  Result.success(result);
-    }
 }
