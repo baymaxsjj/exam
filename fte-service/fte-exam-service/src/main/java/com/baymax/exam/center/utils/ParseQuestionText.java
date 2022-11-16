@@ -1,10 +1,9 @@
 package com.baymax.exam.center.utils;
 
 import com.baymax.exam.center.enums.QuestionTypeEnum;
-import com.baymax.exam.center.model.Question;
+import com.baymax.exam.center.model.ParseQuestionRules;
 import com.baymax.exam.center.model.QuestionItem;
 import com.baymax.exam.center.vo.QuestionInfoVo;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ import java.util.stream.IntStream;
 public class ParseQuestionText {
     static final String[] letterList = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
-    public static List<QuestionInfoVo> parse(String text,QuestionExtractionRules rule){
+    public static List<QuestionInfoVo> parse(String text, ParseQuestionRules rule){
 
         String divisionRule=rule.getDivisionRule();
         String questionRule=rule.getQuestionRule();

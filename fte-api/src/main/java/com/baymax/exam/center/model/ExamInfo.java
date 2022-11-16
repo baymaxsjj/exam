@@ -58,6 +58,16 @@ public class ExamInfo extends BaseEntity {
 
     @Schema(description = "结束可见")
     private Boolean endVisible;
+    @Schema(description = "开启监控")
+    private Boolean isMonitor;
+
+    @Schema(description = "允许复制粘贴")
+    private Boolean isCopyPaste;
+
+    @Future(message = "开始时间不合法")
+    @Schema(description = "提交时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime submitTime;
 
     @Future(message = "开始时间不合法")
     @NotNull(message = "开始时间不能为空")

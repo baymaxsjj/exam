@@ -80,6 +80,12 @@ public class ExamInfoController {
         if (teacherId != userId) {
             return Result.failed(ResultCode.PARAM_ERROR);
         }
+        // 如果设置了提交时间
+        if(examInfo.getSubmitTime()!=null){
+            if(examInfo.getSubmitTime().isAfter(examInfo.getEndTime())){
+                return Result.msgWaring("提交时间不能超过结束时间");
+            }
+        }
         //试卷是不是我的
         ExamPaper examPaper = examService.getById(examInfo.getExamId());
         if(examPaper.getTeacherId()!=userId){

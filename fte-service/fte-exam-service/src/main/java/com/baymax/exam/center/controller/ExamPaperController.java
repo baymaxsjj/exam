@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.center.model.ExamPaper;
 import com.baymax.exam.center.model.ExamQuestion;
+import com.baymax.exam.center.model.Question;
 import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
 import com.baymax.exam.center.service.impl.ExamPaperServiceImpl;
 import com.baymax.exam.center.service.impl.QuestionServiceImpl;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,4 +157,27 @@ public class ExamPaperController {
         Page<ExamPaper> record = examService.page(pa, queryWrapper);
         return Result.success(PageResult.setResult(record));
     }
+    @Operation(summary = "试卷数据统计")
+    @GetMapping("/statistics/{examId}")
+    public Result statistics(@PathVariable Integer examId){
+        ExamPaper examPaper = examService.getById(examId);
+        Integer userId = UserAuthUtil.getUserId();
+        if(examPaper ==null|| examPaper.getTeacherId()!=userId){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        List<Question> list = examQuestionService.getQuestionByExamId(examId);
+        final Map<String, List<Question>> collect = list.stream().collect(Collectors.groupingBy(i -> i.getType().getLabel()));
+        Map<String,Integer> questionStatistics=new HashMap<>();
+        collect.forEach((key,value)->{
+            questionStatistics.put(key,value.size());
+        });
+        Integer total=list.stream().mapToInt(Question::getScore).sum();
+        Map<String,Object> result=new HashMap<>();
+        result.put("questionCount",list.size());
+        result.put("examPaper",examPaper);
+        result.put("questionStatistics",questionStatistics);
+        result.put("totalScore",total);
+        return Result.success(result);
+    }
+
 }

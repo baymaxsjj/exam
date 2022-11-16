@@ -1,16 +1,16 @@
 package com.baymax.exam.center.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baymax.exam.center.enums.QuestionTypeEnum;
+import com.baymax.exam.center.enums.DefaultQuestionRuleEnum;
 import com.baymax.exam.center.model.Question;
-import com.baymax.exam.center.model.Tags;
 import com.baymax.exam.center.service.impl.QuestionServiceImpl;
 import com.baymax.exam.center.utils.ParseQuestionText;
-import com.baymax.exam.center.utils.QuestionExtractionRules;
+import com.baymax.exam.center.model.ParseQuestionRules;
+import com.baymax.exam.center.vo.BatchQuestion;
+import com.baymax.exam.center.vo.ParseQuestionVo;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
@@ -26,9 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -67,26 +66,44 @@ public class QuestionController {
         }
     }
     @Operation(summary = "批量创建题目")
-    @PostMapping("/batchAdd/{tagId}")
-    public Result batchAdd(@RequestBody @Validated List<QuestionInfoVo> questionInfo, @PathVariable String tagId){
-        // TODO:还是后端呢？
-        return Result.msgSuccess("更新成功");
+    @PostMapping("/batchAdd")
+    public Result batchAdd(@RequestBody @Validated BatchQuestion batchQuestion){
+        Courses course = userServiceClient.findCourse(batchQuestion.getCourseId());
+        Integer userId = UserAuthUtil.getUserId();
+        if(course==null||course.getUserId()!=userId){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        List<QuestionInfoVo> list=batchQuestion.getQuestionInfos();
+        List<String> result=new ArrayList<>();
+        list.stream().forEach(i->{
+            i.setTeacherId(userId);
+            i.setTagId(batchQuestion.getTagId());
+            i.setCourseId(batchQuestion.getCourseId());
+            result.add( questionService.addQuestion(i));
+        });
+        return Result.success(result);
+    }
+    @Operation(summary = "获取匹配题目规则")
+    @GetMapping("/rules")
+    public Result rules(){
+        Map<String, String> collect = Arrays.stream(DefaultQuestionRuleEnum.values()).collect(Collectors.toMap(DefaultQuestionRuleEnum::name, DefaultQuestionRuleEnum::getName));
+        return Result.success(collect);
     }
     @Operation(summary = "解析题目文本")
     @PostMapping("/analyze")
-    public Result analyze(@RequestBody Map<String,String> map){
+    public Result analyze(@RequestBody @Validated ParseQuestionVo parseQuestionVo){
         // TODO:还是后端呢？
-        QuestionExtractionRules studyRule = new QuestionExtractionRules();
-        studyRule.setDivisionRule("\\d{1,3}\\s*[、]");
-        studyRule.setQuestionRule("");
-        studyRule.setAnswerRule("答案：\\s*([\\s\\S]*)");
-        studyRule.setAnswerSplit("；");
-        studyRule.setOptionRule("\\n\\s*[A-Z]\\s*[、]\\s*");
+        ParseQuestionRules rule= DefaultQuestionRuleEnum.CHAOXING.getRule();
+        if(parseQuestionVo.getCustomRule()!=null){
+            rule= parseQuestionVo.getCustomRule();
+        }else if(parseQuestionVo.getDefaultRule()!=null){
+            rule = parseQuestionVo.getDefaultRule().getRule();
+        }
         //将富文本换行改成\n
-        String text=map.get("questionText").replaceAll("<br\\/?>","\n");
+        String text= parseQuestionVo.getQuestionsText().replaceAll("<br\\/?>","\n");
         //去除富文本最外层p
         text=text.replaceAll("^<p>|<\\/p>$","");
-        return Result.success( ParseQuestionText.parse(text,studyRule));
+        return Result.success( ParseQuestionText.parse(text,rule));
     }
 
     @Operation(summary = "更新题目")

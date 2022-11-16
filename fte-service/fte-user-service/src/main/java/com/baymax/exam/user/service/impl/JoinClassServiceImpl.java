@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -69,6 +70,24 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
         Page<User> page=new Page<>(currentPage,pageSize);
         LambdaQueryWrapper<JoinClass> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(JoinClass::getClassId,classId);
+        return joinClassMapper.getJoinClassUser(page,queryWrapper);
+    }
+
+    /**
+     * 批处理类用户
+     *
+     * @param classIds    类id
+     * @param teacherId   老师id
+     * @param currentPage 当前页面
+     * @param pageSize    页面大小
+     * @return {@link IPage}<{@link User}>
+     */
+    @Override
+    public IPage<User> getBatchClassUsers(Set<Integer> classIds, Integer teacherId, long currentPage, long pageSize) {
+        Page<User> page=new Page<>(currentPage,pageSize);
+        QueryWrapper queryWrapper=new QueryWrapper();
+        queryWrapper.eq("c.teacher_id",teacherId);
+        queryWrapper.in("jc.class_id",classIds);
         return joinClassMapper.getJoinClassUser(page,queryWrapper);
     }
 }

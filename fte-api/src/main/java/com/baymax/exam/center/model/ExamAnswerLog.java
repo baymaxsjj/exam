@@ -29,10 +29,12 @@ public class ExamAnswerLog implements Serializable {
     private Integer examId;
 
     @Schema(description = "学生id")
-    private Integer sutdentId;
+    private Integer studentId;
 
     @Schema(description = "状态：0:开始、2：交卷")
     private Byte status;
+    @Schema(description = "状态信息")
+    private String info;
 
     private LocalDateTime createdAt;
 

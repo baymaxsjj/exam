@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baymax.exam.center.model.ExamPaper;
 import com.baymax.exam.center.model.ExamQuestion;
+import com.baymax.exam.center.model.Question;
 import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
 import com.baymax.exam.center.service.impl.ExamPaperServiceImpl;
+import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.web.utils.UserAuthUtil;
@@ -16,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -49,7 +52,7 @@ public class ExamQuestionController {
         return Result.msgSuccess("添加成功");
     }
     @Deprecated
-    @Operation(summary = "添加试卷题目")
+    @Operation(summary = "删除试卷题目")
     @PostMapping("/delete")
     public Result delete(@RequestBody @Validated ExamQuestion examQuestion){
         ExamPaper examPaper = examService.getById(examQuestion.getExamId());
@@ -65,4 +68,5 @@ public class ExamQuestionController {
         examQuestionService.remove(queryWrapper);
         return Result.msgSuccess("删除成功");
     }
+
 }

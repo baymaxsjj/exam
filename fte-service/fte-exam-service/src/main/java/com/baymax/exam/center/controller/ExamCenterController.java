@@ -14,6 +14,7 @@ import com.baymax.exam.user.model.User;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ import static com.baymax.exam.common.core.base.ExamAuth.*;
  * @modified By：
  * @version:
  */
+@Slf4j
 @Validated
 @Tag(name = "考试中心")
 @RestController
@@ -84,7 +86,7 @@ public class ExamCenterController {
         result.put("questionList",questionTypeList);
         return  Result.success(result);
     }
-    @Operation(summary = "考试题目")
+    @Operation(summary = "考试选项")
     @GetMapping("/question/{questionId}")
     public Result option(@PathVariable Integer examInfoId, @PathVariable Integer questionId){
         //判断改题目是否在考试中
@@ -99,38 +101,44 @@ public class ExamCenterController {
         //1.缓存获取答案
         String redisAnswerKey=RedisKeyRule.examAnswerKey(examInfoId,userId);
         Map<String,Map<Integer,String>> answerList = redisUtil.getCacheMap(redisAnswerKey);
+        log.info("缓存答案："+answerList);
         //2.获取选项
         List<QuestionItem> questionItems = questionItemService.getQuestionItems(questionId);
+        //3.获取该题的作答
+        Map<Integer, String> answer = answerList.get(questionId.toString());
+        log.info("该题目缓存答案："+questionId+"->"+answer);
         //TODO:3.判断选项要不要乱序,这样还要判断题目类型哭~~~算了先放着吧
-
         questionItems.stream().forEach(questionItem -> {
-            questionItem.setAnswer(null);
+            if(answer!=null){
+                questionItem.setAnswer(answer.get(questionItem.getId()));
+            }else{
+                questionItem.setAnswer(null);
+            }
         });
-        //TODO: 服务端直接把答案合并到选择中，前端重复处理
-        Map<String,Object> result=new HashMap<>();
-        result.put("options",questionItems);
-        result.put("answerList",answerList);
-        return  Result.success(result);
+        return  Result.success(questionItems);
     }
     @Operation(summary = "提交答案")
-    @GetMapping("/answer/{questionId}")
+    @PostMapping("/answer/{questionId}")
     public Result answer(@PathVariable Integer examInfoId, @RequestBody Map<Integer,String> answerResult, @PathVariable String questionId){
         Integer userId = UserAuthUtil.getUserId();
         String redisAnswerKey=RedisKeyRule.examAnswerKey(examInfoId,userId);
+        //key
+        Map<String,Map<Integer,String>> result;
         // 判断是不是考试题目
-
-        //1.获取缓存中的考试答案
-        Map<String,Map<Integer,String>> result=redisUtil.getCacheMap(redisAnswerKey);
-        if(result==null){
+        if (redisUtil.hasKey(redisAnswerKey)){
+            //1.获取缓存中的考试答案
+            result=redisUtil.getCacheMap(redisAnswerKey);
+        }else{
             result=new HashMap<>();
         }
         result.put(questionId,answerResult);
-        redisUtil.setCacheMap(redisAnswerKey,result);
+        log.info("提交答案："+result);
         //放入缓存，提交答案的时候在存到数据库
-        return Result.success();
+        redisUtil.setCacheMap(redisAnswerKey,result);
+        return Result.success(answerResult.size());
     }
     @Operation(summary = "交卷")
-    @GetMapping("/submit")
+    @PostMapping("/submit")
     public Result submit(@PathVariable Integer examInfoId){
         //放入缓存，提交答案的时候在存到数据库
 

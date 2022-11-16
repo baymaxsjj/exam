@@ -5,6 +5,8 @@ import com.baymax.exam.user.model.JoinClass;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baymax.exam.user.model.User;
 
+import java.util.Set;
+
 /**
  * <p>
  *  服务类
@@ -42,4 +44,15 @@ public interface IJoinClassService extends IService<JoinClass> {
      * @return {@link IPage}<{@link User}>
      */
     IPage<User> getClassUsers(Integer classId,long currentPage,long pageSize);
+
+    /**
+     * 批处理类用户
+     *
+     * @param classIds    类id
+     * @param teacherId   老师id
+     * @param currentPage 当前页面
+     * @param pageSize    页面大小
+     * @return {@link IPage}<{@link User}>
+     */
+    IPage<User> getBatchClassUsers(Set<Integer> classIds,Integer teacherId, long currentPage, long pageSize);
 }

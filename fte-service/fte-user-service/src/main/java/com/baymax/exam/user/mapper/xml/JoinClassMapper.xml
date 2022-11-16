@@ -10,8 +10,9 @@
             u.picture
         FROM
             ec_join_class jc
-                INNER JOIN es_user u ON (
-                jc.student_id = u.id)
+                INNER JOIN es_user u ON ( jc.student_id = u.id )
+                INNER JOIN ec_classes c ON (
+                jc.class_id = c.id)
             ${ew.customSqlSegment}
     </select>
     <select id="getJoinByCourseId" resultType="com.baymax.exam.user.model.JoinClass">
