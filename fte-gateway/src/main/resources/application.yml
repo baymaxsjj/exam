@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: "gateway" # 服务名称
+  zipkin:
+    base-url: http://localhost:9411/ # zipkin server 的请求地址
+    discovery-client-enabled: false  # 让 Nacos 把它当成一个 url ，而不要当成服务名
   security:
     oauth2:
       resourceserver:
@@ -23,24 +26,19 @@ spring:
           enabled: true
           lower-case-service-id: true #使用小写service-id
       routes: # 网关路由配置
+        - id: message-socket
+#          uri: "ws://127.0.0.1:8090" #websocket配置，直接地址使用方式1
+          uri: "lb:ws://exam-message" #websocket配置，通过nacos注册中心调用serviceName使用方式2
+          predicates:
+            - Path=/exam-message/socket
+          filters:
+            - StripPrefix=1
 #        - id: openapi
 #          uri: http://localhost:${server.port}
 #          predicates:
 #            - Path=/v3/api-docs/**
 #          filters:
 #            - RewritePath=/v3/api-docs/(?<path>.*),/$\{path}/v3/api-docs
-      globalcors:
-        add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题
-        corsConfigurations:
-          '[/**]':
-            allowedOriginPatterns: "*"# 允许哪些网站的跨域请求 allowedOrigins: “*” 允许所有网站
-            allowedMethods: "*" # 允许的跨域ajax的请求方式
-            allowedHeaders: "*" # 允许在请求中携带的头信息
-            allowCredentials: true # 是否允许携带cookie
-            maxAge: 360000 # 这次跨域检测的有效期
-      default-filters:
-        - DedupeResponseHeader=Vary Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
-
 springdoc:
   swagger-ui:
     use-root-path: true

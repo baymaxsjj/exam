@@ -1,10 +1,10 @@
 package com.baymax.exam.center;
 
-import com.baymax.exam.user.feign.UserServiceClient;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @author ：Baymax
@@ -13,7 +13,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @modified By：
  * @version:
  */
-@EnableFeignClients(basePackageClasses = UserServiceClient.class)
+//表示开启异步化
+@EnableAsync
+@EnableFeignClients(basePackages="com.baymax.exam.*")
 @SpringBootApplication(scanBasePackages = "com.baymax.exam")
 //扫描mapper
 @MapperScan(basePackages = "com.baymax.exam.center.mapper")

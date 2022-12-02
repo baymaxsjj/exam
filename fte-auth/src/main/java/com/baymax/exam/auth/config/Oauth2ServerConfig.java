@@ -1,15 +1,13 @@
 package com.baymax.exam.auth.config;
 
 import com.baymax.exam.auth.component.JwtTokenEnhancer;
-import com.baymax.exam.auth.service.UserServiceImpl;
-import com.baymax.exam.common.core.base.ExamAuth;
+import com.baymax.exam.common.core.enums.ClientIdEnum;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -48,14 +46,14 @@ public class Oauth2ServerConfig extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient(ExamAuth.ADMIN_CLIENT_ID)
+                .withClient(ClientIdEnum.ADMIN_CLIENT_ID.getValue())
                 .secret(passwordEncoder.encode("123456"))
                 .scopes("all")
                 .authorizedGrantTypes("password", "refresh_token")
                 .accessTokenValiditySeconds(3600*24*30*12)
                 .refreshTokenValiditySeconds(3600*24*7*30*12)
                 .and()
-                .withClient(ExamAuth.PORTAL_CLIENT_ID)
+                .withClient(ClientIdEnum.PORTAL_CLIENT_ID.getValue())
                 .secret(passwordEncoder.encode("123456"))
                 .scopes("all")
                 .authorizedGrantTypes("password", "refresh_token")

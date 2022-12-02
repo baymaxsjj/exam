@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>examPaper</artifactId>
+        <artifactId>exam</artifactId>
         <groupId>com.baymax</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
@@ -11,8 +11,8 @@
     <packaging>pom</packaging>
     <artifactId>fte-common</artifactId>
     <modules>
-        <module>fte-common-core</module>
         <module>fte-common-web</module>
         <module>fte-common-redis</module>
+        <module>fte-common-core</module>
     </modules>
 </project>

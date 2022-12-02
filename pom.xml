@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.baymax</groupId>
-    <artifactId>examPaper</artifactId>
+    <artifactId>exam</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
@@ -182,5 +182,5 @@
         <artifactId>hutool-all</artifactId>
         <version>${hutool.version}</version>
     </dependency>
-</dependencies>
+    </dependencies>
 </project>

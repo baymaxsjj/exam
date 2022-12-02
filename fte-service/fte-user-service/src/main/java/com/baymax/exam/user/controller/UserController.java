@@ -8,13 +8,15 @@ package com.baymax.exam.user.controller;
  * @version:
  */
 
-import com.baymax.exam.common.core.base.ExamAuth;
+import com.baymax.exam.common.core.base.SecurityConstants;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.service.impl.UserServiceImpl;
+import com.baymax.exam.web.annotation.Inner;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,26 +24,40 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @Validated
 @Tag(name = "用户管理")
-@RestController
+@RestController("/user")
 public class UserController {
     @Autowired
     UserServiceImpl userService;
     @Operation(summary = "获取用户信息")
-    @GetMapping("/user/info")
+    @GetMapping("/info")
     Result getUserInfo(){
+        log.info("用户id"+UserAuthUtil.getUserId());
         return Result.success(userService.getById(UserAuthUtil.getUserId()));
     }
     @Operation(summary = "获取用户信息")
-    @PostMapping("/user/update")
+    @PostMapping("/update")
     Result updateUser(@RequestBody @Validated({User.UpdateUserRequestValid.class}) User user){
 //        =userService.updateUser(user);
 //        userService.up
         return Result.success(userService.getById(UserAuthUtil.getUserId()));
     }
+    @Inner
+    @Operation(summary = "用户名/邮箱获取用户信息")
+    @GetMapping("/findUser")
+    public User findUser(String username){
+        User user = null;
+        if(username.contains("@")){
+            user=userService.getUserByEmail(username);
+        }else{
+            user=userService.getUserByUserName(username);
+        }
+        return user;
+    }
     @Operation(summary = "注册信息")
-    @PostMapping(ExamAuth.API_OPEN_PRE+"/register")
+    @PostMapping("/register")
     Result register(@RequestBody @Validated({User.RegisterRequestValid.class}) User user){
         // TODO: 邮箱验证码校验
         return userService.addUser(user);

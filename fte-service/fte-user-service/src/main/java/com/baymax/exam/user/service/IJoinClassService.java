@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baymax.exam.user.model.JoinClass;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baymax.exam.user.model.User;
-
-import java.util.Set;
+import com.baymax.exam.user.po.CourseUserPo;
 
 /**
  * <p>
@@ -47,12 +46,13 @@ public interface IJoinClassService extends IService<JoinClass> {
 
     /**
      * 批处理类用户
+     * 得到一批用户
      *
-     * @param classIds    类id
-     * @param teacherId   老师id
-     * @param currentPage 当前页面
-     * @param pageSize    页面大小
+     * @param isInList     是在
+     * @param courseUserPo 当然用户订单
+     * @param currPage     咕咕叫页面
+     * @param pageSize     页面大小
      * @return {@link IPage}<{@link User}>
      */
-    IPage<User> getBatchClassUsers(Set<Integer> classIds,Integer teacherId, long currentPage, long pageSize);
+    IPage<User> getBatchClassUsers(CourseUserPo courseUserPo, Boolean isInList,long currPage,long pageSize);
 }

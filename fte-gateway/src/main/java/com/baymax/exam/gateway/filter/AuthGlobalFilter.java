@@ -1,7 +1,7 @@
 package com.baymax.exam.gateway.filter;
 
 import cn.hutool.core.util.StrUtil;
-import com.baymax.exam.common.core.base.ExamAuth;
+import com.baymax.exam.common.core.base.SecurityConstants;
 import com.nimbusds.jose.JWSObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -27,17 +27,20 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String token = exchange.getRequest().getHeaders().getFirst(ExamAuth.JWT_TOKEN_HEADER);
+        String token = exchange.getRequest().getHeaders().getFirst(SecurityConstants.JWT_TOKEN_HEADER);
+        if(token==null){
+            token=exchange.getRequest().getQueryParams().getFirst("token");
+        }
         if (StrUtil.isEmpty(token)) {
             return chain.filter(exchange);
         }
         try {
             //从token中解析用户信息并设置到Header中去
-            String realToken = token.replace(ExamAuth.JWT_TOKEN_PREFIX, "");
+            String realToken = token.replace(SecurityConstants.JWT_TOKEN_PREFIX, "");
             JWSObject jwsObject = JWSObject.parse(realToken);
             String userStr = jwsObject.getPayload().toString();
             log.info("AuthGlobalFilter.filter() user:{}",userStr);
-            ServerHttpRequest request = exchange.getRequest().mutate().header(ExamAuth.USER_TOKEN_HEADER, userStr).build();
+            ServerHttpRequest request = exchange.getRequest().mutate().header(SecurityConstants.USER_TOKEN_HEADER, userStr).build();
             exchange = exchange.mutate().request(request).build();
         }catch (ParseException e) {
             e.printStackTrace();

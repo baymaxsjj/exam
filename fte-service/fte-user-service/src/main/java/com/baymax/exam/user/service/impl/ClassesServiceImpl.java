@@ -1,7 +1,7 @@
 package com.baymax.exam.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baymax.exam.common.core.base.ExamAuth;
+import com.baymax.exam.common.core.base.SecurityConstants;
 import com.baymax.exam.common.redis.utils.RedisUtil;
 import com.baymax.exam.user.model.Classes;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.baymax.exam.common.core.base.RedisKeyConstants.REDIS_CLASS_CODE_KEY;
+import static com.baymax.exam.common.core.base.RedisKeyConstants.REDIS_CODE_CLASS_KEY;
 
 /**
  * <p>
@@ -55,9 +58,9 @@ public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> impl
             //班级码有效
             if(reCode==null){
                 //有效期7天
-                redisUtil.setCacheObject(ExamAuth.REDIS_CLASS_CODE_KEY+classId,code,7, TimeUnit.DAYS);
+                redisUtil.setCacheObject(REDIS_CLASS_CODE_KEY+classId,code,7, TimeUnit.DAYS);
                 //双向映射
-                redisUtil.setCacheObject(ExamAuth.REDIS_CODE_CLASS_KEY+code,classId,7,TimeUnit.HOURS);
+                redisUtil.setCacheObject(REDIS_CODE_CLASS_KEY+code,classId,7,TimeUnit.HOURS);
                 break;
             }
         }
@@ -72,7 +75,7 @@ public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> impl
      */
     @Override
     public String getCodeById(Integer classId) {
-        return redisUtil.getCacheObject(ExamAuth.REDIS_CLASS_CODE_KEY+classId);
+        return redisUtil.getCacheObject(REDIS_CLASS_CODE_KEY+classId);
     }
 
     /**
@@ -83,7 +86,7 @@ public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> impl
      */
     @Override
     public Integer getClassByCode(String code) {
-        return redisUtil.<Integer>getCacheObject(ExamAuth.REDIS_CODE_CLASS_KEY+code);
+        return redisUtil.<Integer>getCacheObject(REDIS_CODE_CLASS_KEY+code);
     }
 
     /**
@@ -94,7 +97,7 @@ public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> impl
      */
     @Override
     public long getCodeValidTime(Integer classId) {
-        return redisUtil.getExpire(ExamAuth.REDIS_CLASS_CODE_KEY+classId);
+        return redisUtil.getExpire(REDIS_CLASS_CODE_KEY+classId);
     }
 
 }

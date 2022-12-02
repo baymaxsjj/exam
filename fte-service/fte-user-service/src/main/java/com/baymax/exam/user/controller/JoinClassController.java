@@ -7,17 +7,17 @@ import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.user.model.Classes;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.user.model.User;
+import com.baymax.exam.user.po.CourseUserPo;
 import com.baymax.exam.user.service.impl.ClassesServiceImpl;
 import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
+import com.baymax.exam.web.annotation.Inner;
 import com.baymax.exam.web.utils.UserAuthUtil;
-import io.lettuce.core.codec.RedisCodec;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 /**
  * <p>
@@ -55,15 +55,16 @@ public class JoinClassController {
         IPage<User> classUsers = joinClassService.getClassUsers(classId, currentPage, pageSize);
         return Result.success(PageResult.setResult(classUsers));
     }
-    @Operation(summary = "获取班级人数")
-    @PostMapping("/student/batch/list")
-    public Result getQuantity(
-            @RequestBody Set<Integer> classIds,
-                    @RequestParam(required = false,defaultValue = "1") Long currentPage,
+    @Inner
+    @Operation(summary = "批量获取班级学生")
+    @PostMapping("/students/list")
+    public PageResult<User> getBatchClassUser(
+            @RequestBody @Validated CourseUserPo courseUser,
+            @RequestParam(required = false,defaultValue = "true") Boolean isInlist,
+            @RequestParam(defaultValue = "1") Long currPage,
             @RequestParam(required = false,defaultValue = "10") Long pageSize){
-        Integer userId = UserAuthUtil.getUserId();
-        final IPage<User> batchClassUsers = joinClassService.getBatchClassUsers(classIds, userId, currentPage, pageSize);
-        return Result.success(PageResult.setResult(batchClassUsers));
+        final IPage<User> batchClassUsers = joinClassService.getBatchClassUsers(courseUser, isInlist, currPage,pageSize);
+        return PageResult.setResult(batchClassUsers);
     }
 
 }

@@ -11,7 +11,12 @@ import lombok.Getter;
  * @version:
  */
 public enum DefaultQuestionRuleEnum {
-    CHAOXING("学习通",new ParseQuestionRules("\\n\\d{1,3}\\s*[、]","","答案：\\s*([\\s\\S]*)","；","\\n\\s*[A-Z]\\s*[、]\\s*"));
+//    rule.setDivisionRule("\\n\\d{1,3}\\s*[\\.、：:]");
+//        rule.setQuestionRule("");
+//        rule.setAnswerRule("答案：\\s*([\\s\\S]*)");
+//        rule.setAnswerSplit("；");
+//        rule.setOptionRule("\\n\\s*[A-Z]\\s*[、]\\s*");
+    CHAOXING("学习通",new ParseQuestionRules("\\n\\d{1,3}\\s*[\\.、：:]","","答案：\\s*([\\s\\S]*)","；","\\n\\s*[A-Z]\\s*[、.]\\s*"));
     @Getter
     private String name;
     @Getter

@@ -1,7 +1,7 @@
 package com.baymax.exam.center.utils;
 
 
-import static com.baymax.exam.common.core.base.ExamAuth.RDS_EXAM_ONLINE_KEY;
+import static com.baymax.exam.common.core.base.RedisKeyConstants.RDS_EXAM_ONLINE_KEY;
 
 /**
  * @author ：Baymax

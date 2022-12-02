@@ -1,0 +1,38 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: exam-message
+  zipkin:
+    base-url: http://localhost:9411/ # zipkin server 的请求地址
+    discovery-client-enabled: false  # 让 Nacos 把它当成一个 url ，而不要当成服务名
+  datasource:
+    url: jdbc:mysql://localhost:3306/wk_message?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5 #连接池初始化大小
+      min-idle: 10 #最小空闲连接数
+      max-active: 20 #最大连接数
+      web-stat-filter:
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #不统计这些请求数据
+      stat-view-servlet: #访问监控网页的登录用户名和密码
+        login-username: druid
+        login-password: druid
+  redis:
+    host: localhost # Redis服务器地址
+    database: 0 # Redis数据库索引（默认为0）
+    port: 6379 # Redis服务器连接端口
+    password: 123456 # Redis服务器连接密码（默认为空）
+    timeout: 3000ms # 连接超时时间（毫秒）
+mybatis-plus:
+  mapper-locations: classpath*:com/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  cloud:
+#    nacos:
+#      server-addr: 127.0.0.1:8848
+#      discovery:
+#        cluster-name: HZ # 集群名称，杭州集群

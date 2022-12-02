@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
+import java.nio.file.AccessDeniedException;
 
 /**
  * @author ：Baymax
@@ -36,5 +37,10 @@ public class ValidExceptionHandler {
     @ResponseBody
     public Result handleBindGetException(ConstraintViolationException ex){
         return Result.failed(ResultCode.PARAM_ERROR,ex.getMessage());
+    }
+    @ExceptionHandler(value = AccessDeniedException.class)
+    @ResponseBody
+    public Result handleAccessDeniedException(AccessDeniedException e) {
+        return Result.failed(ResultCode.AUTHORIZED_ERROR,e.getMessage());
     }
 }

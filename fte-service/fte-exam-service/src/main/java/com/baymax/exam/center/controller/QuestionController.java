@@ -15,7 +15,8 @@ import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.user.feign.UserServiceClient;
+import com.baymax.exam.user.feign.CourseClient;
+import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
@@ -46,12 +47,12 @@ public class QuestionController {
     @Autowired
     QuestionServiceImpl questionService;
     @Autowired
-    UserServiceClient userServiceClient;
+    CourseClient courseClient;
     @Operation(summary = "创建题目")
     @PostMapping("/add")
     public Result add(@RequestBody @Validated QuestionInfoVo questionInfo){
         //判断课程是不是自己的
-        Courses course = userServiceClient.findCourse(questionInfo.getCourseId());
+        Courses course = courseClient.findCourse(questionInfo.getCourseId());
         Integer userId = UserAuthUtil.getUserId();
         if(course==null||course.getUserId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
@@ -68,7 +69,7 @@ public class QuestionController {
     @Operation(summary = "批量创建题目")
     @PostMapping("/batchAdd")
     public Result batchAdd(@RequestBody @Validated BatchQuestion batchQuestion){
-        Courses course = userServiceClient.findCourse(batchQuestion.getCourseId());
+        Courses course = courseClient.findCourse(batchQuestion.getCourseId());
         Integer userId = UserAuthUtil.getUserId();
         if(course==null||course.getUserId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
@@ -102,7 +103,9 @@ public class QuestionController {
         //将富文本换行改成\n
         String text= parseQuestionVo.getQuestionsText().replaceAll("<br\\/?>","\n");
         //去除富文本最外层p
-        text=text.replaceAll("^<p>|<\\/p>$","");
+        text=text.replaceAll("<p>|<\\/p>","");
+        log.info("题目文本",text);
+        log.info("题目文本"+text);
         return Result.success( ParseQuestionText.parse(text,rule));
     }
 
@@ -138,7 +141,7 @@ public class QuestionController {
             @PathVariable Integer courseId,
             @RequestParam Integer currentPage,
             @RequestParam(required = false) Integer tagId){
-        Courses course = userServiceClient.findCourse(courseId);
+        Courses course = courseClient.findCourse(courseId);
         Integer userId = UserAuthUtil.getUserId();
         if(course==null){
             return Result.failed(ResultCode.PARAM_ERROR);
@@ -151,7 +154,7 @@ public class QuestionController {
         queryMap.put(Question::getCourseId,courseId);
         if(course.getUserId()!=userId){
             //1.判断是否课程班级中
-            JoinClass joinClass = userServiceClient.joinCourseByStuId(courseId, userId);
+            JoinClass joinClass = courseClient.joinCourseByStuId(courseId, userId);
             if(joinClass==null){
                 return Result.failed(ResultCode.PARAM_ERROR);
             }
@@ -173,7 +176,7 @@ public class QuestionController {
         // 是否有查看权限
         if(question.getTeacherId()!=userId){
             //1.判断是否课程班级中
-            JoinClass joinClass = userServiceClient.joinCourseByStuId(question.getCourseId(), userId);
+            JoinClass joinClass = courseClient.joinCourseByStuId(question.getCourseId(), userId);
             if(joinClass==null){
                 return Result.failed(ResultCode.PARAM_ERROR);
             }

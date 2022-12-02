@@ -1,5 +1,6 @@
 package com.baymax.exam.common.core.base;
 
+import com.baymax.exam.common.core.enums.ClientIdEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,6 +26,7 @@ public class LoginUser {
         private String username;
         private String password;
         private Boolean enabled;
-        private String clientId;
+        private ClientIdEnum clientId;
+        private String ip;
         private List<String> roles;
 }

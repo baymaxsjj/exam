@@ -22,7 +22,7 @@ public class FastAutoGeneratorTest {
      * 数据源配置
      */
     private static final DataSourceConfig.Builder DATA_SOURCE_CONFIG = new DataSourceConfig
-            .Builder("jdbc:mysql://localhost:3306/wk_exam?characterEncoding=utf-8&serverTimezone=Asia/Shanghai", "root", "123456");
+            .Builder("jdbc:mysql://localhost:3306/wk_message?characterEncoding=utf-8&serverTimezone=Asia/Shanghai", "root", "123456");
     private static String author="baymax";
     private static String myPackage="com.baymax.exam.center";
     private static String path=System.getProperty("user.dir");;
@@ -45,7 +45,7 @@ public class FastAutoGeneratorTest {
                 // 策略配置
                 .strategyConfig((scanner, builder) -> builder.
                         addInclude(getTables(scanner.apply("请输入表名，多个英文逗号分隔？所有输入 all")))
-                        .addTablePrefix("es_", "ec_","eq_","ee_","ed_")
+                        .addTablePrefix("es_", "ec_","eq_","ee_","ed_","em_")
                         .controllerBuilder()
                         .enableFileOverride()
                         .enableRestStyle()

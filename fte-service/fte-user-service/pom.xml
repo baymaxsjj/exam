@@ -11,7 +11,18 @@
     <artifactId>fte-user-service</artifactId>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.baymax</groupId>
+            <artifactId>fte-common-web</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baymax</groupId>
+            <artifactId>fte-common-redis</artifactId>
+        </dependency>
+    </dependencies>
 </project>

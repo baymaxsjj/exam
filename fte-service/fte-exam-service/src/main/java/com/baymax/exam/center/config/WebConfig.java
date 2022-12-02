@@ -1,6 +1,7 @@
 package com.baymax.exam.center.config;
 
 import com.baymax.exam.center.interceptor.ExamCenterInterceptor;
+import com.baymax.exam.web.config.BaseWebConfig;
 import com.baymax.exam.web.interceptor.UserTokenInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,16 +21,15 @@ import static com.baymax.exam.center.interceptor.ExamCenterInterceptor.EXAM_INFO
  * @version:
  */
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig extends BaseWebConfig {
 
-    @Resource
-    private UserTokenInterceptor tokenInterceptor ;
     //在此处，将拦截器注册为一个 Bean
     @Resource
     private ExamCenterInterceptor examCenterInterceptor ;
 
+    @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(tokenInterceptor).addPathPatterns("/**");
+        super.addInterceptors(registry);
         registry.addInterceptor(examCenterInterceptor).addPathPatterns("/exam-center/**");
     }
 }

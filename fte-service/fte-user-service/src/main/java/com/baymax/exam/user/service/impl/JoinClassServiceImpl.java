@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.mapper.JoinClassMapper;
+import com.baymax.exam.user.po.CourseUserPo;
 import com.baymax.exam.user.service.IJoinClassService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * <p>
@@ -75,19 +75,27 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
 
     /**
      * 批处理类用户
+     * 得到一批用户
      *
-     * @param classIds    类id
-     * @param teacherId   老师id
-     * @param currentPage 当前页面
-     * @param pageSize    页面大小
+     * @param pageSize     页面大小
+     * @param isInList     在列表
+     * @param courseUserPo 当然用户订单
+     * @param currPage     咕咕叫页面
      * @return {@link IPage}<{@link User}>
      */
     @Override
-    public IPage<User> getBatchClassUsers(Set<Integer> classIds, Integer teacherId, long currentPage, long pageSize) {
-        Page<User> page=new Page<>(currentPage,pageSize);
+    public IPage<User> getBatchClassUsers(CourseUserPo courseUserPo, Boolean isInList,long currPage,long pageSize) {
+        Page<User> page=new Page<>(currPage,pageSize);
         QueryWrapper queryWrapper=new QueryWrapper();
-        queryWrapper.eq("c.teacher_id",teacherId);
-        queryWrapper.in("jc.class_id",classIds);
+        queryWrapper.in("jc.class_id",courseUserPo.getClassIds());
+        if(courseUserPo.getStudentIds()!=null){
+            if(isInList){
+                queryWrapper.in("u.id",courseUserPo.getStudentIds());
+            }else{
+                queryWrapper.notIn("u.id",courseUserPo.getStudentIds());
+            }
+        }
+
         return joinClassMapper.getJoinClassUser(page,queryWrapper);
     }
 }

@@ -14,7 +14,8 @@ import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.user.feign.UserServiceClient;
+import com.baymax.exam.user.feign.CourseClient;
+import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/exam-paper")
 public class ExamPaperController {
     @Autowired
-    UserServiceClient userServiceClient;
+    CourseClient courseClient;
     @Autowired
     ExamPaperServiceImpl examService;
     @Autowired
@@ -65,7 +65,7 @@ public class ExamPaperController {
             }
             info = "更新成功";
         } else {
-            Courses course = userServiceClient.findCourse(examPaper.getCourseId());
+            Courses course = courseClient.findCourse(examPaper.getCourseId());
             if (course != null) {
                 teacherId = course.getUserId();
             }

@@ -1,5 +1,6 @@
 package com.baymax.exam.gateway.config;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -12,7 +13,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
  * @version:
  */
 
-//@Configuration
+@Configuration
 public class GlobalCorsConfig {
 //    @Bean
     public CorsWebFilter  corsFilter() {

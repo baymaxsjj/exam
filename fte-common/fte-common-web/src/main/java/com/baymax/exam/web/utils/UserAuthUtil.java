@@ -32,6 +32,15 @@ public final class UserAuthUtil {
     }
 
     /**
+     * 获取用户ip
+     *
+     * @return {@link String}
+     */
+    public static String getUserIp() {
+        return user.get().getIp();
+    }
+
+    /**
      * 获取用户
      *
      * @return {@link LoginUser}

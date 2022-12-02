@@ -1,5 +1,11 @@
 package com.baymax.exam.center.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+import lombok.Value;
+
 /**
  * @author ：Baymax
  * @date ：Created in 2022/11/13 15:36
@@ -7,13 +13,18 @@ package com.baymax.exam.center.enums;
  * @modified By：
  * @version:
  */
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ExamAnswerLogEnum {
-    START(0,"开始考试"),
-    SUBMIT(1,"提交"),
-    COPY(2,"复制"),
-    PASTE(3,"粘贴"),
-    PAUSE(4,"暂停");
+    START(11,"开始答题"),
+    SUBMIT(12,"提交试卷"),
+    COPY(51,"复制行为"),
+    PASTE(52,"粘贴行为"),
+    PAUSE(53,"后台行为");
+
+    @Getter
     private String action;
+    @Getter
+    @EnumValue
     private Integer value;
     ExamAnswerLogEnum(Integer value,String action){
         this.action=action;

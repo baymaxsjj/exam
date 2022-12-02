@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.service.impl.ExamClassServiceImpl;
 import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
@@ -14,7 +13,8 @@ import com.baymax.exam.center.vo.ExamInfoVo;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.user.feign.UserServiceClient;
+import com.baymax.exam.user.feign.CourseClient;
+import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
@@ -25,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +53,7 @@ public class ExamInfoController {
     ExamQuestionServiceImpl examQuestionService;
 
     @Autowired
-    UserServiceClient userServiceClient;
+    CourseClient courseClient;
 
     @Operation(summary = "发布考试信息")
     @PostMapping("/update")
@@ -71,7 +69,7 @@ public class ExamInfoController {
             }
             info = "更新成功";
         } else {
-            Courses course = userServiceClient.findCourse(examInfo.getCourseId());
+            Courses course = courseClient.findCourse(examInfo.getCourseId());
             if (course != null) {
                 teacherId = course.getUserId();
             }
@@ -152,7 +150,7 @@ public class ExamInfoController {
                        @RequestParam(defaultValue = "10",required = false) Integer pageSize
                        ){
         Integer userId = UserAuthUtil.getUserId();
-        Courses course = userServiceClient.findCourse(courseId);
+        Courses course = courseClient.findCourse(courseId);
         if(course==null){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
@@ -188,7 +186,7 @@ public class ExamInfoController {
             queryWrapper.allEq(queryMap);
             record= examInfoService.page(pa, queryWrapper);
         }else{
-            JoinClass joinClass = userServiceClient.joinCourseByStuId(courseId, userId);
+            JoinClass joinClass = courseClient.joinCourseByStuId(courseId, userId);
             if(joinClass==null){
                 return Result.failed(ResultCode.PARAM_ERROR);
             }

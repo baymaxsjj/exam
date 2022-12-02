@@ -9,10 +9,12 @@ import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.user.service.impl.CoursesServiceImpl;
 import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
 import com.baymax.exam.user.vo.CourseInfoVo;
+import com.baymax.exam.web.annotation.Inner;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
  * @author baymax
  * @since 2022-10-11
  */
+@Slf4j
 @Validated
 @Tag(name = "课程管理")
 @RestController
@@ -59,6 +62,7 @@ public class CoursesController {
     @GetMapping("/getInfo")
     public Result<Courses> getCourse(@RequestParam Integer courseId) {
         //
+        final long startTime = System.currentTimeMillis();
         Courses course = coursesService.getById(courseId);
         Integer userId = UserAuthUtil.getUserId();
         // 未公开:未登录/未加入 禁止获取课程信息
@@ -71,6 +75,8 @@ public class CoursesController {
                 return Result.msgWaring("未加入该课程~");
             }
         }
+        final long endtTime = System.currentTimeMillis();
+        log.info("课程耗时："+(endtTime-startTime));
         return Result.success(coursesService.getCourseInfo(courseId));
     }
 
@@ -112,5 +118,17 @@ public class CoursesController {
         }
         coursesService.updateById(courses);
         return Result.msgSuccess("修改成功");
+    }
+    @Inner
+    @Operation(summary = "id获取课程信息")
+    @GetMapping("/findCourse")
+    public Courses findCourse(Integer courseId){
+        return coursesService.getById(courseId);
+    }
+    @Inner
+    @Operation(summary = "获取课程参加信息")
+    @GetMapping("/joinCourseByStuId")
+    public JoinClass joinCourseByStuId(Integer courseId, Integer stuId){
+        return joinClassService.getJoinByCourseId(stuId,courseId);
     }
 }

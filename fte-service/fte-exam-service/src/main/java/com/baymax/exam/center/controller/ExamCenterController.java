@@ -1,16 +1,13 @@
 package com.baymax.exam.center.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baymax.exam.center.enums.QuestionTypeEnum;
+import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.service.impl.*;
 import com.baymax.exam.center.utils.RedisKeyRule;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.common.redis.utils.RedisUtil;
-import com.baymax.exam.user.feign.UserServiceClient;
-import com.baymax.exam.user.model.JoinClass;
-import com.baymax.exam.user.model.User;
+import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +22,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.baymax.exam.center.interceptor.ExamCenterInterceptor.EXAM_INFO_KEY;
-import static com.baymax.exam.common.core.base.ExamAuth.*;
 
 /**
  * 缓存处理建议
@@ -49,15 +45,17 @@ public class ExamCenterController {
     QuestionItemServiceImpl questionItemService;
 
     @Autowired
-    UserServiceClient userServiceClient;
+    UserClient userClient;
     @Autowired
     HttpServletRequest request;
     @Autowired
     RedisUtil redisUtil;
+    @Autowired
+    ExamAnswerLogServiceImpl examAnswerLogService;
 
     @Operation(summary = "开始考试")
     @GetMapping("/start")
-    public Result startExam(@PathVariable String examInfoId){
+    public Result startExam(@PathVariable Integer examInfoId){
         Integer userId = UserAuthUtil.getUserId();
         //获取考试信息
         ExamInfo examInfo = (ExamInfo) request.getAttribute(EXAM_INFO_KEY);
@@ -80,6 +78,8 @@ public class ExamCenterController {
             //3.放入缓存
             redisUtil.setCacheMap(redisAnswerKey,questionTypeList);
         }
+        //写入日志
+        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.START,UserAuthUtil.getUserIp());
         Map<String,Object> result=new HashMap<>();
         result.put("examInfo",examInfo);
         result.put("systemTime",LocalDateTime.now());
@@ -137,11 +137,25 @@ public class ExamCenterController {
         redisUtil.setCacheMap(redisAnswerKey,result);
         return Result.success(answerResult.size());
     }
+    @Operation(summary = "考试行为")
+    @PostMapping("/action")
+    public Result action(@PathVariable Integer examInfoId,@RequestBody ExamAnswerLog answerLog){
+        ExamInfo examInfo = (ExamInfo) request.getAttribute(EXAM_INFO_KEY);
+        final Boolean isMonitor = examInfo.getIsMonitor();
+        if(isMonitor){
+            Integer userId = UserAuthUtil.getUserId();
+            examAnswerLogService.writeLog(userId,examInfo,answerLog.getStatus(),answerLog.getInfo());
+        }
+        //放入缓存，提交答案的时候在存到数据库
+        return Result.success("提交成功");
+    }
     @Operation(summary = "交卷")
     @PostMapping("/submit")
     public Result submit(@PathVariable Integer examInfoId){
+        ExamInfo examInfo = (ExamInfo) request.getAttribute(EXAM_INFO_KEY);
         //放入缓存，提交答案的时候在存到数据库
-
+        final Integer userId = UserAuthUtil.getUserId();
+        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.SUBMIT,UserAuthUtil.getUserIp());
         return Result.success("交卷成功",null);
     }
 }

@@ -1,6 +1,6 @@
 package com.baymax.exam.auth;
 
-import com.baymax.exam.user.feign.UserServiceClient;
+import com.baymax.exam.user.feign.UserClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -12,7 +12,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @modified By：
  * @version:
  */
-@EnableFeignClients(basePackageClasses = UserServiceClient.class)
+@EnableFeignClients(basePackageClasses = UserClient.class)
 @SpringBootApplication
 public class AuthServiceApplication {
     public static void main(String[] args) {

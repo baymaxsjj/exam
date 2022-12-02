@@ -6,6 +6,8 @@ import com.baymax.exam.center.model.QuestionItem;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,6 +95,45 @@ public class ParseQuestionText {
             questionInfo.setTopicItems(getItem(type,answerList,optionList));
             list.add(questionInfo);
             //判断答案可视
+        }
+        return list;
+    }
+    public static List<QuestionInfoVo> lineParse(String text, ParseQuestionRules rule) throws IOException {
+        BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))));
+        String buffer;
+        List<QuestionInfoVo> list=new ArrayList<>();
+        int preStep=0;
+        String tempStr;
+        QuestionInfoVo questionInfo;
+        List<QuestionItem> questionItems;
+        QuestionTypeEnum type;
+        while ((buffer=bufferedReader.readLine())!=null){
+            questionInfo=new QuestionInfoVo();
+            switch (preStep){
+                //啥也没匹配到，折为上一步的内容
+                case 1:
+                    tempStr=questionInfo.getContent();
+                    questionInfo.setContent(tempStr+buffer);
+                case 2:
+                case 3:
+
+            }
+            if(buffer.matches(rule.getQuestionRule())){
+                //当匹配的下一个题目的时候添加到
+                preStep=1;
+                questionInfo.setContent(buffer);
+                questionItems=new ArrayList<>();
+//                continue;如果题目中包含答案的模式吧
+            }
+            if(buffer.matches(rule.getQuestionRule())){
+                preStep=2;
+//                continue;
+            }
+            if(buffer.matches(rule.getAnswerRule())){
+                preStep=3;
+//                continue;
+            }
+
         }
         return list;
     }

@@ -1,9 +1,10 @@
 package com.baymax.exam.auth.service;
 
+import com.baymax.exam.common.core.base.IBaseEnum;
 import com.baymax.exam.common.core.base.LoginUser;
 import com.baymax.exam.auth.base.SecurityUser;
-import com.baymax.exam.common.core.base.ExamAuth;
-import com.baymax.exam.user.feign.UserServiceClient;
+import com.baymax.exam.common.core.enums.ClientIdEnum;
+import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +33,18 @@ public class UserServiceImpl implements UserDetailsService {
     @Autowired
     private HttpServletRequest request;
     @Autowired
-    UserServiceClient userServiceClient;
+    UserClient userClient;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String clientId = request.getParameter("client_id");
+        ClientIdEnum client = IBaseEnum.getEnumByValue(clientId, ClientIdEnum.class);
         log.info(username);
         LoginUser loginUser=null;
-        if(ExamAuth.ADMIN_CLIENT_ID.equals(clientId)){
+        if(ClientIdEnum.ADMIN_CLIENT_ID==client){
             //TODO:管理端获取用户
 
         }else    {
-           User user=userServiceClient.findUser(username);
+           User user= userClient.findUser(username);
            if(user!=null){
                loginUser=new LoginUser();
                loginUser.setUsername(user.getUsername());
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserDetailsService {
         if (loginUser==null) {
             throw new UsernameNotFoundException("用户名或密码错误");
         }
-        loginUser.setClientId(clientId);
+        loginUser.setClientId(client);
         log.info(loginUser.toString());
         SecurityUser securityUser=new SecurityUser(loginUser);
         if (!securityUser.isEnabled()) {

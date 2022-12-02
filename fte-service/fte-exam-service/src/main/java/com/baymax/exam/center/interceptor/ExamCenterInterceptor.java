@@ -2,13 +2,9 @@ package com.baymax.exam.center.interceptor;
 
 import com.baymax.exam.center.exceptions.ExamOnLineException;
 import com.baymax.exam.center.model.ExamInfo;
-import com.baymax.exam.center.service.impl.ExamClassServiceImpl;
 import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
-import com.baymax.exam.center.service.impl.ExamPaperServiceImpl;
-import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
-import com.baymax.exam.common.core.result.Result;
-import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.user.feign.UserServiceClient;
+import com.baymax.exam.user.feign.CourseClient;
+import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +34,7 @@ public class ExamCenterInterceptor implements HandlerInterceptor {
     ExamInfoServiceImpl examInfoService;
     @Lazy
     @Autowired
-    UserServiceClient userServiceClient;
+    CourseClient courseClient;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Map<String, String> pathVars = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
@@ -56,7 +52,7 @@ public class ExamCenterInterceptor implements HandlerInterceptor {
         Integer courseId = examInfo.getCourseId();
         //试卷id
         Integer userId = UserAuthUtil.getUserId();
-        JoinClass joinClass = userServiceClient.joinCourseByStuId(courseId, userId);
+        JoinClass joinClass = courseClient.joinCourseByStuId(courseId, userId);
         if(joinClass==null){
             throw new ExamOnLineException("非法请求~");
         }

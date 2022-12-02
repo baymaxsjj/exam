@@ -1,14 +1,7 @@
 package com.baymax.exam.user.config;
 
-import com.baymax.exam.web.interceptor.UserTokenInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.baymax.exam.web.config.BaseWebConfig;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @author ：Baymax
@@ -18,11 +11,6 @@ import java.util.List;
  * @version:
  */
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig extends BaseWebConfig {
 
-    @Resource
-    private UserTokenInterceptor tokenInterceptor ;
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(tokenInterceptor).addPathPatterns("/**");
-    }
 }

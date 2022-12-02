@@ -1,14 +1,13 @@
 package com.baymax.exam.center.controller;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baymax.exam.center.model.Tags;
 import com.baymax.exam.center.service.impl.TagsServiceImpl;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.user.feign.UserServiceClient;
+import com.baymax.exam.user.feign.CourseClient;
+import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
@@ -21,7 +20,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,12 +40,12 @@ public class TagsController {
     @Autowired
     TagsServiceImpl tagsService;
     @Autowired
-    UserServiceClient userServiceClient;
+    CourseClient courseClient;
 
     @Operation(summary = "创建/更新题目分类")
     @PostMapping("/update")
     public Result update(@RequestBody @Validated Tags tags){
-        Courses course = userServiceClient.findCourse(tags.getCourseId());
+        Courses course = courseClient.findCourse(tags.getCourseId());
         Integer userId = UserAuthUtil.getUserId();
         if(course==null||course.getUserId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
@@ -79,7 +77,7 @@ public class TagsController {
     public Result<List<Tags>> list(
             @Schema(description = "课程id") @PathVariable Integer courseId,
             @Schema(description = "父标签id") @RequestParam(required = false) Integer parentId){
-        Courses course = userServiceClient.findCourse(courseId);
+        Courses course = courseClient.findCourse(courseId);
         Integer userId = UserAuthUtil.getUserId();
         if(course==null){
             return Result.failed(ResultCode.PARAM_ERROR);
@@ -95,7 +93,7 @@ public class TagsController {
             return Result.success(tagsService.list(queryWrapper));
         }else{
             //1.判断是否课程班级中
-            JoinClass joinClass = userServiceClient.joinCourseByStuId(courseId, userId);
+            JoinClass joinClass = courseClient.joinCourseByStuId(courseId, userId);
             if(joinClass==null){
                 return Result.failed(ResultCode.PARAM_ERROR);
             }

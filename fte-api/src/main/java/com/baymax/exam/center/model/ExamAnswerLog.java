@@ -3,9 +3,13 @@ package com.baymax.exam.center.model;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.Null;
 
 /**
  * <p>
@@ -31,8 +35,10 @@ public class ExamAnswerLog implements Serializable {
     @Schema(description = "学生id")
     private Integer studentId;
 
+    @Null(message = "状态不能为考")
     @Schema(description = "状态：0:开始、2：交卷")
-    private Byte status;
+    private ExamAnswerLogEnum status;
+
     @Schema(description = "状态信息")
     private String info;
 
