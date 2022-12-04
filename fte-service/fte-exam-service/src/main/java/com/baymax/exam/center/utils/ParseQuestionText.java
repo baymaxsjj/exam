@@ -92,7 +92,7 @@ public class ParseQuestionText {
                 }
             }
             questionInfo.setType(type);
-            questionInfo.setTopicItems(getItem(type,answerList,optionList));
+            questionInfo.setOptions(getItem(type,answerList,optionList));
             list.add(questionInfo);
             //判断答案可视
         }

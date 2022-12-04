@@ -1,24 +1,23 @@
 package com.baymax.exam.center.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import com.baymax.exam.center.model.ExamAnswerLog;
 import com.baymax.exam.center.model.ExamInfo;
 import com.baymax.exam.center.service.impl.ExamAnswerLogServiceImpl;
 import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
+import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <p>
@@ -49,27 +48,52 @@ public class ExamAnswerLogController {
         final List<ExamAnswerLog> list = examAnswerLogService.getLogListByStatus(examInfoId,null);
         Map<ExamAnswerLogEnum, Set<Integer>> normalAction=new HashMap<>();
         Map<ExamAnswerLogEnum,Integer> abnormalAction=new HashMap<>();
+        AtomicInteger abnormalCount= new AtomicInteger();
         list.stream().forEach(i->{
             //正常行为,去重
             ExamAnswerLogEnum status = i.getStatus();
-            if(status==ExamAnswerLogEnum.START||status==ExamAnswerLogEnum.SUBMIT){
+            if(status.getValue()<20){
                 Set<Integer>  userIds= normalAction.get(status);
                 if(userIds==null){
                     userIds=new HashSet<>();
                 }
                 userIds.add(i.getStudentId());
                 normalAction.put(status,userIds);
-            }else{
+            }else if(status.getValue()>50){
+                //异常行为
                 Integer count = abnormalAction.get(status);
                 count=(count==null)?0:count+1;
+                abnormalCount.getAndIncrement();
                 abnormalAction.put(status,count);
             }
         });
-        
+
         Map<String,Object> result=new HashMap<>();
-        result.put("total",list.size());
+        result.put("abnormalCount",abnormalCount.intValue());
         result.put("normal",normalAction);
         result.put("abnormal",abnormalAction);
         return Result.success(result);
+    }
+    @GetMapping("/student/{examInfoId}/{studentId}")
+    public Result getStudentLog(@PathVariable Integer studentId,
+                                @PathVariable Integer examInfoId,
+                                @RequestParam(defaultValue = "1") Integer page,
+                                @RequestParam(required = false,defaultValue = "10") Integer pageSize){
+         Integer userId = UserAuthUtil.getUserId();
+         ExamInfo examInfo = examInfoService.getById(examInfoId);
+        if(examInfo==null|| examInfo.getTeacherId()!=userId){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        ExamAnswerLog studentLogOne = examAnswerLogService.getStudentLogOne(examInfoId, studentId,null);
+        //没有日志
+        if(studentLogOne==null){
+            return Result.success(PageResult.setResult(new Page<>()));
+        }
+        //防止非法访问
+        if(studentLogOne.getExamId()!=examInfoId){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        final IPage<ExamAnswerLog> logList = examAnswerLogService.getLogListByUserId(examInfoId, studentId, page, pageSize);
+        return Result.success(PageResult.setResult(logList));
     }
 }

@@ -3,7 +3,7 @@
 <mapper namespace="com.baymax.exam.center.mapper.QuestionMapper">
     <resultMap id="questionInfo" autoMapping="true" type="com.baymax.exam.center.vo.QuestionInfoVo">
         <id property="id" column="id"/>
-        <collection property="topicItems" javaType="java.util.List" ofType="com.baymax.exam.center.model.QuestionItem">
+        <collection property="options" javaType="java.util.List" ofType="com.baymax.exam.center.model.QuestionItem">
             <id property="id" column="item_id"/>
             <result property="content" column="item_content"/>
             <result property="answer" column="item_answer"/>

@@ -62,13 +62,14 @@ public class ExamConsoleController {
             @PathVariable Integer examInfoId,
             @RequestBody Set<Integer> classIds,
             @RequestParam AnswerStatusEnum status,
-            @RequestParam(defaultValue = "1") Long currPage,
+            @RequestParam(defaultValue = "1") Long page,
             @RequestParam(required = false,defaultValue = "10") Long pageSize){
         ExamInfo examInfo = examInfoService.getById(examInfoId);
          Integer userId = UserAuthUtil.getUserId();
         if(examInfo==null||examInfo.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
+        //TODO:判断班级是不是自己的
         Set<Integer> studentIds=null;
         boolean isIsList=true;
         // 查询行为日志
@@ -92,7 +93,7 @@ public class ExamConsoleController {
         CourseUserPo courseUserPo=new CourseUserPo();
         courseUserPo.setClassIds(classIds);
         courseUserPo.setStudentIds(studentIds);
-        PageResult batchClassUser = joinClassClient.getBatchClassUser(courseUserPo, isIsList, currPage,pageSize);
+        PageResult batchClassUser = joinClassClient.getBatchClassUser(courseUserPo, isIsList, page,pageSize);
         //整合行为列表
         List<User> studentList = batchClassUser.getList();
         List<StudentActionVo> studentsActionInfo = studentList.stream().map(i -> {

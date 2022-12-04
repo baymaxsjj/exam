@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author ：Baymax
@@ -13,8 +14,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @modified By：
  * @version:
  */
-//表示开启异步化
-@EnableAsync
+
+@EnableAsync//表示开启异步化
+@EnableScheduling //定时任务在启动类注解
 @EnableFeignClients(basePackages="com.baymax.exam.*")
 @SpringBootApplication(scanBasePackages = "com.baymax.exam")
 //扫描mapper

@@ -52,14 +52,14 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         }
         int itemMin = enumByValue.getItemMin();
         int itemMax = enumByValue.getItemMax();
-        int itemSize = questionInfo.getTopicItems().size();
+        int itemSize = questionInfo.getOptions().size();
         if(itemSize<itemMin||(itemSize>itemMax)){
             log.info("题目项个数不合法");
             return "题目项个数不合法";
         }
         //2.单选，判断，答案只能是一个
         if(enumByValue==QuestionTypeEnum.SIGNAL_CHOICE||enumByValue==QuestionTypeEnum.JUDGMENTAL){
-            long count = questionInfo.getTopicItems().stream().filter(el -> el.getAnswer() != null).count();
+            long count = questionInfo.getOptions().stream().filter(el -> el.getAnswer() != null).count();
             if(count!=1){
                 log.info("题目正确选择个数不正确");
                 return "题目正确选择个数不正确";
@@ -68,7 +68,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         //3.创建题目
         questionMapper.insert((Question) questionInfo);
 
-        List<QuestionItem> topicItems = questionInfo.getTopicItems().stream().map(tem->{
+        List<QuestionItem> topicItems = questionInfo.getOptions().stream().map(tem->{
             tem.setQuestionId(questionInfo.getId());
             return tem;
         }).collect(Collectors.toList());

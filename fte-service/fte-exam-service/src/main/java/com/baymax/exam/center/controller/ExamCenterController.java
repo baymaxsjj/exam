@@ -1,9 +1,11 @@
 package com.baymax.exam.center.controller;
 
 import com.baymax.exam.center.enums.ExamAnswerLogEnum;
+import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.service.impl.*;
-import com.baymax.exam.center.utils.RedisKeyRule;
+import com.baymax.exam.center.utils.ExamRedisKey;
+import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.common.redis.utils.RedisUtil;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.baymax.exam.center.interceptor.ExamCenterInterceptor.EXAM_INFO_KEY;
@@ -43,6 +46,8 @@ public class ExamCenterController {
     ExamQuestionServiceImpl examQuestionService;
     @Autowired
     QuestionItemServiceImpl questionItemService;
+    @Autowired
+    ExamCenterServiceImpl examCenterService;
 
     @Autowired
     UserClient userClient;
@@ -56,72 +61,77 @@ public class ExamCenterController {
     @Operation(summary = "开始考试")
     @GetMapping("/start")
     public Result startExam(@PathVariable Integer examInfoId){
+        //FIXME:考试题目/选项，放入缓存。这里只存题目序号
         Integer userId = UserAuthUtil.getUserId();
         //获取考试信息
         ExamInfo examInfo = (ExamInfo) request.getAttribute(EXAM_INFO_KEY);
-        Integer examId = examInfo.getExamId();
-        String redisAnswerKey= RedisKeyRule.examQuestionKey(examInfo.getId(),userId);
-        //0.从缓存获取
-        Map<String,List<Question>> questionTypeList;
-        if(redisUtil.hasKey(redisAnswerKey)){
-            questionTypeList = redisUtil.getCacheMap(redisAnswerKey);
+        //获取考试题目
+        List<QuestionInfoVo> cacheQuestionsInfo = examCenterService.getCacheQuestionsInfo(examInfoId, examInfo.getExamId());
+        //获取个人题目序号
+        String key = ExamRedisKey.examStudentQuestionsInfoKey(examInfoId, userId);
+        if(redisUtil.hasKey(key)){
+            Map<String, Integer> questionOrders=redisUtil.getCacheMap(key);
+            //还原题目顺序
+            cacheQuestionsInfo.sort((o1, o2) -> {
+                Integer w1=questionOrders.get(o1.getId().toString());
+                Integer w2=questionOrders.get(o2.getId().toString());
+                return w1.compareTo(w2);
+            });
         }else{
-            //1. 查询 试卷题目
-            List<Question> questionList = examQuestionService.getQuestionByExamId(examId);
             if(examInfo.getQuestionDisorder()){
                 //打乱集合
-                Collections.shuffle(questionList);
+                Collections.shuffle(cacheQuestionsInfo);
+                //保存题目顺序
+                final Map<String, Integer> orderWight = new HashMap<>();
+                for (int i = 0; i < cacheQuestionsInfo.size(); i++) {
+                    orderWight.put(cacheQuestionsInfo.get(i).getId().toString(),i);
+                }
+                redisUtil.setCacheMap(key,orderWight);
             }
-            questionList.stream().forEach(question -> question.setAnalysis(null));
-            //2.题目类型分类
-            questionTypeList=questionList.stream().collect(Collectors.groupingBy(i->i.getType().name()));
-            //3.放入缓存
-            redisUtil.setCacheMap(redisAnswerKey,questionTypeList);
         }
-        //写入日志
+        //打乱题目选项
+        if(examInfo.getOptionDisorder()){
+            cacheQuestionsInfo.stream().forEach(q->{
+                final QuestionTypeEnum type = q.getType();
+                if(type==QuestionTypeEnum.MULTIPLE_CHOICE||type==QuestionTypeEnum.SIGNAL_CHOICE){
+                    Collections.shuffle(q.getOptions());
+                }
+            });
+        }
+        //去除答案
+        cacheQuestionsInfo.stream().forEach(q->{
+           q.getOptions().forEach(questionItem -> questionItem.setAnswer(null));
+        });
+        //2.题目类型分类
+        final Map<QuestionTypeEnum, List<QuestionInfoVo>> questionGroup = cacheQuestionsInfo.stream().collect(Collectors.groupingBy(i -> i.getType()));
+        //题目类型排序
+        TreeMap<QuestionTypeEnum, List<QuestionInfoVo>> questionOrderGroup=new TreeMap<>((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+        questionOrderGroup.putAll(questionGroup);
+
         examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.START,UserAuthUtil.getUserIp());
         Map<String,Object> result=new HashMap<>();
         result.put("examInfo",examInfo);
         result.put("systemTime",LocalDateTime.now());
-        result.put("questionList",questionTypeList);
+        result.put("questionList",questionOrderGroup);
         return  Result.success(result);
     }
     @Operation(summary = "考试选项")
     @GetMapping("/question/{questionId}")
     public Result option(@PathVariable Integer examInfoId, @PathVariable Integer questionId){
         //判断改题目是否在考试中
-        ExamInfo examInfo = (ExamInfo) request.getAttribute(EXAM_INFO_KEY);
-        Integer examId = examInfo.getExamId();
-        ExamQuestion examQuestion = examQuestionService.getExamQuestion(examId, questionId);
-        if(examQuestion==null){
-            return Result.failed(ResultCode.PARAM_ERROR);
-        }
         Integer userId = UserAuthUtil.getUserId();
-
         //1.缓存获取答案
-        String redisAnswerKey=RedisKeyRule.examAnswerKey(examInfoId,userId);
+        String redisAnswerKey= ExamRedisKey.examStudentAnswerKey(examInfoId,userId);
         Map<String,Map<Integer,String>> answerList = redisUtil.getCacheMap(redisAnswerKey);
-        log.info("缓存答案："+answerList);
-        //2.获取选项
-        List<QuestionItem> questionItems = questionItemService.getQuestionItems(questionId);
         //3.获取该题的作答
         Map<Integer, String> answer = answerList.get(questionId.toString());
-        log.info("该题目缓存答案："+questionId+"->"+answer);
-        //TODO:3.判断选项要不要乱序,这样还要判断题目类型哭~~~算了先放着吧
-        questionItems.stream().forEach(questionItem -> {
-            if(answer!=null){
-                questionItem.setAnswer(answer.get(questionItem.getId()));
-            }else{
-                questionItem.setAnswer(null);
-            }
-        });
-        return  Result.success(questionItems);
+        return  Result.success(answer);
     }
     @Operation(summary = "提交答案")
     @PostMapping("/answer/{questionId}")
     public Result answer(@PathVariable Integer examInfoId, @RequestBody Map<Integer,String> answerResult, @PathVariable String questionId){
         Integer userId = UserAuthUtil.getUserId();
-        String redisAnswerKey=RedisKeyRule.examAnswerKey(examInfoId,userId);
+        String redisAnswerKey= ExamRedisKey.examStudentAnswerKey(examInfoId,userId);
         //key
         Map<String,Map<Integer,String>> result;
         // 判断是不是考试题目

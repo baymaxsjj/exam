@@ -17,5 +17,5 @@ import java.util.List;
 @Data
 @Schema(name = "QuestionInfoVo", description = "题目具体信息")
 public class QuestionInfoVo extends Question {
-    private List<QuestionItem> topicItems;
+    private List<QuestionItem> options;
 }

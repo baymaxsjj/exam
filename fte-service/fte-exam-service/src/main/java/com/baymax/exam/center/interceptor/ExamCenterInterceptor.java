@@ -1,7 +1,11 @@
 package com.baymax.exam.center.interceptor;
 
+import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import com.baymax.exam.center.exceptions.ExamOnLineException;
+import com.baymax.exam.center.model.ExamAnswerLog;
 import com.baymax.exam.center.model.ExamInfo;
+import com.baymax.exam.center.service.impl.ExamAnswerLogServiceImpl;
+import com.baymax.exam.center.service.impl.ExamCenterServiceImpl;
 import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
 import com.baymax.exam.user.feign.CourseClient;
 import com.baymax.exam.user.feign.UserClient;
@@ -31,7 +35,9 @@ import java.util.Map;
 public class ExamCenterInterceptor implements HandlerInterceptor {
     public static final String EXAM_INFO_KEY="examInfo";
     @Autowired
-    ExamInfoServiceImpl examInfoService;
+    ExamCenterServiceImpl examInfoService;
+    @Autowired
+    ExamAnswerLogServiceImpl examAnswerLogService;
     @Lazy
     @Autowired
     CourseClient courseClient;
@@ -44,7 +50,7 @@ public class ExamCenterInterceptor implements HandlerInterceptor {
         }
         log.info(String.valueOf(examInfoService));
         //获取考试信息
-        ExamInfo examInfo = examInfoService.getById(examInfoId);
+        ExamInfo examInfo = examInfoService.getCacheExamInfo(Integer.valueOf(examInfoId));
         if(examInfo==null){
             throw new ExamOnLineException("非法请求~");
         }
@@ -58,6 +64,11 @@ public class ExamCenterInterceptor implements HandlerInterceptor {
         }
         if(nowTime.isBefore(examInfo.getStartTime())||nowTime.isAfter(examInfo.getEndTime())){
             throw new ExamOnLineException("不在考试时间~");
+        }
+        //判断是否交卷
+        final ExamAnswerLog isSubmit = examAnswerLogService.getStudentLogOne(examInfo.getId(), userId, ExamAnswerLogEnum.SUBMIT);
+        if(isSubmit!=null){
+            throw new ExamOnLineException("已提交");
         }
         log.info(examInfo.toString());
         request.setAttribute(EXAM_INFO_KEY,examInfo);

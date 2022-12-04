@@ -16,6 +16,7 @@ import com.baymax.exam.message.enums.MessageCodeEnum;
 import com.baymax.exam.message.feign.MessageServiceClient;
 import com.baymax.exam.message.model.MessageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @Service
 public class ExamAnswerLogServiceImpl extends ServiceImpl<ExamAnswerLogMapper, ExamAnswerLog> implements IExamAnswerLogService {
+    @Lazy
     @Autowired
     MessageServiceClient messageServiceClient;
     @Async
@@ -56,6 +58,16 @@ public class ExamAnswerLogServiceImpl extends ServiceImpl<ExamAnswerLogMapper, E
         }
         queryWrapper.orderByDesc(ExamAnswerLog::getCreatedAt);
         return this.list(queryWrapper);
+    }
+    public ExamAnswerLog getStudentLogOne(int examId,int userId,ExamAnswerLogEnum status){
+        LambdaQueryWrapper<ExamAnswerLog> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(ExamAnswerLog::getExamId,examId);
+        queryWrapper.eq(ExamAnswerLog::getStudentId,userId);
+        if(status!=null){
+            queryWrapper.eq(ExamAnswerLog::getStatus,status);
+        }
+        queryWrapper.last("LIMIT 1");
+        return getOne(queryWrapper);
     }
     public IPage<ExamAnswerLog> getLogListByUserId(int examId,int userId,int page,int pageSize){
         LambdaQueryWrapper<ExamAnswerLog> queryWrapper=new LambdaQueryWrapper<>();

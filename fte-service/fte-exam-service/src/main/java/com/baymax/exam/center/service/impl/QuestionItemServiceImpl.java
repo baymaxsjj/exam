@@ -31,4 +31,5 @@ public class QuestionItemServiceImpl extends ServiceImpl<QuestionItemMapper, Que
     public List<QuestionItem> getQuestionItems(int questionId) {
         return list(new LambdaQueryWrapper<QuestionItem>().eq(QuestionItem::getQuestionId,questionId));
     }
+
 }
