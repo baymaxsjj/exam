@@ -5,11 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.baymax.exam.center.enums.QuestionResultTypeEnum;
+import com.baymax.exam.center.enums.ReviewTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * <p>
@@ -17,7 +18,7 @@ import javax.validation.constraints.NotNull;
  * </p>
  *
  * @author baymax
- * @since 2022-11-04
+ * @since 2022-12-06
  */
 @Getter
 @Setter
@@ -38,15 +39,23 @@ public class ExamAnswerResult implements Serializable {
     @Schema(description = "题目id")
     private Integer questionId;
 
-    @NotNull(message = "选择id 不能为空")
     @Schema(description = "选项id")
     private Integer optionId;
 
     @Schema(description = "答案：主观题使用")
     private String answer;
 
-    @Schema(description = "结果：0:错误：1：正确")
-    private Byte result;
+    @Schema(description = "得分")
+    private Float score;
+
+    @Schema(description = "结果类型：对、错、半错")
+    private QuestionResultTypeEnum resultType;
+
+    @Schema(description = "批阅类型：机器、老师")
+    private ReviewTypeEnum reviewType;
+
+    @Schema(description = "评价")
+    private String evaluate;
 
     private LocalDateTime createdAt;
 

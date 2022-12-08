@@ -1,21 +1,16 @@
 package com.baymax.exam.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baymax.exam.common.core.base.SecurityConstants;
-import com.baymax.exam.common.redis.utils.RedisUtil;
+import com.baymax.exam.common.redis.utils.RedisUtils;
 import com.baymax.exam.user.model.Classes;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baymax.exam.user.mapper.ClassesMapper;
 import com.baymax.exam.user.service.IClassesService;
-import com.baymax.exam.user.utils.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import static com.baymax.exam.common.core.base.RedisKeyConstants.REDIS_CLASS_CODE_KEY;
-import static com.baymax.exam.common.core.base.RedisKeyConstants.REDIS_CODE_CLASS_KEY;
 
 /**
  * <p>
@@ -29,7 +24,7 @@ import static com.baymax.exam.common.core.base.RedisKeyConstants.REDIS_CODE_CLAS
 public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> implements IClassesService {
 
     @Autowired
-    RedisUtil redisUtil;
+    RedisUtils redisUtils;
 
     /**
      * 根据课程id获取
@@ -42,62 +37,6 @@ public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> impl
         LambdaQueryWrapper<Classes> queryWrapper=new LambdaQueryWrapper();
         queryWrapper.eq(Classes::getCourseId,courseId);
         return list(queryWrapper);
-    }
-
-    /**
-     * 生成代码
-     *
-     * @return {@link String}
-     */
-    @Override
-    public String generateCode(Integer classId) {
-        String code = null;
-        for(int i=0;i<3;i++){
-            code=RandomUtil.generateCode();
-            String reCode=getCodeById(classId);
-            //班级码有效
-            if(reCode==null){
-                //有效期7天
-                redisUtil.setCacheObject(REDIS_CLASS_CODE_KEY+classId,code,7, TimeUnit.DAYS);
-                //双向映射
-                redisUtil.setCacheObject(REDIS_CODE_CLASS_KEY+code,classId,7,TimeUnit.HOURS);
-                break;
-            }
-        }
-        return code;
-    }
-
-    /**
-     * 班级id获取班级码
-     *
-     * @param classId 类id
-     * @return {@link String}
-     */
-    @Override
-    public String getCodeById(Integer classId) {
-        return redisUtil.getCacheObject(REDIS_CLASS_CODE_KEY+classId);
-    }
-
-    /**
-     * 班级码获取班级id
-     *
-     * @param code 代码
-     * @return {@link String}
-     */
-    @Override
-    public Integer getClassByCode(String code) {
-        return redisUtil.<Integer>getCacheObject(REDIS_CODE_CLASS_KEY+code);
-    }
-
-    /**
-     * 有班级码有效时间
-     *
-     * @param classId
-     * @return long
-     */
-    @Override
-    public long getCodeValidTime(Integer classId) {
-        return redisUtil.getExpire(REDIS_CLASS_CODE_KEY+classId);
     }
 
 }

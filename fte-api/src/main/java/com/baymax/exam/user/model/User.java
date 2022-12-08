@@ -77,7 +77,7 @@ public class User extends BaseEntity {
     private String role;
 
     @Schema(description = "状态，0：启用，>0:封禁")
-    private String enable;
+    private Boolean enable;
 
     /**
      * 编码密码

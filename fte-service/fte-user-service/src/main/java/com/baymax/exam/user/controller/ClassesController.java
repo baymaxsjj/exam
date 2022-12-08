@@ -8,6 +8,7 @@ import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.user.service.impl.ClassesServiceImpl;
 import com.baymax.exam.user.service.impl.CoursesServiceImpl;
 import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
+import com.baymax.exam.user.utils.CourseClassCodeUtil;
 import com.baymax.exam.user.vo.ClassCodeVo;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +46,8 @@ public class ClassesController {
     ClassesServiceImpl classesService;
     @Autowired
     JoinClassServiceImpl joinClassService;
+    @Autowired
+    CourseClassCodeUtil courseClassCodeUtil;
 
     @Operation(summary = "创建/修改班级")
     @PostMapping("/update")
@@ -126,29 +129,17 @@ public class ClassesController {
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         //班级码是否存在
-        String code = null;
-        if(!anew){
-            code=classesService.getCodeById(classId);
-        }
-        //生成班级码
-        if(code==null){
-            code=classesService.generateCode(classId);
-        }
-        long validTime=classesService.getCodeValidTime(classId);
-        log.info("班级码:"+code+"时间"+validTime);
-        LocalDateTime localDateTime=LocalDateTime.now();
-        //获取失效时间
-        localDateTime=localDateTime.plusSeconds(validTime);
+        String code =courseClassCodeUtil.getClassCode(classId,anew);
         ClassCodeVo classCode = new ClassCodeVo();
         classCode.setCode(code);
-        classCode.setExpirationTime(localDateTime);
+        classCode.setExpirationTime(courseClassCodeUtil.getExtricableTime(code));
         return Result.success(classCode);
     }
     @Operation(summary = "加入班级")
     @PostMapping("/join/{code}")
     public Result joinClass(
             @Schema(description = "班级码") @PathVariable String code){
-        Integer classId = classesService.getClassByCode(code);
+        Integer classId = courseClassCodeUtil.getClassIdByCode(code);
         if(classId==null){
             return Result.msgInfo("班级码不存在");
         }

@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserDetailsService {
                loginUser.setPassword(user.getPassword());
                loginUser.setId(user.getId());
                loginUser.setRoles(new ArrayList<>());
-               loginUser.setEnabled(user.getEnable().equals("0"));
+               loginUser.setEnabled(user.getEnable());
            }
         }
         if (loginUser==null) {

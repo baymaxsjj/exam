@@ -7,8 +7,7 @@ import com.baymax.exam.center.service.impl.*;
 import com.baymax.exam.center.utils.ExamRedisKey;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.Result;
-import com.baymax.exam.common.core.result.ResultCode;
-import com.baymax.exam.common.redis.utils.RedisUtil;
+import com.baymax.exam.common.redis.utils.RedisUtils;
 import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.baymax.exam.center.interceptor.ExamCenterInterceptor.EXAM_INFO_KEY;
@@ -54,7 +52,7 @@ public class ExamCenterController {
     @Autowired
     HttpServletRequest request;
     @Autowired
-    RedisUtil redisUtil;
+    RedisUtils redisUtils;
     @Autowired
     ExamAnswerLogServiceImpl examAnswerLogService;
 
@@ -69,8 +67,8 @@ public class ExamCenterController {
         List<QuestionInfoVo> cacheQuestionsInfo = examCenterService.getCacheQuestionsInfo(examInfoId, examInfo.getExamId());
         //获取个人题目序号
         String key = ExamRedisKey.examStudentQuestionsInfoKey(examInfoId, userId);
-        if(redisUtil.hasKey(key)){
-            Map<String, Integer> questionOrders=redisUtil.getCacheMap(key);
+        if(redisUtils.hasKey(key)){
+            Map<String, Integer> questionOrders= redisUtils.getCacheMap(key);
             //还原题目顺序
             cacheQuestionsInfo.sort((o1, o2) -> {
                 Integer w1=questionOrders.get(o1.getId().toString());
@@ -86,7 +84,7 @@ public class ExamCenterController {
                 for (int i = 0; i < cacheQuestionsInfo.size(); i++) {
                     orderWight.put(cacheQuestionsInfo.get(i).getId().toString(),i);
                 }
-                redisUtil.setCacheMap(key,orderWight);
+                redisUtils.setCacheMap(key,orderWight);
             }
         }
         //打乱题目选项
@@ -98,10 +96,32 @@ public class ExamCenterController {
                 }
             });
         }
-        //去除答案
-        cacheQuestionsInfo.stream().forEach(q->{
-           q.getOptions().forEach(questionItem -> questionItem.setAnswer(null));
-        });
+        String redisAnswerKey= ExamRedisKey.examStudentAnswerKey(examInfoId,userId);
+        if(redisUtils.hasKey(redisAnswerKey)){
+            //第n次访问，整合自己的答案
+            Map<String,Map<Integer,String>> answerList = redisUtils.getCacheMap(redisAnswerKey);
+            cacheQuestionsInfo.stream().forEach(q->{
+                //得到个人答案
+                Map<Integer, String> questionAnswer = answerList.get(q.getId().toString());
+                q.getOptions().forEach(questionItem -> {
+                    if(questionAnswer!=null&&questionAnswer.containsKey(questionItem.getId())){
+                        String answer = questionAnswer.get(questionItem.getId());
+                        questionItem.setAnswer(answer);
+                    }else{
+                        //去除答案
+                        questionItem.setAnswer(null);
+                    }
+                });
+            });
+        }else{
+            //第一次访问，清除所有答案
+            cacheQuestionsInfo.stream().forEach(q->{
+                q.getOptions().forEach(questionItem -> {
+                    questionItem.setAnswer(null);
+                });
+            });
+        }
+
         //2.题目类型分类
         final Map<QuestionTypeEnum, List<QuestionInfoVo>> questionGroup = cacheQuestionsInfo.stream().collect(Collectors.groupingBy(i -> i.getType()));
         //题目类型排序
@@ -115,14 +135,14 @@ public class ExamCenterController {
         result.put("questionList",questionOrderGroup);
         return  Result.success(result);
     }
-    @Operation(summary = "考试选项")
+    @Operation(summary = "学生答案一致性确认")
     @GetMapping("/question/{questionId}")
     public Result option(@PathVariable Integer examInfoId, @PathVariable Integer questionId){
         //判断改题目是否在考试中
         Integer userId = UserAuthUtil.getUserId();
         //1.缓存获取答案
         String redisAnswerKey= ExamRedisKey.examStudentAnswerKey(examInfoId,userId);
-        Map<String,Map<Integer,String>> answerList = redisUtil.getCacheMap(redisAnswerKey);
+        Map<String,Map<Integer,String>> answerList = redisUtils.getCacheMap(redisAnswerKey);
         //3.获取该题的作答
         Map<Integer, String> answer = answerList.get(questionId.toString());
         return  Result.success(answer);
@@ -135,16 +155,16 @@ public class ExamCenterController {
         //key
         Map<String,Map<Integer,String>> result;
         // 判断是不是考试题目
-        if (redisUtil.hasKey(redisAnswerKey)){
+        if (redisUtils.hasKey(redisAnswerKey)){
             //1.获取缓存中的考试答案
-            result=redisUtil.getCacheMap(redisAnswerKey);
+            result= redisUtils.getCacheMap(redisAnswerKey);
         }else{
             result=new HashMap<>();
         }
         result.put(questionId,answerResult);
         log.info("提交答案："+result);
         //放入缓存，提交答案的时候在存到数据库
-        redisUtil.setCacheMap(redisAnswerKey,result);
+        redisUtils.setCacheMap(redisAnswerKey,result);
         return Result.success(answerResult.size());
     }
     @Operation(summary = "考试行为")
