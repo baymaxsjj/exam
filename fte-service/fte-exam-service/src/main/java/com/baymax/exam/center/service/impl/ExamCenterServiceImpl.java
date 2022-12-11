@@ -1,19 +1,23 @@
 package com.baymax.exam.center.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baymax.exam.center.enums.QuestionResultTypeEnum;
 import com.baymax.exam.center.enums.QuestionTypeEnum;
-import com.baymax.exam.center.model.ExamAnswerResult;
-import com.baymax.exam.center.model.ExamInfo;
-import com.baymax.exam.center.model.Question;
-import com.baymax.exam.center.model.QuestionItem;
+import com.baymax.exam.center.enums.ReviewTypeEnum;
+import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.utils.ExamRedisKey;
+import com.baymax.exam.center.vo.ExamAnswerInfoVo;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.redis.utils.RedisUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
  * @modified By：
  * @version:
  */
+@Slf4j
 @Service
 public class ExamCenterServiceImpl {
     @Autowired
@@ -60,6 +65,9 @@ public class ExamCenterServiceImpl {
             return redisUtils.getCacheObject(key);
         }
         ExamInfo examInfo = examInfoService.getById(examInfoId);
+        if(examInfo==null){
+            return null;
+        }
         final LocalDateTime now = LocalDateTime.now();
         //只在考试期间缓存
         if(now.isAfter(examInfo.getStartTime())&&now.isBefore(examInfo.getEndTime())){
@@ -71,43 +79,130 @@ public class ExamCenterServiceImpl {
 
     }
 
-    public List<ExamAnswerResult> answerCompare(List<QuestionInfoVo> questionInfos, List<ExamAnswerResult> answerResults){
+    /**
+     * 回答比较
+     * 系统对答案选项值给出正确、错误、半错、未选等请求说明
+     * 得分应是算在题目上，而不是选项上,
+     * 个人答案屏蔽null
+     *
+     * @param questionInfos 问题信息
+     * @param answerResults 回答结果
+     * @return {@link List}<{@link ExamAnswerInfoVo}>
+     */
+    public List<ExamAnswerInfoVo> answerCompare(List<QuestionInfoVo> questionInfos, List<ExamAnswerResult> answerResults){
+        List<ExamAnswerInfoVo> list=new ArrayList<>();
         //按题目id分组
         final Map<Integer, List<ExamAnswerResult>> optionsMap = answerResults.stream().collect(Collectors.groupingBy(ExamAnswerResult::getQuestionId));
        questionInfos.forEach(question->{
            //获取该题目的所有作答序列
            if(optionsMap.containsKey(question.getId())){
-               List<ExamAnswerResult> results=optionsMap.get(question.getId());
+               log.info("\n");
+               log.info("------------------机器评阅------------------");
+               log.info("题目信息：id：{}、分值：{}",question.getId(),question.getScore());
+               ExamAnswerInfoVo answerInfo=new ExamAnswerInfoVo();
+               //得分记录
+               ExamScoreRecord scoreRecord=new ExamScoreRecord();
+               //学生作答信息,过滤不为nul答答案
+               List<ExamAnswerResult> results=optionsMap.get(question.getId()).stream().filter(r->r.getAnswer()!=null).collect(Collectors.toList());
+               //题目选项信息
                List<QuestionItem> options = question.getOptions();
-               int score=question.getScore();
                QuestionTypeEnum type=question.getType();
-               //答案对比
-               if(type!=QuestionTypeEnum.MULTIPLE_CHOICE){
-                    float optionScore;
-                    if(type==QuestionTypeEnum.COMPLETION||type==QuestionTypeEnum.SUBJECTIVE){
-                        optionScore=score/options.size();
-                    } else {
-                        optionScore = score;
-                    }
-                   options.stream().forEach(option->{
-                        String answer = option.getAnswer();
-                        results.stream().filter(r->r.getOptionId()==option.getId()).findFirst().ifPresent(r->{
-                             boolean equals = r.getAnswer().equals(answer);
-                             if(equals){
-                                 r.setScore(optionScore);
-                                 r.setResultType(QuestionResultTypeEnum.CORRECT);
-                             }else{
-                                 r.setScore(0f);
-                                 r.setResultType(QuestionResultTypeEnum.ERROR);
-                             }
+               AtomicReference<Float> score= new AtomicReference<>(0f);
+                if(type==QuestionTypeEnum.SIGNAL_CHOICE||type==QuestionTypeEnum.JUDGMENTAL){
+                    //只能一个选项
+                    if(results.size()==1){
+                        results.forEach(result -> {
+                            options.stream().filter(o-> Objects.equals(o.getId(), result.getOptionId())).findFirst().ifPresent(option->{
+                                log.info("单选/判断：选项答案:{}、作答答案:{}",option.getAnswer(),result.getAnswer());
+                                if(Objects.equals(option.getAnswer(),result.getAnswer())){
+                                    log.info("单选/判断：批评结果：正确");
+                                    result.setResultType(QuestionResultTypeEnum.CORRECT);
+                                    score.set(question.getScore());
+                                }else{
+                                    result.setResultType(QuestionResultTypeEnum.ERROR);
+                                    log.info("单选/判断：批评结果：错误");
+                                }
+                            });
+                        });
+                     }
+                }else if(type==QuestionTypeEnum.MULTIPLE_CHOICE){
+                    //多选题，错了全错，全队满分，半对看着给
+                    AtomicBoolean isError= new AtomicBoolean(false);
+                    AtomicInteger rCount= new AtomicInteger();
+                    int oCount = (int)options.stream().filter(o -> o.getAnswer() != null).count();
+                    float averageScore=question.getScore()/oCount;
+                    //获取作答答案
+                    results.forEach(result -> {
+                        options.stream().filter(o-> Objects.equals(o.getId(), result.getOptionId())).findFirst().ifPresent(option->{
+                            //获取到正确选项
+                            if (result.getAnswer() != null) {
+                                //判断正确
+                                log.info("多选：选项答案:{}、作答答案:{}", option.getAnswer(), result.getAnswer());
+                                if (Objects.equals(result.getAnswer(), option.getAnswer())) {
+                                    log.info("多选：批评结果：正确");
+                                    result.setResultType(QuestionResultTypeEnum.CORRECT);
+                                    rCount.getAndIncrement();
+                                    score.set((score.get() + averageScore));
+                                } else {
+                                    log.info("多选：批评结果：多选错误");
+                                    //作答错误，结束
+                                    result.setResultType(QuestionResultTypeEnum.ERROR);
+                                    score.set(0f);
+                                    isError.set(true);
+                                }
+                            }
                         });
                     });
-               }else {
-                   //多选题判断
-               }
+                    //选错全错
+                    if(!isError.get() &&(rCount.get() ==oCount)){
+                        //全选对满分
+                        log.info("多选：批评结果：全对。满分");
+                        score.set(question.getScore());
+                    }
+                //填空
+                }else if(type==QuestionTypeEnum.COMPLETION||type==QuestionTypeEnum.SUBJECTIVE){
+                    int oCount = options.size();
+                    AtomicInteger rCount= new AtomicInteger();
+                    float averageScore=question.getScore()/oCount;
+                    results.forEach(result->{
+                        options.stream().filter(o-> Objects.equals(o.getId(), result.getOptionId())).findFirst().ifPresent(option->{
+                            String htmlTag="<[^>]+>";
+                            String rAnswer=result.getAnswer().replaceAll(htmlTag,"").trim();
+                            String oAnswer=option.getAnswer().replaceAll(htmlTag,"").trim();
+                            log.info("主观/填空：选项答案:{}、作答答案:{}",oAnswer,rAnswer);
+                            if(Objects.equals(rAnswer,oAnswer)){
+                                log.info("主观/填空：批评结果：正确");
+                                score.set(score.get()+averageScore);
+                                result.setResultType(QuestionResultTypeEnum.CORRECT);
+                                rCount.getAndIncrement();
+                            }else{
+                                result.setResultType(QuestionResultTypeEnum.ERROR);
+                            }
+                        });
+                    });
+                    if(oCount==rCount.get()){
+                        score.set(question.getScore());
+                    }
+                }
+                if(score.get()==0f){
+                    log.info("评判结果：错误");
+                }else{
+                    log.info("评判结果：{}分",score.get());
+                }
+                if(!results.isEmpty()){
+                    scoreRecord.setScore(score.get());
+                    scoreRecord.setQuestionId(question.getId());
+                    scoreRecord.setUserId(results.get(0).getUserId());
+                    scoreRecord.setExamInfoId(results.get(0).getExamInfoId());
+                    scoreRecord.setReviewType(ReviewTypeEnum.ROBOT);
+                    answerInfo.setScoreRecord(scoreRecord);
+                    answerInfo.setAnswerResult(results);
+                    list.add(answerInfo);
+                }
            }
        });
-       return answerResults;
+       log.info("机器评判结果：{}", JSON.toJSON(list));
+       return list;
     }
     public void teacherReview(){
 

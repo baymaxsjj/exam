@@ -1,5 +1,6 @@
 package com.baymax.exam.center.vo;
 
+import com.baymax.exam.center.enums.AnswerStatusEnum;
 import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import com.baymax.exam.center.model.ExamAnswerLog;
 import com.baymax.exam.common.core.result.PageResult;
@@ -19,4 +20,5 @@ import java.util.List;
 public class StudentActionVo {
     private User user;
     private PageResult<ExamAnswerLog> actionPage;
+    private AnswerStatusEnum answerStatus;
 }

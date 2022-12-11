@@ -1,6 +1,6 @@
 package com.baymax.exam.center.mapper;
 
-import com.baymax.exam.center.model.ExamRecord;
+import com.baymax.exam.center.model.ExamScoreRecord;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author baymax
- * @since 2022-11-04
+ * @since 2022-12-11
  */
-public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
+public interface ExamScoreRecordMapper extends BaseMapper<ExamScoreRecord> {
 
 }

@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.baymax.exam.center.enums.QuestionResultTypeEnum;
-import com.baymax.exam.center.enums.ReviewTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +17,7 @@ import lombok.Setter;
  * </p>
  *
  * @author baymax
- * @since 2022-12-06
+ * @since 2022-12-09
  */
 @Getter
 @Setter
@@ -31,6 +30,7 @@ public class ExamAnswerResult implements Serializable {
       @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    @Schema(description = "学生id")
     private Integer userId;
 
     @Schema(description = "考试id")
@@ -45,17 +45,8 @@ public class ExamAnswerResult implements Serializable {
     @Schema(description = "答案：主观题使用")
     private String answer;
 
-    @Schema(description = "得分")
-    private Float score;
-
     @Schema(description = "结果类型：对、错、半错")
     private QuestionResultTypeEnum resultType;
-
-    @Schema(description = "批阅类型：机器、老师")
-    private ReviewTypeEnum reviewType;
-
-    @Schema(description = "评价")
-    private String evaluate;
 
     private LocalDateTime createdAt;
 

@@ -18,8 +18,11 @@ public enum ExamAnswerLogEnum {
     //大于10：正常行为
     START(11,"开始答题"),
     SUBMIT(12,"提交试卷"),
+    ROBOT_REVIEW(21,"机器批阅"),
+    TEACHER_REVIEW(23,"机器批阅"),
     ///大于20：答题行为
-    PROGRESS(21,"答题进度"),
+    PROGRESS(41,"答题进度"),
+
     ///大于50：监控行为
     COPY(51,"复制行为"),
     PASTE(52,"粘贴行为"),

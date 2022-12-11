@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baymax.exam.center.enums.OptionStatusEnum;
 import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.mapper.QuestionItemMapper;
 import com.baymax.exam.center.model.Question;
@@ -70,6 +71,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
 
         List<QuestionItem> topicItems = questionInfo.getOptions().stream().map(tem->{
             tem.setQuestionId(questionInfo.getId());
+            if(enumByValue==QuestionTypeEnum.SIGNAL_CHOICE||enumByValue==QuestionTypeEnum.JUDGMENTAL||enumByValue==QuestionTypeEnum.MULTIPLE_CHOICE){
+                tem.setAnswer(OptionStatusEnum.SELECT.value);
+            }
             return tem;
         }).collect(Collectors.toList());
         //4.创建选项

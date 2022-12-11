@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.baymax.exam.center.enums.OptionStatusEnum;
 import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.mapper.QuestionItemMapper;
 import com.baymax.exam.center.model.Question;
@@ -107,6 +108,7 @@ public class QuestionItemController {
         if(question==null||question.getTeacherId()!=UserAuthUtil.getUserId()){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
+        OptionStatusEnum correct=OptionStatusEnum.SELECT;
         QuestionTypeEnum enumByValue = question.getType();
         QuestionItem questionItem = new QuestionItem();
         if(enumByValue==QuestionTypeEnum.SIGNAL_CHOICE||enumByValue==QuestionTypeEnum.JUDGMENTAL){
@@ -115,12 +117,12 @@ public class QuestionItemController {
             LambdaUpdateWrapper<QuestionItem> updateWrapper=new LambdaUpdateWrapper<>();
             updateWrapper.eq(QuestionItem::getQuestionId,question.getId());
             questionItemService.update(questionItem,updateWrapper);
-            questionItem.setAnswer("1");
+            questionItem.setAnswer(correct.value);
 
         }else if(enumByValue==QuestionTypeEnum.MULTIPLE_CHOICE){
             //多选题取反
             if(item.getAnswer()==null){
-                questionItem.setAnswer("1");
+                questionItem.setAnswer(correct.value);
                 log.info("修改成正确答案"+questionItem.getAnswer());
             }else{
                 //判断多选个数，如果就一个答案禁止取消

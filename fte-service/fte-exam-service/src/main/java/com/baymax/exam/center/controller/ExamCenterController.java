@@ -1,10 +1,12 @@
 package com.baymax.exam.center.controller;
 
 import com.baymax.exam.center.enums.ExamAnswerLogEnum;
+import com.baymax.exam.center.enums.QuestionResultTypeEnum;
 import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.service.impl.*;
 import com.baymax.exam.center.utils.ExamRedisKey;
+import com.baymax.exam.center.vo.ExamAnswerInfoVo;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.redis.utils.RedisUtils;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +49,10 @@ public class ExamCenterController {
     QuestionItemServiceImpl questionItemService;
     @Autowired
     ExamCenterServiceImpl examCenterService;
+    @Autowired
+    ExamAnswerResultServiceImpl answerResultService;
+    @Autowired
+    ExamScoreRecordServiceImpl scoreRecordService;
 
     @Autowired
     UserClient userClient;
@@ -55,6 +62,8 @@ public class ExamCenterController {
     RedisUtils redisUtils;
     @Autowired
     ExamAnswerLogServiceImpl examAnswerLogService;
+
+
 
     @Operation(summary = "开始考试")
     @GetMapping("/start")
@@ -184,8 +193,39 @@ public class ExamCenterController {
     public Result submit(@PathVariable Integer examInfoId){
         ExamInfo examInfo = (ExamInfo) request.getAttribute(EXAM_INFO_KEY);
         //放入缓存，提交答案的时候在存到数据库
-        final Integer userId = UserAuthUtil.getUserId();
+        int userId = UserAuthUtil.getUserId();
+        submit(userId,examInfo);
         examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.SUBMIT,UserAuthUtil.getUserIp());
         return Result.success("交卷成功",null);
+    }
+    @Async
+    public void submit(int userId,ExamInfo examInfo){
+        //提交记录
+        //获取题目
+        List<QuestionInfoVo> questionsInfo = examCenterService.getCacheQuestionsInfo(examInfo.getId(), examInfo.getExamId());
+        String redisAnswerKey= ExamRedisKey.examStudentAnswerKey(examInfo.getId(),userId);
+        List<ExamAnswerResult> answerResults=new ArrayList<>();
+        if (redisUtils.hasKey(redisAnswerKey)) {
+            //1.获取缓存中的考试答案
+            Map<String,Map<Integer,String>> results= redisUtils.getCacheMap(redisAnswerKey);
+            //答案封装
+            results.forEach((questionId,answers)->{
+                answers.forEach((optionId,answer)->{
+                    ExamAnswerResult result=new ExamAnswerResult();
+                    result.setUserId(userId);
+                    result.setExamInfoId(examInfo.getId());
+                    result.setQuestionId(Integer.valueOf(questionId));
+                    result.setOptionId(Integer.valueOf(optionId));
+                    result.setAnswer(answer);
+                    answerResults.add(result);
+                });
+            });
+        }
+        List<ExamAnswerInfoVo> examAnswerInfo = examCenterService.answerCompare(questionsInfo, answerResults);
+        List<ExamAnswerResult> answerResult = examAnswerInfo.stream().flatMap(info -> info.getAnswerResult().stream()).collect(Collectors.toList());
+        List<ExamScoreRecord> scoreRecords = examAnswerInfo.stream().map(info -> info.getScoreRecord()).collect(Collectors.toList());
+        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.ROBOT_REVIEW,null);
+        scoreRecordService.saveBatch(scoreRecords);
+        answerResultService.saveBatch(answerResult);
     }
 }

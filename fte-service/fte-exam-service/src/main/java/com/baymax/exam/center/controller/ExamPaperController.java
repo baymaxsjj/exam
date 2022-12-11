@@ -171,7 +171,7 @@ public class ExamPaperController {
         collect.forEach((key,value)->{
             questionStatistics.put(key,value.size());
         });
-        Integer total=list.stream().mapToInt(Question::getScore).sum();
+        Float total= (float) list.stream().mapToDouble(Question::getScore).sum();
         Map<String,Object> result=new HashMap<>();
         result.put("questionCount",list.size());
         result.put("examPaper",examPaper);

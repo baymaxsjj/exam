@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
  * </p>
  *
  * @author baymax
- * @since 2022-11-04
+ * @since 2022-12-11
  */
 @RestController
-@RequestMapping("/exam-record")
-public class ExamRecordController {
+@RequestMapping("/exam-score-record")
+public class ExamScoreRecordController {
 
 }

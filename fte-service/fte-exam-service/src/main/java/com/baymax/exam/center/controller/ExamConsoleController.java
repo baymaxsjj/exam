@@ -23,8 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -100,15 +99,30 @@ public class ExamConsoleController {
             StudentActionVo studentActionVo = new StudentActionVo();
             studentActionVo.setUser(i);
             //如果存在日志,就返回后10条
-            boolean present = distinctLogList.stream().filter(fi -> fi.getStudentId() == i.getId()).findFirst().isPresent();
+            boolean present = distinctLogList.stream().anyMatch(fi -> Objects.equals(fi.getStudentId(), i.getId()));
             if(present){
                  IPage<ExamAnswerLog> userLog = examAnswerLogService.getLogListByUserId(examInfoId,i.getId(),1,10);
+                Collections.reverse(userLog.getRecords());
                  studentActionVo.setActionPage(PageResult.setResult(userLog));
+                 userLog.getRecords().stream().filter(log->log.getStatus()==ExamAnswerLogEnum.SUBMIT).findFirst().ifPresentOrElse(log->{
+                     studentActionVo.setAnswerStatus(AnswerStatusEnum.SUBMIT);
+                    },()->{
+                     studentActionVo.setAnswerStatus(AnswerStatusEnum.START);
+                    }
+                 );
+            }else{
+                studentActionVo.setAnswerStatus(AnswerStatusEnum.NOT_START);
             }
             return studentActionVo;
         }).collect(Collectors.toList());
         batchClassUser.setList(studentsActionInfo);
         return Result.success(batchClassUser);
     }
-
+//    @Operation(summary = "获取概况/监控")
+//    @PostMapping("/review/list")
+//    public Result getReViewList(
+//            @RequestParam reviewType,
+//            @RequestBody Set<Integer> classIds){
+//
+//    }
 }

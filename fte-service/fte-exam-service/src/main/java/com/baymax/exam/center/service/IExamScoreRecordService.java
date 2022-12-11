@@ -1,6 +1,6 @@
 package com.baymax.exam.center.service;
 
-import com.baymax.exam.center.model.ExamRecord;
+import com.baymax.exam.center.model.ExamScoreRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author baymax
- * @since 2022-11-04
+ * @since 2022-12-11
  */
-public interface IExamRecordService extends IService<ExamRecord> {
+public interface IExamScoreRecordService extends IService<ExamScoreRecord> {
 
 }
