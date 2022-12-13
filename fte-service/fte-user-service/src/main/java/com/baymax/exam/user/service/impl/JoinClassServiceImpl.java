@@ -40,10 +40,8 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
     @Override
     public JoinClass getJoinByClassId(Integer userId, Integer classId) {
         QueryWrapper<JoinClass> queryWrapper=new QueryWrapper<>();
-        Map<String,Object> map=new HashMap();
-        map.put("student_id",userId);
-        map.put("class_id",classId);
-        queryWrapper.allEq(map);
+        queryWrapper.eq("student_id",userId);
+        queryWrapper.eq("class_id",classId);
         return getOne(queryWrapper);
     }
 
@@ -90,6 +88,7 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
         Page<User> page=new Page<>(currPage,pageSize);
         QueryWrapper queryWrapper=new QueryWrapper();
         log.info("getBatchClassUsers:{}",courseUserPo);
+        queryWrapper.eq("c.course_id",courseUserPo.getCourseId());
         queryWrapper.in("jc.class_id",courseUserPo.getClassIds());
         if(courseUserPo.getStudentIds()!=null){
             //使用in/not in的时候，不能为空

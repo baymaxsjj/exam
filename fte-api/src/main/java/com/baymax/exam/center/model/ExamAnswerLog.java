@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.baymax.exam.base.BaseEntity;
 import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -23,7 +24,7 @@ import javax.validation.constraints.Null;
 @Setter
 @TableName("ed_exam_answer_log")
 @Schema(name = "ExamAnswerLog", description = "考试作答日志")
-public class ExamAnswerLog implements Serializable {
+public class ExamAnswerLog extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,8 +42,4 @@ public class ExamAnswerLog implements Serializable {
 
     @Schema(description = "状态信息")
     private String info;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 }

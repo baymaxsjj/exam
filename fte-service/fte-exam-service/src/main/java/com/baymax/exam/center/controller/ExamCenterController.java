@@ -132,11 +132,8 @@ public class ExamCenterController {
         }
 
         //2.题目类型分类
-        final Map<QuestionTypeEnum, List<QuestionInfoVo>> questionGroup = cacheQuestionsInfo.stream().collect(Collectors.groupingBy(i -> i.getType()));
         //题目类型排序
-        TreeMap<QuestionTypeEnum, List<QuestionInfoVo>> questionOrderGroup=new TreeMap<>((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-        questionOrderGroup.putAll(questionGroup);
-
+        TreeMap<QuestionTypeEnum, List<QuestionInfoVo>> questionOrderGroup= examCenterService.getGroupQuestionList(cacheQuestionsInfo);
         examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.START,UserAuthUtil.getUserIp());
         Map<String,Object> result=new HashMap<>();
         result.put("examInfo",examInfo);
@@ -195,13 +192,13 @@ public class ExamCenterController {
         //放入缓存，提交答案的时候在存到数据库
         int userId = UserAuthUtil.getUserId();
         submit(userId,examInfo);
-        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.SUBMIT,UserAuthUtil.getUserIp());
         return Result.success("交卷成功",null);
     }
     @Async
     public void submit(int userId,ExamInfo examInfo){
         //提交记录
         //获取题目
+        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.SUBMIT,UserAuthUtil.getUserIp());
         List<QuestionInfoVo> questionsInfo = examCenterService.getCacheQuestionsInfo(examInfo.getId(), examInfo.getExamId());
         String redisAnswerKey= ExamRedisKey.examStudentAnswerKey(examInfo.getId(),userId);
         List<ExamAnswerResult> answerResults=new ArrayList<>();
@@ -224,8 +221,12 @@ public class ExamCenterController {
         List<ExamAnswerInfoVo> examAnswerInfo = examCenterService.answerCompare(questionsInfo, answerResults);
         List<ExamAnswerResult> answerResult = examAnswerInfo.stream().flatMap(info -> info.getAnswerResult().stream()).collect(Collectors.toList());
         List<ExamScoreRecord> scoreRecords = examAnswerInfo.stream().map(info -> info.getScoreRecord()).collect(Collectors.toList());
-        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.ROBOT_REVIEW,null);
         scoreRecordService.saveBatch(scoreRecords);
         answerResultService.saveBatch(answerResult);
+        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.ROBOT_REVIEW,null);
+        //删除缓存
+        String questionsKey = ExamRedisKey.examStudentQuestionsInfoKey(examInfo.getId(), userId);
+        redisUtils.deleteObject(redisAnswerKey);
+        redisUtils.deleteObject(questionsKey);
     }
 }

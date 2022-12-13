@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -115,6 +116,23 @@ public class ClassesController {
             list=new ArrayList<>();
             list.add( classesService.getById(joinClass.getClassId()));
         }
+
+        return Result.success(list);
+    }
+    @Operation(summary = "获取班级列表")
+    @PostMapping("/{courseId}/part/list")
+    public Result<List<Classes>> getClassListByIds(
+            @RequestBody List<Integer> classIds,
+            @PathVariable Integer courseId
+        ){
+        Integer userId = UserAuthUtil.getUserId();
+        Courses courses = coursesService.getById(courseId);
+        List<Classes> list = null;
+        if(courses==null|| !Objects.equals(courses.getUserId(), userId)){
+            return  Result.failed(ResultCode.PARAM_ERROR);
+        }
+        //老师获取班级列表;
+        list=classesService.getClassByIds(courseId,classIds);
         return Result.success(list);
     }
 

@@ -38,5 +38,11 @@ public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> impl
         queryWrapper.eq(Classes::getCourseId,courseId);
         return list(queryWrapper);
     }
+    public List<Classes> getClassByIds(Integer courseId,List<Integer> ids) {
+        LambdaQueryWrapper<Classes> queryWrapper=new LambdaQueryWrapper();
+        queryWrapper.eq(Classes::getCourseId,courseId);
+        queryWrapper.in(Classes::getId,ids);
+        return list(queryWrapper);
+    }
 
 }

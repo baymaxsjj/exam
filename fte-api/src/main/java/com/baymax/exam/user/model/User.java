@@ -70,8 +70,8 @@ public class User extends BaseEntity {
     @Schema(description = "邮箱")
     private String email;
 
-    @Schema(description = "认证:工号")
-    private Integer personalId;
+    @Schema(description = "认证Id")
+    private Integer authId;
 
     @Schema(description = "0：学生 1：教师")
     private String role;

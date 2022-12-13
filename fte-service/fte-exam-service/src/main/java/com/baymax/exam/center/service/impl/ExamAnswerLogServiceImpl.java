@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -85,5 +86,15 @@ public class ExamAnswerLogServiceImpl extends ServiceImpl<ExamAnswerLogMapper, E
         }
         queryWrapper.select("distinct student_id");
         return this.list(queryWrapper);
+    }
+    public List<ExamAnswerLog> getNormalLogList(int examId,int userId){
+        LambdaQueryWrapper<ExamAnswerLog> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(ExamAnswerLog::getExamId,examId);
+        queryWrapper.eq(ExamAnswerLog::getStudentId,userId);
+        queryWrapper.orderByDesc(ExamAnswerLog::getStatus);
+        queryWrapper.orderByAsc(ExamAnswerLog::getCreatedAt);
+        List<ExamAnswerLogEnum> normalList=List.of(ExamAnswerLogEnum.SUBMIT,ExamAnswerLogEnum.START,ExamAnswerLogEnum.ROBOT_REVIEW,ExamAnswerLogEnum.TEACHER_REVIEW);
+        queryWrapper.in(ExamAnswerLog::getStatus,normalList);
+        return list(queryWrapper);
     }
 }

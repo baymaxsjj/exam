@@ -1,10 +1,13 @@
 package com.baymax.exam.center.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baymax.exam.center.model.ExamScoreRecord;
 import com.baymax.exam.center.mapper.ExamScoreRecordMapper;
 import com.baymax.exam.center.service.IExamScoreRecordService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +20,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExamScoreRecordServiceImpl extends ServiceImpl<ExamScoreRecordMapper, ExamScoreRecord> implements IExamScoreRecordService {
 
+    public List<ExamScoreRecord> getScoreList(int examInfoId,int userId){
+        LambdaQueryWrapper<ExamScoreRecord> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(ExamScoreRecord::getExamInfoId,examInfoId);
+        queryWrapper.eq(ExamScoreRecord::getUserId,userId);
+        return list(queryWrapper);
+    }
 }

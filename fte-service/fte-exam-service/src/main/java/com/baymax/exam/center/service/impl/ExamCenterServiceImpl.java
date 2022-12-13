@@ -75,6 +75,13 @@ public class ExamCenterServiceImpl {
         }
         return examInfo;
     }
+    public TreeMap<QuestionTypeEnum, List<QuestionInfoVo>> getGroupQuestionList(List<QuestionInfoVo> questionInfoList){
+        final Map<QuestionTypeEnum, List<QuestionInfoVo>> questionGroup = questionInfoList.stream().collect(Collectors.groupingBy(Question::getType));
+        //题目类型排序
+        TreeMap<QuestionTypeEnum, List<QuestionInfoVo>> questionOrderGroup=new TreeMap<>(Comparator.comparing(QuestionTypeEnum::getValue));
+        questionOrderGroup.putAll(questionGroup);
+        return questionOrderGroup;
+    }
     public void robotReview(){
 
     }
@@ -185,10 +192,13 @@ public class ExamCenterServiceImpl {
                     }
                 }
                 if(score.get()==0f){
-                    log.info("评判结果：错误");
+                    scoreRecord.setResultType(QuestionResultTypeEnum.ERROR);
+                }else if(score.get()==question.getScore()){
+                    scoreRecord.setResultType(QuestionResultTypeEnum.CORRECT);
                 }else{
-                    log.info("评判结果：{}分",score.get());
+                    scoreRecord.setResultType(QuestionResultTypeEnum.WRONG);
                 }
+               log.info("得分：{}",score.get());
                 if(!results.isEmpty()){
                     scoreRecord.setScore(score.get());
                     scoreRecord.setQuestionId(question.getId());

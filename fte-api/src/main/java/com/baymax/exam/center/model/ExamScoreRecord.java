@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.baymax.exam.center.enums.QuestionResultTypeEnum;
 import com.baymax.exam.center.enums.ReviewTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -44,7 +45,8 @@ public class ExamScoreRecord implements Serializable {
 
     @Schema(description = "评语")
     private String comment;
-
+    @Schema(description = "结果类型：对、错、半错")
+    private QuestionResultTypeEnum resultType;
     @Schema(description = "评阅类型")
     private ReviewTypeEnum reviewType;
 

@@ -19,7 +19,7 @@ public enum ExamAnswerLogEnum {
     START(11,"开始答题"),
     SUBMIT(12,"提交试卷"),
     ROBOT_REVIEW(21,"机器批阅"),
-    TEACHER_REVIEW(23,"机器批阅"),
+    TEACHER_REVIEW(23,"教师批阅"),
     ///大于20：答题行为
     PROGRESS(41,"答题进度"),
 
