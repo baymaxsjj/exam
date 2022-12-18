@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.baymax.exam.center.mapper.ExamScoreRecordMapper">
-
+    <update id="batchUpdateByList">
+        #  allowMultiQueries=true
+        <foreach collection="scoreRecordList" item="item" index="index" open="" close="" separator=";">
+            update ed_exam_score_record
+            <set>
+                <if test="item.score!=null">score=#{item.score},</if>
+                <if test="item.comment!=null">'comment'=#{item.comment},</if>
+                <if test="item.resultType!=null">result_type=#{item.resultType},</if>
+                <if test="item.reviewType!=null">review_type=#{item.reviewType}</if>
+            </set>
+            where id = #{item.id} and exam_info_id=#{item.examInfoId}
+        </foreach>
+    </update>
 </mapper>

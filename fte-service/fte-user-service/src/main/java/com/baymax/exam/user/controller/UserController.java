@@ -8,9 +8,9 @@ package com.baymax.exam.user.controller;
  * @version:
  */
 
-import com.baymax.exam.common.core.base.SecurityConstants;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.user.model.User;
+import com.baymax.exam.user.service.impl.UserAuthInfoServiceImpl;
 import com.baymax.exam.user.service.impl.UserServiceImpl;
 import com.baymax.exam.web.annotation.Inner;
 import com.baymax.exam.web.utils.UserAuthUtil;
@@ -29,11 +29,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     UserServiceImpl userService;
+    @Autowired
+    UserAuthInfoServiceImpl studentInfoService;
     @Operation(summary = "获取用户信息")
     @GetMapping("/info")
     Result getUserInfo(){
         log.info("用户id"+UserAuthUtil.getUserId());
-        return Result.success(userService.getById(UserAuthUtil.getUserId()));
+        Integer userId = UserAuthUtil.getUserId();
+        return Result.success(studentInfoService.getStudentByUserId(userId));
     }
     @Operation(summary = "获取用户信息")
     @PostMapping("/update")

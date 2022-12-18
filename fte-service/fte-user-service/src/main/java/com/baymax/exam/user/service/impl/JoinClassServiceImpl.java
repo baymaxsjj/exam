@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.user.model.JoinClass;
+import com.baymax.exam.user.model.UserAuthInfo;
 import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.mapper.JoinClassMapper;
 import com.baymax.exam.user.po.CourseUserPo;
@@ -13,9 +14,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>
@@ -66,8 +64,8 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
      * @return {@link IPage}<{@link User}>
      */
     @Override
-    public IPage<User> getClassUsers(Integer classId,long currentPage,long pageSize) {
-        Page<User> page=new Page<>(currentPage,pageSize);
+    public IPage<UserAuthInfo> getClassUsers(Integer classId, long currentPage, long pageSize) {
+        Page<UserAuthInfo> page=new Page<>(currentPage,pageSize);
         LambdaQueryWrapper<JoinClass> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(JoinClass::getClassId,classId);
         return joinClassMapper.getJoinClassUser(page,queryWrapper);
@@ -84,8 +82,8 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
      * @return {@link IPage}<{@link User}>
      */
     @Override
-    public IPage<User> getBatchClassUsers(CourseUserPo courseUserPo, Boolean isInList,long currPage,long pageSize) {
-        Page<User> page=new Page<>(currPage,pageSize);
+    public IPage<UserAuthInfo> getBatchClassUsers(CourseUserPo courseUserPo, Boolean isInList, long currPage, long pageSize) {
+        Page<UserAuthInfo> page=new Page<>(currPage,pageSize);
         QueryWrapper queryWrapper=new QueryWrapper();
         log.info("getBatchClassUsers:{}",courseUserPo);
         queryWrapper.eq("c.course_id",courseUserPo.getCourseId());
@@ -97,9 +95,9 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
                 return new Page<>();
             }else if(!empty){
                 if(isInList){
-                    queryWrapper.in("u.id",courseUserPo.getStudentIds());
+                    queryWrapper.in("u.user_id",courseUserPo.getStudentIds());
                 }else{
-                    queryWrapper.notIn("u.id",courseUserPo.getStudentIds());
+                    queryWrapper.notIn("u.user_id",courseUserPo.getStudentIds());
                 }
             }
         }

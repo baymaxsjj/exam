@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>
  * 考试得分
@@ -27,7 +29,7 @@ import lombok.Setter;
 public class ExamScoreRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @NotNull(message = "id不能为空")
       @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -39,7 +41,7 @@ public class ExamScoreRecord implements Serializable {
 
     @Schema(description = "题目id")
     private Integer questionId;
-
+    @NotNull(message = "得分不能为空")
     @Schema(description = "得分")
     private Float score;
 

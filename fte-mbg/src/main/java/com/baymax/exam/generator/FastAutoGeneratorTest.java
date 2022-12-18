@@ -22,9 +22,9 @@ public class FastAutoGeneratorTest {
      * 数据源配置
      */
     private static final DataSourceConfig.Builder DATA_SOURCE_CONFIG = new DataSourceConfig
-            .Builder("jdbc:mysql://localhost:3306/wk_exam?characterEncoding=utf-8&serverTimezone=Asia/Shanghai", "root", "123456");
+            .Builder("jdbc:mysql://localhost:3306/wk_school?characterEncoding=utf-8&serverTimezone=Asia/Shanghai", "root", "123456");
     private static String author="baymax";
-    private static String myPackage="com.baymax.exam.center";
+    private static String myPackage="com.baymax.exam.user";
     private static String path=System.getProperty("user.dir");;
 
     /**

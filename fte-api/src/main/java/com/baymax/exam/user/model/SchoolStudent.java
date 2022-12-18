@@ -11,7 +11,7 @@ import lombok.Setter;
 
 /**
  * <p>
- * 学校信息
+ * 学校用户认证信息
  * </p>
  *
  * @author baymax
@@ -19,27 +19,28 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("es_school")
-@Schema(name = "School", description = "学校信息")
-public class School implements Serializable {
+@TableName("es_school_student")
+@Schema(name = "SchoolStudent", description = "学校用户认证信息")
+public class SchoolStudent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
       @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    private String logo;
+    @Schema(description = "工号/学号")
+    private String jobNo;
 
-    @Schema(description = "学校名称")
-    private String name;
+    @Schema(description = "姓名")
+    private String realName;
 
-    @Schema(description = "学校域名")
-    private String site;
+    private String email;
 
-    @Schema(description = "学校介绍")
-    private String introduce;
+    private String phone;
 
-    @Schema(description = "创建时间")
+    @Schema(description = "部门/班级")
+    private Integer departmentId;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

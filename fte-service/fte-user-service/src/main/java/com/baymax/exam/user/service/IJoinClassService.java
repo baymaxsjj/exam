@@ -3,6 +3,7 @@ package com.baymax.exam.user.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baymax.exam.user.model.JoinClass;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.baymax.exam.user.model.UserAuthInfo;
 import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.po.CourseUserPo;
 
@@ -42,7 +43,7 @@ public interface IJoinClassService extends IService<JoinClass> {
      * @param pageSize    页面大小
      * @return {@link IPage}<{@link User}>
      */
-    IPage<User> getClassUsers(Integer classId,long currentPage,long pageSize);
+    IPage<UserAuthInfo> getClassUsers(Integer classId, long currentPage, long pageSize);
 
     /**
      * 批处理类用户
@@ -54,5 +55,5 @@ public interface IJoinClassService extends IService<JoinClass> {
      * @param pageSize     页面大小
      * @return {@link IPage}<{@link User}>
      */
-    IPage<User> getBatchClassUsers(CourseUserPo courseUserPo, Boolean isInList,long currPage,long pageSize);
+    IPage<UserAuthInfo> getBatchClassUsers(CourseUserPo courseUserPo, Boolean isInList, long currPage, long pageSize);
 }

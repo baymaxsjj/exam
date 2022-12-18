@@ -5,14 +5,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- * 学校信息 前端控制器
+ * 学生认证表 前端控制器
  * </p>
  *
  * @author baymax
  * @since 2022-12-14
  */
 @RestController
-@RequestMapping("/school")
-public class SchoolController {
+@RequestMapping("/school-auth")
+public class SchoolAuthController {
 
 }

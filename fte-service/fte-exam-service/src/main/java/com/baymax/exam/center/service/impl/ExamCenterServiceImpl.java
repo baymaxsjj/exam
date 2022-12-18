@@ -1,6 +1,7 @@
 package com.baymax.exam.center.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.baymax.exam.center.enums.QuestionClassificationTypeEnum;
 import com.baymax.exam.center.enums.QuestionResultTypeEnum;
 import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.enums.ReviewTypeEnum;
@@ -8,6 +9,7 @@ import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.utils.ExamRedisKey;
 import com.baymax.exam.center.vo.ExamAnswerInfoVo;
 import com.baymax.exam.center.vo.QuestionInfoVo;
+import com.baymax.exam.center.vo.StudentReviewVo;
 import com.baymax.exam.common.redis.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,8 +216,34 @@ public class ExamCenterServiceImpl {
        log.info("机器评判结果：{}", JSON.toJSON(list));
        return list;
     }
-    public void teacherReview(){
+    public void statisticalAnswerInfo(StudentReviewVo studentReview, List<ExamScoreRecord> scoreList, List<QuestionInfoVo> questionInfoVos){
+        AtomicReference<Float> sumScore= new AtomicReference<>((float) 0);
+        AtomicInteger correctNumber= new AtomicInteger();
+        AtomicInteger reviewCount= new AtomicInteger();
+        AtomicInteger reviewTotal= new AtomicInteger();
+        scoreList.forEach(examScoreRecord -> {
+            //计算得分
+            sumScore.updateAndGet(v ->(v + examScoreRecord.getScore()));
+            //计算正确数目
+            if(examScoreRecord.getResultType()==QuestionResultTypeEnum.CORRECT){
+                correctNumber.getAndIncrement();
+            }
+            //计算批阅总数
+            questionInfoVos.stream().filter(questionInfoVo -> Objects.equals(questionInfoVo.getId(), examScoreRecord.getQuestionId())).findFirst().ifPresent(questionInfoVo -> {
+                QuestionClassificationTypeEnum classificationType = questionInfoVo.getType().getClassificationType();
+                if(classificationType==QuestionClassificationTypeEnum.SUBJECTIVE){
+                    reviewTotal.getAndIncrement();
+                    if(examScoreRecord.getReviewType()==ReviewTypeEnum.TEACHER){
+                        reviewCount.getAndIncrement();
+                    }
+                }
+            });
 
+        });
+        studentReview.setScore(sumScore.get());
+        studentReview.setCorrectNumber(correctNumber.get());
+        studentReview.setReviewCount(reviewCount.get());
+        studentReview.setReviewTotal(reviewTotal.get());
     }
 
 

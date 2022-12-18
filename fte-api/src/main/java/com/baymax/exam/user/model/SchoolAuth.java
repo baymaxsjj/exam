@@ -5,38 +5,36 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
-import com.baymax.exam.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * <p>
- * 学校信息
+ * 学生认证表
  * </p>
  *
  * @author baymax
- * @since 2022-10-11
+ * @since 2022-12-14
  */
 @Getter
 @Setter
-@TableName("es_personal_info")
-@Schema(name = "PersonalInfo", description = "学校信息")
-public class PersonalInfo extends BaseEntity {
+@TableName("es_school_auth")
+@Schema(name = "SchoolAuth", description = "学生认证表")
+public class SchoolAuth implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
       @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @Schema(description = "工号/学号")
-    private String jobNo;
+    @Schema(description = "用户id")
+    private Integer userId;
 
-    @Schema(description = "姓名")
-    private String name;
+    @Schema(description = "学生id")
+    private Integer studentId;
 
-    @Schema(description = "部门/班级")
-    private Integer departmentId;
+    private LocalDateTime createdAt;
 
+    private LocalDateTime updatedAt;
 }

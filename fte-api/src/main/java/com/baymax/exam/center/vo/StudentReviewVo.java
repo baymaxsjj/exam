@@ -1,11 +1,8 @@
 package com.baymax.exam.center.vo;
 
-import com.baymax.exam.center.enums.AnswerStatusEnum;
 import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import com.baymax.exam.center.enums.QuestionTypeEnum;
-import com.baymax.exam.center.model.ExamAnswerLog;
-import com.baymax.exam.common.core.result.PageResult;
-import com.baymax.exam.user.model.User;
+import com.baymax.exam.user.model.UserAuthInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -13,7 +10,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author ：Baymax
@@ -24,8 +20,8 @@ import java.util.TreeMap;
  */
 @Data
 public class StudentReviewVo {
-    @Schema(description = "用户信息")
-    private User user;
+    @Schema(description = "学生信息")
+    private UserAuthInfo userAuthInfo;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Schema(description = "提交时间")
     private LocalDateTime submitTime;
@@ -34,6 +30,10 @@ public class StudentReviewVo {
     private LocalDateTime startTime;
     @Schema(description = "正确个数")
     private Integer correctNumber=0;
+    @Schema(description = "已批阅个数")
+    private Integer reviewCount=0;
+    @Schema(description = "批阅总数")
+    private Integer reviewTotal=0;
     @Schema(description = "得分")
     private Float score=0f;
     @Schema(description = "审阅类型")

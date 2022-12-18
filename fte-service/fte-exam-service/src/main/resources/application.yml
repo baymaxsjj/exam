@@ -7,7 +7,7 @@ spring:
     base-url: http://localhost:9411/ # zipkin server 的请求地址
     discovery-client-enabled: false  # 让 Nacos 把它当成一个 url ，而不要当成服务名
   datasource:
-    url: jdbc:mysql://localhost:3306/wk_exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://localhost:3306/wk_exam?allowMultiQueries=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver

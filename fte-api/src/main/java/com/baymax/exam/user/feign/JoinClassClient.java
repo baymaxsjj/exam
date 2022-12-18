@@ -1,7 +1,7 @@
 package com.baymax.exam.user.feign;
 
 import com.baymax.exam.common.core.result.PageResult;
-import com.baymax.exam.user.model.User;
+import com.baymax.exam.user.model.UserAuthInfo;
 import com.baymax.exam.user.po.CourseUserPo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface JoinClassClient {
 
      @PostMapping("/students/list")
-     PageResult<User> getBatchClassUser(
+     PageResult<UserAuthInfo> getBatchClassUser(
              @RequestBody @Validated CourseUserPo courseUser,
              @RequestParam Boolean isInlist,
              @RequestParam Long currPage,

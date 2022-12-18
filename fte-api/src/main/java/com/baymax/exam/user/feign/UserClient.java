@@ -18,6 +18,4 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserClient {
     @GetMapping("/findUser")
      User findUser(@RequestParam String username);
-    @GetMapping("/auth/user")
-    User findStudent(@RequestParam int userId);
 }

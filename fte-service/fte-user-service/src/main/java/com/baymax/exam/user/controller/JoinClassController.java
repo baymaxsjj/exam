@@ -6,7 +6,7 @@ import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.user.model.Classes;
 import com.baymax.exam.user.model.JoinClass;
-import com.baymax.exam.user.model.User;
+import com.baymax.exam.user.model.UserAuthInfo;
 import com.baymax.exam.user.po.CourseUserPo;
 import com.baymax.exam.user.service.impl.ClassesServiceImpl;
 import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
@@ -52,18 +52,18 @@ public class JoinClassController {
                 return Result.msgError("未加入该课程班级");
             }
         }
-        IPage<User> classUsers = joinClassService.getClassUsers(classId, currentPage, pageSize);
+        IPage<UserAuthInfo> classUsers = joinClassService.getClassUsers(classId, currentPage, pageSize);
         return Result.success(PageResult.setResult(classUsers));
     }
     @Inner
     @Operation(summary = "批量获取班级学生")
     @PostMapping("/students/list")
-    public PageResult<User> getBatchClassUser(
+    public PageResult<UserAuthInfo> getBatchClassUser(
             @RequestBody @Validated CourseUserPo courseUser,
             @RequestParam(required = false,defaultValue = "true") Boolean isInlist,
             @RequestParam(defaultValue = "1") Long currPage,
             @RequestParam(required = false,defaultValue = "10") Long pageSize){
-        final IPage<User> batchClassUsers = joinClassService.getBatchClassUsers(courseUser, isInlist, currPage,pageSize);
+        final IPage<UserAuthInfo> batchClassUsers = joinClassService.getBatchClassUsers(courseUser, isInlist, currPage,pageSize);
         return PageResult.setResult(batchClassUsers);
     }
 

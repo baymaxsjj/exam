@@ -12,14 +12,13 @@ import lombok.Getter;
  * @version:
  */
 public enum QuestionTypeEnum implements IBaseEnum<Integer> {
-    SIGNAL_CHOICE(0,"单选题",2,26),
-    MULTIPLE_CHOICE(1,"多选题",2,26),
-    JUDGMENTAL(2,"判断题",2,2),
-    COMPLETION(3,"填空题",1,50),
-    SUBJECTIVE(4,"主观题",1,1),
-    FILE(5,"文件题",1,10),
-    CODE(6,"代码题",1,10);
-
+    SIGNAL_CHOICE(0,"单选题",QuestionClassificationTypeEnum.OBJECTIVE,2,26),
+    MULTIPLE_CHOICE(1,"多选题",QuestionClassificationTypeEnum.OBJECTIVE,2,26),
+    JUDGMENTAL(2,"判断题",QuestionClassificationTypeEnum.OBJECTIVE,2,2),
+    COMPLETION(3,"填空题",QuestionClassificationTypeEnum.MEDIUM,1,50),
+    SUBJECTIVE(4,"主观题",QuestionClassificationTypeEnum.SUBJECTIVE,1,1),
+    FILE(5,"文件题",QuestionClassificationTypeEnum.SUBJECTIVE,1,10),
+    CODE(6,"代码题",QuestionClassificationTypeEnum.MEDIUM,1,10);
     @Getter
     @EnumValue //  Mybatis-Plus 提供注解表示插入数据库时插入该值
     private Integer value;
@@ -33,10 +32,14 @@ public enum QuestionTypeEnum implements IBaseEnum<Integer> {
     //选项最多个数，<0不限制
     @Getter
     private int itemMax;
+    @Getter
+    private QuestionClassificationTypeEnum classificationType;
 
-    QuestionTypeEnum(Integer value, String label,int itemMin,int itmeMax) {
+
+    QuestionTypeEnum(Integer value, String label,QuestionClassificationTypeEnum classificationType,int itemMin,int itmeMax) {
         this.value = value;
         this.label = label;
+        this.classificationType=classificationType;
         this.itemMin=itemMin;
         this.itemMax=itmeMax;
     }

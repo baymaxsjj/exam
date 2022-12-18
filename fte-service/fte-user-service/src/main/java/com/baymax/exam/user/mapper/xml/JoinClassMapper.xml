@@ -2,15 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.baymax.exam.user.mapper.JoinClassMapper">
 
-    <select id="getJoinClassUser" resultType="com.baymax.exam.user.model.User">
+    <select id="getJoinClassUser" resultType="com.baymax.exam.user.model.UserAuthInfo">
         SELECT
-            u.id,
-            u.nickname,
-            u.username,
-            u.picture
+           *
         FROM
             ec_join_class jc
-                INNER JOIN es_user u ON ( jc.student_id = u.id )
+                INNER JOIN es_user_auth_info u ON ( jc.student_id = u.user_id )
                 INNER JOIN ec_classes c ON (
                 jc.class_id = c.id)
             ${ew.customSqlSegment}
