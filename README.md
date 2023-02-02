@@ -12,15 +12,17 @@
          <td><img src="./images/image-20221218151312869.png"/></td>
     </tr>
     <tr>
+        <td><img src="./images/image-20230202111804.png"/></td>         
         <td><img src="./images/image-20221218151535396.png"/></td>
          <td><img src="./images/image-20221218151606964.png"/></td>
          <td><img src="./images/image-20221218151632484.png"/></td>
-         <td><img src="./images/image-20221218152101748.png"/></td>
     </tr>
     <tr>
+        <td><img src="./images/image-20221218152101748.png"/></td>
         <td><img src="./images/image-20221218152121039.png"/></td>
          <td><img src="./images/image-20221218152214509.png"/></td>
          <td><img src="./images/image-20221218152256006.png"/></td>
+         
     </tr>
 </table>
 
@@ -36,6 +38,8 @@
 - [x] 创建课程、添加课程
 
 - [x]  创建班级、查看班级用户、分享班级码
+
+- [x] 课堂互相实时聊天
 
 - [x] 创建题库、题库树形分类
 
