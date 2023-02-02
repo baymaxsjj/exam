@@ -5,6 +5,8 @@ import com.baymax.exam.common.core.base.LoginUser;
 import com.baymax.exam.common.core.enums.ClientIdEnum;
 import com.baymax.exam.message.MessageResult;
 import com.baymax.exam.message.model.MessageInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -147,8 +149,8 @@ public class MyWebSocketHandler implements WebSocketHandler {
      * @param result  结果
      * @return boolean
      */
-    public Map<Integer,Boolean> batchMessage(Set<Integer> userIds, MessageResult result){
-        String msg = JSONUtil.toJsonStr(result);
+    public Map<Integer,Boolean> batchMessage(Set<Integer> userIds, MessageResult result) throws JsonProcessingException {
+        String msg = new ObjectMapper().writeValueAsString(result);
         final ClientIdEnum clientId = result.getInfo().getClientId();
         Map<Integer,Boolean> sendResult=new HashMap<>();
         userIds.forEach(userId -> {

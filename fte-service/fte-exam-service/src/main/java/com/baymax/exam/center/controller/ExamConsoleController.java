@@ -1,7 +1,13 @@
 package com.baymax.exam.center.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.util.MapUtils;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baymax.exam.center.enums.*;
+import com.baymax.exam.center.excel.StudentReviewExcel;
 import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.service.impl.*;
 import com.baymax.exam.center.vo.AnswerQuestionResultVo;
@@ -21,10 +27,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ResourceUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.rmi.server.ExportException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +71,9 @@ public class ExamConsoleController {
     ExamScoreRecordServiceImpl scoreRecordService;
     @Autowired
     ExamAnswerResultServiceImpl answerResultService;
+
+    @Autowired
+    ExamConsoleServiceImpl examConsoleService;
 
     /**
      * 获取总览
@@ -143,60 +159,64 @@ public class ExamConsoleController {
         if(examInfo==null||examInfo.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
-        Set<Integer> studentIds=null;
-        boolean isIsList=true;
-        ExamAnswerLogEnum answerLogEnum=null;
-        switch (reviewType){
-            case "none":
-                answerLogEnum=ExamAnswerLogEnum.SUBMIT;
-                isIsList=false;
-                break;
-            case "robot":
-                answerLogEnum=ExamAnswerLogEnum.SUBMIT;
-                break;
-            case "teacher":
-                answerLogEnum=ExamAnswerLogEnum.TEACHER_REVIEW;
-                break;
-        }
-        if(answerLogEnum!=null){
-            List<ExamAnswerLog> distinctLogList = examAnswerLogService.getDistinctLogList(examInfoId, answerLogEnum);
-            studentIds=distinctLogList.stream().map(i->i.getStudentId()).collect(Collectors.toSet());
-        }
-
-        CourseUserPo courseUserPo=new CourseUserPo();
-        courseUserPo.setClassIds(classIds);
-        courseUserPo.setCourseId(examInfo.getCourseId());
-        courseUserPo.setStudentIds(studentIds);
-        //学生列表
-        PageResult batchClassUser = joinClassClient.getBatchClassUser(courseUserPo, isIsList, page,pageSize);
-        List<UserAuthInfo> studentList = batchClassUser.getList();
-        //题目选项
-        List<QuestionInfoVo> questionInfoVos = questionService.examQuestionInfo(examInfo.getExamId());
-        List<StudentReviewVo> studentsActionInfo = studentList.stream().map(studentInfo -> {
-            StudentReviewVo studentReviewVo = new StudentReviewVo();
-            studentReviewVo.setUserAuthInfo(studentInfo);
-            List<ExamAnswerLog> normalLogList = examAnswerLogService.getNormalLogList(examInfoId, studentInfo.getUserId());
-            //如果存在日志,就返回后10条
-            if(normalLogList!=null){
-                normalLogList.stream().findFirst().ifPresent(answerLog->{
-                    studentReviewVo.setAnswerStatus(answerLog.getStatus());
-                });
-                normalLogList.stream().filter(log->log.getStatus()==ExamAnswerLogEnum.START).findFirst().ifPresent(answerLog->{
-                    studentReviewVo.setStartTime(answerLog.getCreatedAt());
-                });
-                normalLogList.stream().filter(log->log.getStatus()==ExamAnswerLogEnum.SUBMIT).findFirst().ifPresent(answerLog->{
-                    studentReviewVo.setSubmitTime(answerLog.getCreatedAt());
-                });
-                if(studentReviewVo.getAnswerStatus()!=ExamAnswerLogEnum.START){
-                    List<ExamScoreRecord> scoreList = scoreRecordService.getScoreList(examInfoId, studentInfo.getUserId());
-                    examCenterService.statisticalAnswerInfo(studentReviewVo,scoreList,questionInfoVos);
-                }
-            }
-            return studentReviewVo;
-        }).collect(Collectors.toList());
-        batchClassUser.setList(studentsActionInfo);
-        return Result.success(batchClassUser);
+        return Result.success(examConsoleService.getReViewList(reviewType,classIds,examInfoId,page,pageSize));
     }
+    @Operation(summary = "导出批阅列表")
+    @PostMapping("/review/list/export")
+    public void reviewListExport(
+            HttpServletResponse res,
+            @RequestParam(required = false,defaultValue = "all") String reviewType,
+            @RequestBody Set<Integer> classIds,
+            @PathVariable Integer examInfoId) throws IOException {
+        ExamInfo examInfo = examInfoService.getById(examInfoId);
+        Integer userId = UserAuthUtil.getUserId();
+        if(examInfo==null||examInfo.getTeacherId()!=userId){
+            throw new ExportException("");
+        }
+        //获取xx打印 表格
+        //定义输出文件名称
+        String fileName = URLEncoder.encode(examInfo.getTitle()+"-考试成绩" + ".xlsx","UTF-8") ;
+        //设置响应字符集
+        res.setCharacterEncoding("UTF-8");
+        //设置响应媒体类型
+        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
+        res.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        //设置响应的格式说明
+//        res.setHeader("Content-Disposition", "attachment;filename="+fileName);
+        res.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
+        //读取响应文件的模板
+        File file= ResourceUtils.getFile("classpath:template/考试成绩模板.xlsx");
+        //替换模板的数据
+        // 方案3 分多次 填充 会使用文件缓存（省内存）
+        try (ExcelWriter excelWriter = EasyExcel.write(res.getOutputStream()).withTemplate(file).build()) {
+            WriteSheet writeSheet = EasyExcel.writerSheet().build();
+            PageResult<StudentReviewVo> reviewList;
+            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+            AtomicInteger joinNumber= new AtomicInteger();
+            long page=1;
+            do{
+                reviewList= examConsoleService.getReViewList(reviewType, classIds, examInfoId, page, 100L);
+                if(reviewList!=null){
+                     List<StudentReviewExcel> reviewExcels = reviewList.getList().stream().map(studentReviewVo -> {
+                         if(studentReviewVo.getAnswerStatus()!=null){
+                             joinNumber.getAndIncrement();
+                         }
+                         return  new StudentReviewExcel(studentReviewVo);
+                     }).collect(Collectors.toList());
+                     log.info("Excels list:{}",reviewExcels);
+                    excelWriter.fill(reviewExcels,fillConfig, writeSheet);
+                    page++;
+                }
+            }while (reviewList!=null&&page<=reviewList.getPages());
+            Map<String, Object> map = MapUtils.newHashMap();
+            map.put("join", joinNumber.get());
+            map.put("total", reviewList.getTotal());
+            excelWriter.fill(map,fillConfig, writeSheet);
+            excelWriter.finish();
+        }
+//        return Result.failed(ResultCode.PARAM_ERROR);
+    }
+
     @Operation(summary = "获取批阅列表")
     @GetMapping("/review/{studentId}")
     public Result getReViewAnswer(

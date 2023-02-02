@@ -37,4 +37,18 @@
                 JOIN es_user u ON ( c.user_id = u.id )
         where c.id=#{id}
     </select>
+    <select id="getCourseByClassId" resultType="com.baymax.exam.user.model.Courses">
+        SELECT
+            ec_courses.*
+        FROM
+            ec_courses
+        WHERE
+                ec_courses.id =(
+                SELECT
+                    course_id
+                FROM
+                    ec_classes
+                WHERE
+                    ec_classes.id = #{classId})
+    </select>
 </mapper>

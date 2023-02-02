@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
+import com.baymax.exam.user.mapper.CoursesMapper;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.user.service.impl.CoursesServiceImpl;
@@ -37,7 +38,8 @@ public class CoursesController {
     CoursesServiceImpl coursesService;
     @Autowired
     JoinClassServiceImpl joinClassService;
-
+    @Autowired
+    CoursesMapper coursesMapper;
     @Operation(summary = "创建课程")
     @PostMapping("/update")
     public Result add(@RequestBody @Validated Courses courses) {
@@ -79,7 +81,17 @@ public class CoursesController {
         log.info("课程耗时："+(endtTime-startTime));
         return Result.success(coursesService.getCourseInfo(courseId));
     }
-
+    @Operation(summary = "获取班级课程")
+    @GetMapping("/getInfo/{classId}")
+    public Result<Courses> getCourseByClassId(@PathVariable Integer classId){
+        Integer userId = UserAuthUtil.getUserId();
+        JoinClass joinClass = joinClassService.getJoinByClassId(userId,classId);
+        if(joinClass==null){
+             return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        Courses course = coursesMapper.getCourseByClassId(classId);
+        return Result.success(course);
+    }
     @Operation(summary = "分页获取课程列表")
     @GetMapping("/list/{role}")
     public Result<PageResult<CourseInfoVo>> getCourseList(

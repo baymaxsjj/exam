@@ -53,4 +53,5 @@ public interface SecurityConstants {
      */
     String JWT_TOKEN_PREFIX = "Bearer ";
     String USER_TOKEN_HEADER="Token";
+    int CLASS_MAX_SIZE=200;
 }

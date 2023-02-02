@@ -1,6 +1,7 @@
 package com.baymax.exam.message.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.io.Serializable;
 import com.baymax.exam.base.BaseEntity;
 import com.baymax.exam.common.core.enums.ClientIdEnum;
 import com.baymax.exam.message.enums.MessageTypeEnum;
+import com.baymax.exam.user.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,4 +63,10 @@ public class MessageInfo extends BaseEntity {
     @NotNull(message = "客户端id不能为空")
     @Schema(description = "客户端id")
     private ClientIdEnum clientId;
+    @TableField(exist = false)
+    private User user;
+
+    public void setUser(User user) {
+        this.user = user.getBaseInfo();
+    }
 }

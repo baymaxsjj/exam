@@ -1,5 +1,6 @@
 package com.baymax.exam.center.service.impl;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -50,6 +51,22 @@ public class ExamAnswerLogServiceImpl extends ServiceImpl<ExamAnswerLogMapper, E
         messageResult.setData(answerLog);
         messageResult.setInfo(new MessageInfo(examInfo.getTeacherId(), ClientIdEnum.PORTAL_CLIENT_ID));
         messageServiceClient.sendMessage(messageResult);
+    }
+    public void saveReviewStatus(int examId,int userId, ExamAnswerLogEnum status){
+        LambdaQueryWrapper<ExamAnswerLog> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(ExamAnswerLog::getExamId,examId);
+        queryWrapper.eq(ExamAnswerLog::getStudentId,userId);
+        queryWrapper.in(ExamAnswerLog::getStatus,List.of(ExamAnswerLogEnum.ROBOT_REVIEW,ExamAnswerLogEnum.TEACHER_REVIEW));
+        queryWrapper.last("LIMIT 1");
+        ExamAnswerLog reviewLog = getOne(queryWrapper);
+        if(reviewLog==null){
+            reviewLog=new ExamAnswerLog();
+            reviewLog.setExamId(examId);
+            reviewLog.setStudentId(userId);
+        }
+        reviewLog.setStatus(status);
+        reviewLog.setUpdatedAt(null);
+        saveOrUpdate(reviewLog);
     }
     public List<ExamAnswerLog> getLogListByStatus(int examId,ExamAnswerLogEnum answerLogEnum){
         LambdaQueryWrapper<ExamAnswerLog> queryWrapper=new LambdaQueryWrapper<>();

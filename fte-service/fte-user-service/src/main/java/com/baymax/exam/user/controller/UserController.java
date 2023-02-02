@@ -8,6 +8,8 @@ package com.baymax.exam.user.controller;
  * @version:
  */
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.service.impl.UserAuthInfoServiceImpl;
@@ -20,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -37,6 +41,13 @@ public class UserController {
         log.info("用户id"+UserAuthUtil.getUserId());
         Integer userId = UserAuthUtil.getUserId();
         return Result.success(studentInfoService.getStudentByUserId(userId));
+    }
+    @Operation(summary = "获取用户信息")
+    @GetMapping("/base/info")
+    Result<User> getBaseUserInfo(){
+        log.info("用户id"+UserAuthUtil.getUserId());
+        Integer userId = UserAuthUtil.getUserId();
+        return Result.success(userService.getById(userId));
     }
     @Operation(summary = "获取用户信息")
     @PostMapping("/update")
@@ -57,6 +68,14 @@ public class UserController {
         }
         return user;
     }
+    @Inner
+    @Operation(summary = "用户名/邮箱获取用户信息")
+    @PostMapping ("/batchUser")
+    List<User> getBatchUser(@RequestBody List<Integer> ids){
+        LambdaQueryWrapper<User> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.in(User::getId,ids);
+        return userService.list(queryWrapper);
+    };
     @Operation(summary = "注册信息")
     @PostMapping("/register")
     Result register(@RequestBody @Validated({User.RegisterRequestValid.class}) User user){

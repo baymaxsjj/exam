@@ -223,7 +223,8 @@ public class ExamCenterController {
         List<ExamScoreRecord> scoreRecords = examAnswerInfo.stream().map(info -> info.getScoreRecord()).collect(Collectors.toList());
         scoreRecordService.saveBatch(scoreRecords);
         answerResultService.saveBatch(answerResult);
-        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.ROBOT_REVIEW,null);
+//        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.ROBOT_REVIEW,null);
+        examAnswerLogService.saveReviewStatus(examInfo.getId(),userId,ExamAnswerLogEnum.ROBOT_REVIEW);
         //删除缓存
         String questionsKey = ExamRedisKey.examStudentQuestionsInfoKey(examInfo.getId(), userId);
         redisUtils.deleteObject(redisAnswerKey);

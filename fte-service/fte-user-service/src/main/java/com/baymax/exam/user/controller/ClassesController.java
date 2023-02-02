@@ -1,5 +1,7 @@
 package com.baymax.exam.user.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baymax.exam.common.core.base.SecurityConstants;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.user.model.Classes;
@@ -80,7 +82,7 @@ public class ClassesController {
     public Result delete(
             @Schema(description = "班级id")@PathVariable Integer classId){
         Classes classes = classesService.getById(classId);
-        if(classes==null||classes.getTeacherId()!=UserAuthUtil.getUserId()){
+        if(classes==null|| !Objects.equals(classes.getTeacherId(), UserAuthUtil.getUserId())){
             return  Result.failed(ResultCode.PARAM_ERROR);
         }
         classesService.removeById(classId);
@@ -91,8 +93,13 @@ public class ClassesController {
     public Result info(
             @Schema(description = "班级id")@PathVariable Integer classId){
         Classes classes = classesService.getById(classId);
-        if(classes==null||classes.getTeacherId()!=UserAuthUtil.getUserId()){
-            return  Result.failed(ResultCode.PARAM_ERROR);
+         Integer userId = UserAuthUtil.getUserId();
+        if(classes==null|| !Objects.equals(classes.getTeacherId(), userId)){
+            //学生获取班级信息
+            JoinClass joinByClassId = joinClassService.getJoinByClassId(userId,classId);
+            if(joinByClassId==null){
+                return  Result.failed(ResultCode.PARAM_ERROR);
+            }
         }
         return Result.success(classes);
     }
@@ -168,6 +175,12 @@ public class ClassesController {
         if(isJoinClass!=null){
             return Result.msgInfo("请勿重复加入班级");
         }
+        long classSize=joinClassService.count(new LambdaQueryWrapper<JoinClass>().eq(JoinClass::getClassId,classId));
+        //班级最大
+        if(classSize>SecurityConstants.CLASS_MAX_SIZE){
+            return Result.msgWaring("班级人数已满~");
+        }
+
         //TODO:禁止套娃（老师加入自己的课程）
         JoinClass joinClass=new JoinClass();
         joinClass.setClassId(classId);

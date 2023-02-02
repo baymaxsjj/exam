@@ -16,6 +16,7 @@ import java.util.List;
 public class PageResult<T> implements Serializable {
     private List<T> list;
     private long total;
+    private long pages;
     private long current;
 
     /**
@@ -28,6 +29,7 @@ public class PageResult<T> implements Serializable {
         PageResult<T> result = new PageResult<>();
         result.setList(page.getRecords());
         result.setTotal(page.getTotal());
+        result.setPages(page.getPages());
         result.setCurrent(page.getCurrent());
         return result;
     }

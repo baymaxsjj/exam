@@ -19,4 +19,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface CoursesMapper extends BaseMapper<Courses> {
     IPage<CourseInfoVo> getCourseList(IPage<CourseInfoVo> page, QueryWrapper<CourseInfoVo> ew, Boolean isStudent);
     CourseInfoVo getCourseInfo(Integer courseId);
+    Courses getCourseByClassId(Integer classId);
 }

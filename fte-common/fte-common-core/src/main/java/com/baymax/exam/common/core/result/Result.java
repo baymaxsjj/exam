@@ -1,6 +1,10 @@
 package com.baymax.exam.common.core.result;
 
+import cn.hutool.json.JSONUtil;
+import com.baymax.exam.common.core.exception.ResultException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 
@@ -11,6 +15,7 @@ import java.io.Serializable;
  * @author haoxr
  * @date 2022/1/30
  **/
+@Slf4j
 @Data
 public class Result<T> implements Serializable {
 
@@ -26,6 +31,15 @@ public class Result<T> implements Serializable {
     //正常：有数据
     public static <T> Result<T> success(T data) {
         return result(ResultCode.SUCCESS.getCode(),ResultCode.SUCCESS.getMsg(), data);
+    }
+    @JsonIgnore
+    public  T getResultDate() throws ResultException {
+        log.info("微服务返回数据：{}",JSONUtil.toJsonStr(this));
+        if (!code.equals(ResultCode.SUCCESS.getCode())){
+             throw new ResultException(this);
+        }
+        log.info("微服务实际数据：{}",data);
+        return data;
     }
     //正常，有数据和消息
     public static <T> Result<T> success(String msg,T data) {

@@ -19,12 +19,12 @@
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-        <version>2.7.4</version>
+        <version>2.7.8</version>
     </parent>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <cloud.version>2021.0.4</cloud.version>
+        <cloud.version>2021.0.5</cloud.version>
         <alibaba.version>2021.1</alibaba.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mysql.version>8.0.30</mysql.version>
@@ -32,7 +32,8 @@
         <jwt.version>0.7.0</jwt.version>
         <fastjson.version>2.0.7</fastjson.version>
         <httpclient.version>4.5.3</httpclient.version>
-        <easyexcel.version>3.1.1</easyexcel.version>
+        <easyexcel.version>3.1.4</easyexcel.version>
+        <poi.version>4.1.2</poi.version>
         <aliyun.version>4.5.14</aliyun.version>
         <jwt.version>0.9.1</jwt.version>
         <knife4j.version>3.0.3</knife4j.version>
@@ -42,6 +43,7 @@
         <oauth2.version>2.2.5.RELEASE</oauth2.version>
         <josejwt.version>9.25.4</josejwt.version>
         <redis.version>2.7.4</redis.version>
+        <openfeign.version>4.0.1</openfeign.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -52,7 +54,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
@@ -118,6 +119,18 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
                 <version>${easyexcel.version}</version>
+            </dependency>
+            <!--xlsx-->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <!--xls-->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
             </dependency>
             <!--swagger-->
             <dependency>

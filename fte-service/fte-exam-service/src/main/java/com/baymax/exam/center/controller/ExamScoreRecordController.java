@@ -1,11 +1,13 @@
 package com.baymax.exam.center.controller;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import com.baymax.exam.center.enums.ReviewTypeEnum;
 import com.baymax.exam.center.mapper.ExamScoreRecordMapper;
 import com.baymax.exam.center.model.ExamAnswerResult;
 import com.baymax.exam.center.model.ExamInfo;
 import com.baymax.exam.center.model.ExamScoreRecord;
+import com.baymax.exam.center.service.impl.ExamAnswerLogServiceImpl;
 import com.baymax.exam.center.service.impl.ExamAnswerResultServiceImpl;
 import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
 import com.baymax.exam.center.service.impl.ExamScoreRecordServiceImpl;
@@ -36,6 +38,8 @@ public class ExamScoreRecordController {
     ExamInfoServiceImpl examInfoService;
     @Autowired
     ExamScoreRecordMapper scoreRecordMapper;
+    @Autowired
+    ExamAnswerLogServiceImpl answerLogService;
     @Operation(summary = "更新题目分数")
     @PostMapping("/{examInfoId}/update/score")
     public Result reviewScoreUpdate(
@@ -52,6 +56,13 @@ public class ExamScoreRecordController {
             examScoreRecord.setReviewType(ReviewTypeEnum.TEACHER);
         });
         scoreRecordMapper.batchUpdateByList(scoreRecordList);
+        //添加日志
+        scoreRecordList.stream().findFirst().ifPresent(examScoreRecord -> {
+            ExamScoreRecord scoreRecord = scoreRecordMapper.selectById(examScoreRecord.getId());
+            if(scoreRecord!=null&& Objects.equals(scoreRecord.getExamInfoId(), examInfoId)){
+                answerLogService.saveReviewStatus(examInfoId,scoreRecord.getUserId(),ExamAnswerLogEnum.TEACHER_REVIEW);
+            }
+        });
         return Result.msgSuccess("批阅成功");
     }
 }

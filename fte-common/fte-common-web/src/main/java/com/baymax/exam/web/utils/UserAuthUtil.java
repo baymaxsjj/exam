@@ -1,5 +1,6 @@
 package com.baymax.exam.web.utils;
 
+import cn.hutool.json.JSONUtil;
 import com.baymax.exam.common.core.base.LoginUser;
 
 import java.util.function.IntSupplier;
@@ -47,5 +48,8 @@ public final class UserAuthUtil {
      */
     public static LoginUser getUser() {
         return user.get();
+    }
+    public static String userInfoToString(){
+        return JSONUtil.toJsonStr(user.get());
     }
 }

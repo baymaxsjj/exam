@@ -10,18 +10,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author ：Baymax
+ * @date ：Created in 2023/1/31 17:09
+ * @description：
+ * @modified By：
+ * @version:
+ */
+/**
+ * @author ：Baymax
  * @date ：Created in 2022/12/1 10:07
  * @description：
  * @modified By：
  * @version:
  */
-@FeignClient(value = "exam-user",contextId = "CourseClient",path = "/courses")
-public interface CourseClient {
-    @GetMapping("/findCourse")
-    public Courses findCourse(@RequestParam Integer courseId);
-
-    @GetMapping("/joinCourseByStuId")
-    public JoinClass joinCourseByStuId(@RequestParam Integer courseId, @RequestParam Integer stuId);
-    @GetMapping("/getInfo/{classId}")
-    public Result<Courses> getCourseByClassId(@PathVariable Integer classId);
+@FeignClient(value = "exam-user",contextId = "ClassesClient",path = "/classes")
+public interface ClassesClient {
+    @GetMapping("/info/{classId}")
+    public Result classInfo(@PathVariable String classId);
 }

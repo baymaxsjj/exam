@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baymax.exam.base.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -87,6 +88,15 @@ public class User extends BaseEntity {
     public void setEncodePassword(String password) {
         BCryptPasswordEncoder bcr=new BCryptPasswordEncoder();
         this.password =bcr.encode(password);
+    }
+    @JsonIgnore
+    public User getBaseInfo(){
+        User user = new User();
+        user.setId(id);
+        user.setPicture(picture);
+        user.setUsername(username);
+        user.setNickname(nickname);
+        return user;
     }
 
     //    登录请求
