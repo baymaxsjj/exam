@@ -85,11 +85,14 @@ public class CoursesController {
     @GetMapping("/getInfo/{classId}")
     public Result<Courses> getCourseByClassId(@PathVariable Integer classId){
         Integer userId = UserAuthUtil.getUserId();
+        Courses course = coursesMapper.getCourseByClassId(classId);
+        if(course.getUserId()==userId){
+            return Result.success(course);
+        }
         JoinClass joinClass = joinClassService.getJoinByClassId(userId,classId);
         if(joinClass==null){
              return Result.failed(ResultCode.PARAM_ERROR);
         }
-        Courses course = coursesMapper.getCourseByClassId(classId);
         return Result.success(course);
     }
     @Operation(summary = "分页获取课程列表")

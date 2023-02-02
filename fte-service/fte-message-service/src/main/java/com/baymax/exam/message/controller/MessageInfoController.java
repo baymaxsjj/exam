@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baymax.exam.VueRouteLocationRaw;
 import com.baymax.exam.common.core.base.LoginUser;
 import com.baymax.exam.common.core.base.SecurityConstants;
 import com.baymax.exam.common.core.exception.ResultException;
@@ -96,22 +97,27 @@ public class MessageInfoController {
         messageInfo.setUserId(userId);
         messageInfo.setTargetId(classId);
         messageInfo.setTitle(null);
+
         messageInfo.setClientId(UserAuthUtil.getUser().getClientId());
         //先这样吧
         messageInfo.setType(MessageTypeEnum.COURSE_USER_MESSAGE);
-        messageInfoService.save(messageInfo);
         //异步发通知
 
         Set<Integer> ids=resultDate.getList().stream().map(UserAuthInfo::getUserId).collect(Collectors.toSet());
         //也要通知老师
         Result<Courses> coursesResult = courseClient.getCourseByClassId(classId);
+        VueRouteLocationRaw vueRouteLocationRaw = new VueRouteLocationRaw();
         try{
             if(coursesResult.getResultDate()!=null){
+                vueRouteLocationRaw.setParams(Map.of("courseId",coursesResult.getResultDate().getId()));
                 ids.add(coursesResult.getResultDate().getUserId());
             }
         }catch (ResultException ignored){
             log.info("老师不用发送");
         }
+        vueRouteLocationRaw.setName("Classroom");
+        messageInfo.setPath(vueRouteLocationRaw.getJson());
+        messageInfoService.save(messageInfo);
         //不需要通知自己
         ids.remove(userId);
         User userInfo= userClient.getBaseUserInfo().getResultDate();
