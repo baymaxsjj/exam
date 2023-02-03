@@ -1,9 +1,11 @@
 package com.baymax.exam.center.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baymax.exam.VueRouteLocationRaw;
 import com.baymax.exam.center.model.*;
 import com.baymax.exam.center.service.impl.ExamClassServiceImpl;
 import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
@@ -13,18 +15,25 @@ import com.baymax.exam.center.vo.ExamInfoVo;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
+import com.baymax.exam.message.enums.MessageTypeEnum;
+import com.baymax.exam.message.feign.MessageServiceClient;
+import com.baymax.exam.message.model.MessageInfo;
 import com.baymax.exam.user.feign.CourseClient;
 import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +48,7 @@ import java.util.stream.Collectors;
  * @since 2022-10-28
  */
 @Validated
+@Slf4j
 @Tag(name = "考试管理")
 @RestController
 @RequestMapping("/exam-info")
@@ -54,6 +64,8 @@ public class ExamInfoController {
 
     @Autowired
     CourseClient courseClient;
+    @Autowired
+    MessageServiceClient messageServiceClient;
 
     @Operation(summary = "发布考试信息")
     @PostMapping("/update")
@@ -91,6 +103,7 @@ public class ExamInfoController {
         }
         //TODO:班级是不是我的＞﹏＜
         //TODO:如果考试开始了，就不能更改试卷了
+        //课程通知
 
         //删除试卷考试班级，然后在添加
         if (examInfo.getId()  != null) {
@@ -106,6 +119,21 @@ public class ExamInfoController {
             ExamClass examClass = new ExamClass();
             examClass.setClassId(integer);
             examClass.setExamInfoId(examInfo.getId());
+
+            MessageInfo messageInfo = new MessageInfo();
+            messageInfo.setTitle(examInfo.getTitle());
+            final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            messageInfo.setIntroduce(examInfo.getStartTime().format(dateTimeFormatter)+"~"+examInfo.getEndTime().format(dateTimeFormatter));
+            messageInfo.setUserId(userId);
+            messageInfo.setClientId(UserAuthUtil.getUser().getClientId());
+            messageInfo.setTargetId(integer);
+            VueRouteLocationRaw vueRouteLocationRaw = new VueRouteLocationRaw();
+            vueRouteLocationRaw.setName("ExamManage");
+            vueRouteLocationRaw.setParams(Map.of("",examInfo.getCourseId()));
+            messageInfo.setPath(vueRouteLocationRaw.getJson());
+            log.info("考试通知消息内容：{}", JSONUtil.toJsonStr(messageInfo));
+            messageServiceClient.systemCourseMessage(messageInfo);
+
             return examClass;
         }).collect(Collectors.toList());
         examClassService.saveBatch(list);

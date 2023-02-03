@@ -31,6 +31,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -88,46 +89,61 @@ public class MessageInfoController {
         });
         return Result.success(PageResult.setResult(messageList));
     }
+    @Inner(value = false)
     @PostMapping("/send/classroom/{classId}")
      public Result sendClassroomMessage(@RequestBody MessageInfo messageInfo, @PathVariable Integer classId) throws ResultException, JsonProcessingException {
+        Integer userId = UserAuthUtil.getUserId();
+        String routeName="Classroom";
+        messageInfo.setTitle(null);
+        messageInfo.setTargetId(classId);
+        messageInfo.setType(MessageTypeEnum.COURSE_USER_MESSAGE);
+        messageInfo.setUserId(userId);
         //获取班级用户id
+        messageInfo.setClientId(UserAuthUtil.getUser().getClientId());
+        //非课程管理者，部分消息不可信
+        //消息路由
+        VueRouteLocationRaw vueRouteLocationRaw = new VueRouteLocationRaw();
+        vueRouteLocationRaw.setParams(new HashMap<>());
+        vueRouteLocationRaw.setName("Classroom");
+        //获取用户消息
+        sendCourseMessage(userId,classId,messageInfo,vueRouteLocationRaw);
+        return Result.success();
+     }
+    @Inner
+    @PostMapping("/system/send/classroom")
+     public Result systemCourseMessage(@RequestBody MessageInfo messageInfo) throws ResultException, JsonProcessingException {
+        messageInfo.setType(MessageTypeEnum.COURSE_EXAM_MESSAGE);
+        sendCourseMessage(messageInfo.getUserId(),messageInfo.getTargetId(),messageInfo,null);
+        return Result.success();
+    }
+
+     @Async
+    public void sendCourseMessage(int userId,int classId,MessageInfo messageInfo,VueRouteLocationRaw routeLocationRaw) throws ResultException, JsonProcessingException {
+        //课程用户
         final Result<PageResult<UserAuthInfo>> list = joinClassClient.getList(classId, 1l, (long) SecurityConstants.CLASS_MAX_SIZE);
         PageResult<UserAuthInfo> resultDate = list.getResultDate();
-        Integer userId = UserAuthUtil.getUserId();
-        messageInfo.setUserId(userId);
-        messageInfo.setTargetId(classId);
-        messageInfo.setTitle(null);
-
-        messageInfo.setClientId(UserAuthUtil.getUser().getClientId());
-        //先这样吧
-        messageInfo.setType(MessageTypeEnum.COURSE_USER_MESSAGE);
-        //异步发通知
-
         Set<Integer> ids=resultDate.getList().stream().map(UserAuthInfo::getUserId).collect(Collectors.toSet());
-        //也要通知老师
+        //课程老师
         Result<Courses> coursesResult = courseClient.getCourseByClassId(classId);
-        VueRouteLocationRaw vueRouteLocationRaw = new VueRouteLocationRaw();
-        try{
-            if(coursesResult.getResultDate()!=null){
-                vueRouteLocationRaw.setParams(Map.of("courseId",coursesResult.getResultDate().getId()));
-                ids.add(coursesResult.getResultDate().getUserId());
-            }
-        }catch (ResultException ignored){
-            log.info("老师不用发送");
-        }
-        vueRouteLocationRaw.setName("Classroom");
-        messageInfo.setPath(vueRouteLocationRaw.getJson());
-        messageInfoService.save(messageInfo);
+        Courses courses = coursesResult.getResultDate();
+        ids.add(courses.getUserId());
         //不需要通知自己
         ids.remove(userId);
+        if(routeLocationRaw!=null){
+            //添加课程模块id
+            routeLocationRaw.getParams().put("courseId",courses.getId());
+            messageInfo.setPath(routeLocationRaw.getJson());
+        }
+        //保存消息
+        messageInfoService.save(messageInfo);
+        //个人信息
         User userInfo= userClient.getBaseUserInfo().getResultDate();
         messageInfo.setUser(userInfo.getBaseInfo());
         MessageResult messageResult=new MessageResult();
         messageResult.setInfo(messageInfo);
         messageResult.setCode(MessageCodeEnum.COURSE_CLASSROOM_MESSAGE);
         myWebSocketHandler.batchMessage(ids,messageResult);
-        return Result.success();
-     }
+    }
     @Inner
     @Operation(summary = "发送消息")
     @PostMapping("/inner/send-message")

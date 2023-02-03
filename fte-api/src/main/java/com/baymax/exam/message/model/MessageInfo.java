@@ -10,6 +10,7 @@ import com.baymax.exam.base.BaseEntity;
 import com.baymax.exam.common.core.enums.ClientIdEnum;
 import com.baymax.exam.message.enums.MessageTypeEnum;
 import com.baymax.exam.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,13 +61,14 @@ public class MessageInfo extends BaseEntity {
     @Schema(description = "目标id,行为表id")
     private Integer targetId;
 
-    @NotNull(message = "客户端id不能为空")
     @Schema(description = "客户端id")
     private ClientIdEnum clientId;
     @TableField(exist = false)
     private User user;
 
     public void setUser(User user) {
-        this.user = user.getBaseInfo();
+        if(user!=null){
+            this.user = user.getBaseInfo();
+        }
     }
 }
