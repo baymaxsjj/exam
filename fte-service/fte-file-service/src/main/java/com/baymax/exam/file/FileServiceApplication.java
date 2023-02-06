@@ -5,10 +5,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableFileStorage
 @SpringBootApplication
-public class FteFileServiceApplication {
+public class FileServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FteFileServiceApplication.class, args);
+		SpringApplication.run(FileServiceApplication.class, args);
 	}
 
 }

@@ -12,7 +12,7 @@ public interface RedisKeyConstants {
     /**
      * 电子邮件代码key
      */
-    String REDIS_EMAIL_CODE_KEY="email:code:";
+    String REDIS_EMAIL_CODE_KEY="exam:email:code:";
     /**
      * rds课程班级码缓存  规则：
      */

@@ -1,5 +1,5 @@
 server:
-  port: 8095
+  port: 8084
 spring:
   application:
     name: exam-file

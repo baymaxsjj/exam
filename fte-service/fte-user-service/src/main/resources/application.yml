@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8081
 spring:
   application:
     name: exam-user
@@ -31,8 +31,31 @@ mybatis-plus:
   mapper-locations: classpath*:com/**/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#  cloud:
-#    nacos:
-#      server-addr: 127.0.0.1:8848
-#      discovery:
-#        cluster-name: HZ # 集群名称，杭州集群
+justauth:
+  enabled: true
+  type:
+    gitee:
+      client-id: idorkey
+      client-secret: idorkey
+      redirect-uri: http://127.0.0.1:3030/uapi/public/user/login/GITEE/callback
+    qq:
+      client-id: idorkey
+      client-secret: idorkey
+      redirect-uri: http://127.0.0.1:3030/uapi/public/user/login/gitee/callback
+    github:
+      client-id: idorkey
+      client-secret: idorkey
+      redirect-uri: http://127.0.0.1:3030/uapi/public/user/login/github/callback
+#博客设置类
+exam:
+  name: MGO博客平台
+  login-page: http://localhost:3000/login
+  error-page: http://localhost:3000/error
+  logo-url: /static/img/logo.jpg
+  front:
+    host: localhost:3000
+  email:
+    #      邮件发送间隔
+    interval: 60
+    #      验证码时效
+    aging: 600

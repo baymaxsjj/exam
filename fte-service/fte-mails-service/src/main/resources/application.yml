@@ -1,0 +1,44 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: exam-mails
+  datasource:
+    url: jdbc:mysql://localhost:3306/wk_mails?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5 #????????
+      min-idle: 10 #???????
+      max-active: 20 #?????
+      web-stat-filter:
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #?????????
+      stat-view-servlet: #???????????????
+        login-username: druid
+        login-password: druid
+  mail:
+    #smtp服务主机  qq邮箱则为smtp.qq.com
+    host: smtp.qq.com
+    port: 587
+    #服务协议
+    #    protocol: smtps
+    # 编码集
+    default-encoding: UTF-8
+    nickname: baymax
+    #发送邮件的账户
+    username: youremail 
+    #授权码
+    password: password
+    #    test-connection: true
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          ssl: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+          starttls:
+            enable: true

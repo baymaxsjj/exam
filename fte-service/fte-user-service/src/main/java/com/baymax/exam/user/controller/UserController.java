@@ -94,17 +94,6 @@ public class UserController {
         queryWrapper.in(User::getId,ids);
         return userService.list(queryWrapper);
     };
-    @Operation(summary = "注册信息")
-    @PostMapping("/register")
-    Result register(@RequestBody @Validated({User.RegisterRequestValid.class}) User user){
-        // TODO: 邮箱验证码校验
-        return userService.addUser(user);
-    }
-    @Operation(summary = "忘记密码")
-    @PostMapping("/forgotPassword")
-    Result  forgotPassword(){
-        return Result.success();
-    }
     @Operation(summary = "信息认证")
     @PostMapping("/authentication")
     Result  authentication(){

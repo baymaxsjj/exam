@@ -94,6 +94,9 @@ public class MessageInfoController {
      public Result sendClassroomMessage(@RequestBody MessageInfo messageInfo, @PathVariable Integer classId) throws ResultException, JsonProcessingException {
         Integer userId = UserAuthUtil.getUserId();
         String routeName="Classroom";
+        if(messageInfo.getIntroduce().length()>2000){
+            return Result.msgInfo("消息最多2000个字符");
+        }
         messageInfo.setTitle(null);
         messageInfo.setTargetId(classId);
         messageInfo.setType(MessageTypeEnum.COURSE_USER_MESSAGE);

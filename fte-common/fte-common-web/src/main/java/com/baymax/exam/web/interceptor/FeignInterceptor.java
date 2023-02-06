@@ -28,7 +28,9 @@ public class FeignInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate requestTemplate) {
         //1、使用RequestContextHolder拿到刚进来的请求数据
-        requestTemplate.header(SecurityConstants.USER_TOKEN_HEADER, "{\"id\":"+UserAuthUtil.getUserId()+"}");
+        if(UserAuthUtil.getUser()!=null){
+            requestTemplate.header(SecurityConstants.USER_TOKEN_HEADER, "{\"id\":"+UserAuthUtil.getUserId()+"}");
+        }
         // 新增一个header
         requestTemplate.header(SecurityConstants.FROM, SecurityConstants.FROM_IN);
         log.info("feign拦截器{}", requestTemplate.headers());

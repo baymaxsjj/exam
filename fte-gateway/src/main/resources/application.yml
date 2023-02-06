@@ -46,7 +46,7 @@ springdoc:
 secure:
   ignore:
     urls: #配置白名单路径
-      - "/fapi/test/file/**"
+      - "/exam-user/public/**"
       - "/doc.html"
       - "/*/v3/api-docs/**"
       - "/v3/api-docs/**"

@@ -17,6 +17,7 @@
         <module>fte-user-service</module>
         <module>fte-message-service</module>
         <module>fte-file-service</module>
+        <module>fte-mails-service</module>
     </modules>
 
     <properties>

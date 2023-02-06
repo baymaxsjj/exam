@@ -1,12 +1,14 @@
 package com.baymax.exam.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.user.mapper.UserMapper;
 import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -57,6 +59,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Result<String> updateUser(User user) {
         return null;
+    }
+    public void updatePassword(int id,String password){
+        LambdaUpdateWrapper<User> updateWrapper=new LambdaUpdateWrapper();
+        updateWrapper.eq(User::getId,id);
+        updateWrapper.set(User::getPassword,new BCryptPasswordEncoder().encode(password));
     }
 
     /**
