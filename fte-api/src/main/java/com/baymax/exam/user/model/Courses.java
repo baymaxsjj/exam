@@ -40,7 +40,6 @@ public class Courses extends BaseEntity {
     @Schema(description = "课程名称")
     private String name;
 
-    @URL(message = "课程封面不合法")
     @NotBlank(message = "课程封面不能为空")
     @Schema(description = "课程封面")
     private String cover;

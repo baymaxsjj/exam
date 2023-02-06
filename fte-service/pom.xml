@@ -16,6 +16,7 @@
         <module>fte-exam-service</module>
         <module>fte-user-service</module>
         <module>fte-message-service</module>
+        <module>fte-file-service</module>
     </modules>
 
     <properties>

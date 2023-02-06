@@ -10,7 +10,10 @@ package com.baymax.exam.user.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baymax.exam.common.core.exception.ResultException;
 import com.baymax.exam.common.core.result.Result;
+import com.baymax.exam.file.feign.FileDetailClient;
 import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.service.impl.UserAuthInfoServiceImpl;
 import com.baymax.exam.user.service.impl.UserServiceImpl;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -35,6 +39,8 @@ public class UserController {
     UserServiceImpl userService;
     @Autowired
     UserAuthInfoServiceImpl studentInfoService;
+    @Autowired
+    FileDetailClient fileDetailClient;
     @Operation(summary = "获取用户信息")
     @GetMapping("/info")
     Result getUserInfo(){
@@ -48,6 +54,18 @@ public class UserController {
         log.info("用户id"+UserAuthUtil.getUserId());
         Integer userId = UserAuthUtil.getUserId();
         return Result.success(userService.getById(userId));
+    }
+    @Operation(summary = "更新头像")
+    @PostMapping("/upload-avatar")
+    Result<String> uploadAvatar(@RequestPart("file") MultipartFile file) throws ResultException {
+        Integer userId = UserAuthUtil.getUserId();
+        Result<String> result = fileDetailClient.uploadImage(file, "/"+userId+"/avatar/", userId.toString(), "user");
+        String url = result.getResultDate();
+        LambdaUpdateWrapper<User> updateWrapper=new LambdaUpdateWrapper<>();
+        updateWrapper.eq(User::getId,userId);
+        updateWrapper.set(User::getPicture,url);
+        userService.update(updateWrapper);
+        return Result.success("更新成功",url);
     }
     @Operation(summary = "获取用户信息")
     @PostMapping("/update")

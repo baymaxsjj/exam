@@ -27,7 +27,7 @@
 
 ### 系统
 
-- 框架：SpringBoot、Mybatis Plus、WebSocket
+- 框架：SpringBoot、SpringCloud、Mybatis Plus、WebSocket
 - 数据库：Mysql
 - 缓存：Redis
 - 前端：Vue 3、Vite、Pinia、Arco UI
@@ -54,7 +54,9 @@
 
 - [x] 行为监控
 
-- [ ] 实时消息通知
+- [x] 实时消息通知
+
+- [x] 考试数据导出
 
 - [ ] 考生数据统计分析
 

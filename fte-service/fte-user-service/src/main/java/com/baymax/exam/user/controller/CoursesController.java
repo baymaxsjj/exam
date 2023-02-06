@@ -1,12 +1,16 @@
 package com.baymax.exam.user.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baymax.exam.common.core.exception.ResultException;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
+import com.baymax.exam.file.feign.FileDetailClient;
 import com.baymax.exam.user.mapper.CoursesMapper;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
+import com.baymax.exam.user.model.User;
 import com.baymax.exam.user.service.impl.CoursesServiceImpl;
 import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
 import com.baymax.exam.user.vo.CourseInfoVo;
@@ -19,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -40,6 +45,8 @@ public class CoursesController {
     JoinClassServiceImpl joinClassService;
     @Autowired
     CoursesMapper coursesMapper;
+    @Autowired
+    FileDetailClient fileDetailClient;
     @Operation(summary = "创建课程")
     @PostMapping("/update")
     public Result add(@RequestBody @Validated Courses courses) {
@@ -58,6 +65,14 @@ public class CoursesController {
         courses.setUserId(userId);
         coursesService.saveOrUpdate(courses);
         return Result.msgSuccess(info);
+    }
+    @Operation(summary = "更新封面")
+    @PostMapping("/upload-cover")
+    Result<String> uploadCoursePicture(@RequestPart("file") MultipartFile file) throws ResultException {
+        Integer userId = UserAuthUtil.getUserId();
+        Result<String> result = fileDetailClient.uploadImage(file, "/"+userId+"/course/", null, "course");
+        String url = result.getResultDate();
+        return Result.success("上传成功",url);
     }
 
     @Operation(summary = "获取课程课程")
