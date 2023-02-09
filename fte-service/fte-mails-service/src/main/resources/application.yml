@@ -34,7 +34,7 @@ spring:
     #    test-connection: true
     properties:
       mail:
-        debug: true
+        debug: false
         smtp:
           auth: true
           ssl: true

@@ -20,4 +20,5 @@ public interface IExamClassService extends IService<ExamClass> {
      * @return {@link Integer}
      */
     Integer delExamClass(int classId,int examInfoId);
+
 }

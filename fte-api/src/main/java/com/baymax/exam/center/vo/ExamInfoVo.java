@@ -2,11 +2,15 @@ package com.baymax.exam.center.vo;
 
 import com.baymax.exam.center.model.ExamClass;
 import com.baymax.exam.center.model.ExamInfo;
+import com.baymax.exam.center.model.ExamPaper;
+import com.baymax.exam.user.model.Classes;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,7 +26,8 @@ public class ExamInfoVo {
     @Valid
     @NotNull(message = "考试信息不能为空")
     private ExamInfo examInfo;
-
-    @NotNull(message = "班级列表不能为空")
-    private Set<Integer> classList;
+    @NotEmpty(message = "班级列表不能为空")
+    private Set<Integer> classIds;
+    private ExamPaper paper;
+    private List<Classes> classList;
 }

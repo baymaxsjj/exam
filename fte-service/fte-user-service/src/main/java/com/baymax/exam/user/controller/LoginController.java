@@ -59,6 +59,7 @@ public class LoginController {
             Integer emailCode=redisUtils.getCacheObject(redisEmailCodeKey);
             log.info("验证码：{}",emailCode);
             if(code.equals(emailCode.toString())){
+                redisUtils.deleteObject(redisEmailCodeKey);
                 return userService.addUser(registerRequest);
             }
         }
@@ -70,10 +71,12 @@ public class LoginController {
     public Result forgetPass(@RequestParam String email,
                              @RequestParam String code,
                              @RequestBody String password){
-        String emailCode = redisUtils.getCacheObject(loginService.getRedisEmailCodeKey(email));
-        if(code.equals(emailCode)){
+         String redisEmailCodeKey = loginService.getRedisEmailCodeKey(email);
+        Integer emailCode = redisUtils.getCacheObject(redisEmailCodeKey);
+        if(code.equals(emailCode.toString())){
             User userByEmail = userService.getUserByEmail(email);
             userService.updatePassword(userByEmail.getId(),password);
+            redisUtils.deleteObject(redisEmailCodeKey);
             return Result.msgSuccess("修改成功");
         }
         return Result.msgSuccess("验证码不正确");

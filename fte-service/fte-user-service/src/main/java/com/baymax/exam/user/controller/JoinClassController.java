@@ -1,5 +1,6 @@
 package com.baymax.exam.user.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
@@ -18,6 +19,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 /**
  * <p>
@@ -66,5 +69,13 @@ public class JoinClassController {
         final IPage<UserAuthInfo> batchClassUsers = joinClassService.getBatchClassUsers(courseUser, isInlist, currPage,pageSize);
         return PageResult.setResult(batchClassUsers);
     }
-
+    @Inner
+    @Operation(summary = "获取班级人数")
+    @PostMapping("/student/number")
+    public Result<Long> getStudentNumberByIds(@RequestBody Set<Integer> classIds){
+        LambdaQueryWrapper<JoinClass> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.in(JoinClass::getClassId,classIds);
+        long count = joinClassService.count(queryWrapper);
+        return Result.success(count);
+    }
 }

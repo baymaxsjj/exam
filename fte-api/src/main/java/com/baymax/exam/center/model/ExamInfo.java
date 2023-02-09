@@ -1,12 +1,15 @@
 package com.baymax.exam.center.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.baymax.exam.base.BaseEntity;
+import com.baymax.exam.user.model.Classes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -64,12 +67,11 @@ public class ExamInfo extends BaseEntity {
     @Schema(description = "允许复制粘贴")
     private Boolean isCopyPaste;
 
-    @Future(message = "开始时间不合法")
+    @Future(message = "提交时间不合法")
     @Schema(description = "提交时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime submitTime;
 
-    @Future(message = "开始时间不合法")
     @NotNull(message = "开始时间不能为空")
     @Schema(description = "开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -80,5 +82,4 @@ public class ExamInfo extends BaseEntity {
     @Schema(description = "结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
-
 }

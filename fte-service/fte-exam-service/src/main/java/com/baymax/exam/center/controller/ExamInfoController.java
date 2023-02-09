@@ -7,19 +7,19 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baymax.exam.VueRouteLocationRaw;
 import com.baymax.exam.center.model.*;
-import com.baymax.exam.center.service.impl.ExamClassServiceImpl;
-import com.baymax.exam.center.service.impl.ExamInfoServiceImpl;
-import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
-import com.baymax.exam.center.service.impl.ExamPaperServiceImpl;
+import com.baymax.exam.center.service.impl.*;
 import com.baymax.exam.center.vo.ExamInfoVo;
+import com.baymax.exam.common.core.exception.ResultException;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.message.enums.MessageTypeEnum;
 import com.baymax.exam.message.feign.MessageServiceClient;
 import com.baymax.exam.message.model.MessageInfo;
+import com.baymax.exam.user.feign.ClassesClient;
 import com.baymax.exam.user.feign.CourseClient;
 import com.baymax.exam.user.feign.UserClient;
+import com.baymax.exam.user.model.Classes;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
@@ -33,10 +33,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -63,9 +65,16 @@ public class ExamInfoController {
     ExamQuestionServiceImpl examQuestionService;
 
     @Autowired
+    ExamCenterServiceImpl examCenterService;
+    @Autowired
+    ExamPaperServiceImpl examPaperService;
+    @Autowired
     CourseClient courseClient;
     @Autowired
     MessageServiceClient messageServiceClient;
+
+    @Autowired
+    ClassesClient classesClient;
 
     @Operation(summary = "发布考试信息")
     @PostMapping("/update")
@@ -79,11 +88,19 @@ public class ExamInfoController {
             if (temExam != null) {
                 teacherId = temExam.getTeacherId();
             }
+            //考试考试后不准开始修改时间
+            if(examInfo.getStartTime().isAfter(LocalDateTime.now())){
+               examInfo.setStartTime(null);
+               //删除考试信息缓存
+            }
             info = "更新成功";
         } else {
             Courses course = courseClient.findCourse(examInfo.getCourseId());
             if (course != null) {
                 teacherId = course.getUserId();
+            }
+            if(examInfo.getStartTime().isBefore(LocalDateTime.now())){
+                return Result.msgInfo("考试时间不合法");
             }
         }
         Integer userId = UserAuthUtil.getUserId();
@@ -114,26 +131,26 @@ public class ExamInfoController {
         examInfo.setTeacherId(userId);
         //更新试卷信息
         examInfoService.saveOrUpdate(examInfo);
+        //删除缓存
+        examCenterService.deleteCacheExamInfo(examInfo.getId());
         //重新添加考试班级
-        List<ExamClass> list=examInfoVo.getClassList().stream().map(integer ->{
+        List<ExamClass> list=examInfoVo.getClassIds().stream().map(cId ->{
             ExamClass examClass = new ExamClass();
-            examClass.setClassId(integer);
+            examClass.setClassId(cId);
             examClass.setExamInfoId(examInfo.getId());
-
             MessageInfo messageInfo = new MessageInfo();
             messageInfo.setTitle(examInfo.getTitle());
             final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             messageInfo.setIntroduce(examInfo.getStartTime().format(dateTimeFormatter)+"~"+examInfo.getEndTime().format(dateTimeFormatter));
             messageInfo.setUserId(userId);
             messageInfo.setClientId(UserAuthUtil.getUser().getClientId());
-            messageInfo.setTargetId(integer);
+            messageInfo.setTargetId(cId);
             VueRouteLocationRaw vueRouteLocationRaw = new VueRouteLocationRaw();
             vueRouteLocationRaw.setName("ExamManage");
             vueRouteLocationRaw.setParams(Map.of("",examInfo.getCourseId()));
             messageInfo.setPath(vueRouteLocationRaw.getJson());
             log.info("考试通知消息内容：{}", JSONUtil.toJsonStr(messageInfo));
             messageServiceClient.systemCourseMessage(messageInfo);
-
             return examClass;
         }).collect(Collectors.toList());
         examClassService.saveBatch(list);
@@ -141,7 +158,7 @@ public class ExamInfoController {
     }
     @Operation(summary = "获取考试信息")
     @GetMapping("/detail/{examInfoId}")
-    public Result<ExamInfoVo> detail(@PathVariable Integer examInfoId){
+    public Result<ExamInfoVo> detail(@PathVariable Integer examInfoId) throws ResultException {
         ExamInfo examInfo = examInfoService.getById(examInfoId);
         Integer userId = UserAuthUtil.getUserId();
         if(examInfo==null||examInfo.getTeacherId()!=userId){
@@ -150,10 +167,15 @@ public class ExamInfoController {
         LambdaQueryWrapper<ExamClass> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(ExamClass::getExamInfoId,examInfoId);
         List<ExamClass> list = examClassService.list(queryWrapper);
+
         ExamInfoVo paper=new ExamInfoVo();
         paper.setExamInfo(examInfo);
-
-        paper.setClassList(list.stream().map(item->item.getClassId()).collect(Collectors.toSet()));
+        paper.setPaper(examPaperService.getById(examInfo.getExamId()));
+        //班级信息
+        Set<Integer> classIds = list.stream().map(item -> item.getClassId()).collect(Collectors.toSet());
+        Result<List<Classes>> classListByIds = classesClient.getClassListByIds(classIds, examInfo.getCourseId());
+        paper.setClassList(classListByIds.getResultDate());
+        paper.setClassIds(classIds);
         return Result.success(paper);
     }
 

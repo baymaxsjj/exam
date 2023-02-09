@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.rmi.server.ExportException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -74,7 +75,8 @@ public class ExamConsoleController {
 
     @Autowired
     ExamConsoleServiceImpl examConsoleService;
-
+    @Autowired
+    ExamClassServiceImpl examClassService;
     /**
      * 获取总览
      * 答题进度、
@@ -224,10 +226,14 @@ public class ExamConsoleController {
             @PathVariable Integer studentId) {
         ExamInfo examInfo = examInfoService.getById(examInfoId);
         Integer userId = UserAuthUtil.getUserId();
+        //老师查看
         if (examInfo == null || !Objects.equals(examInfo.getTeacherId(), userId)) {
             //自己查看自己
             if(!(Objects.equals(studentId, userId) &&examInfo.getEndVisible())){
                 return Result.failed(ResultCode.PARAM_ERROR);
+            }
+            if(!LocalDateTime.now().isAfter(examInfo.getEndTime())){
+                return Result.msgInfo("考试期间禁止查看");
             }
         }
         //获取考试题目
@@ -268,5 +274,14 @@ public class ExamConsoleController {
 
         return Result.success(studentReview);
     }
-
+    @Operation(summary = "获取考试人数")
+    @GetMapping("/student-number")
+    public Result<Long> getReViewAnswer(@PathVariable Integer examInfoId){
+        ExamInfo examInfo = examInfoService.getById(examInfoId);
+        if(examInfo==null||examInfo.getTeacherId()!=UserAuthUtil.getUserId()){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        List<ExamClass> examClassIds = examClassService.getExamClassIds(examInfoId);
+        return joinClassClient.getStudentNumberByIds(examClassIds.stream().map(examClass -> examClass.getClassId()).collect(Collectors.toSet()));
+    }
 }

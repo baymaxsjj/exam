@@ -55,6 +55,11 @@ public class ExamCenterServiceImpl {
         redisUtils.setCacheList(key,questionInfo);
         return questionInfo;
     }
+    public boolean deleteCacheExamInfo(int examInfoId){
+        String key = ExamRedisKey.examInfoKey(examInfoId);
+        return redisUtils.deleteObject(key);
+    }
+
 
     /**
      * 得到缓存考试信息

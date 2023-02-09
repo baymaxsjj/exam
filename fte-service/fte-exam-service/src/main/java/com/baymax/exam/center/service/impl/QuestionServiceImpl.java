@@ -17,6 +17,8 @@ import com.baymax.exam.common.core.base.IBaseEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,7 +74,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         List<QuestionItem> topicItems = questionInfo.getOptions().stream().map(tem->{
             tem.setQuestionId(questionInfo.getId());
             if(enumByValue==QuestionTypeEnum.SIGNAL_CHOICE||enumByValue==QuestionTypeEnum.JUDGMENTAL||enumByValue==QuestionTypeEnum.MULTIPLE_CHOICE){
-                tem.setAnswer(OptionStatusEnum.SELECT.value);
+                if(!ObjectUtils.isEmpty(tem.getAnswer())){
+                    tem.setAnswer(OptionStatusEnum.SELECT.value);
+                }
             }
             return tem;
         }).collect(Collectors.toList());

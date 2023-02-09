@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baymax.exam.user.model.UserAuthInfo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
+
 /**
  * <p>
  *  Mapper 接口
@@ -16,6 +18,9 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface JoinClassMapper extends BaseMapper<JoinClass> {
+
     IPage<UserAuthInfo>  getJoinClassUser(IPage<UserAuthInfo> page, Wrapper<JoinClass> ew);
     JoinClass getJoinByCourseId(Integer courseId,Integer userId);
+
+    Integer getStudentNumberByIds(Collection<Integer> ids,Integer userId);
 }

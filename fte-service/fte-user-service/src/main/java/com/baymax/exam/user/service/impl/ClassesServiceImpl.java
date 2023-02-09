@@ -9,6 +9,7 @@ import com.baymax.exam.user.service.IClassesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -38,7 +39,7 @@ public class ClassesServiceImpl extends ServiceImpl<ClassesMapper, Classes> impl
         queryWrapper.eq(Classes::getCourseId,courseId);
         return list(queryWrapper);
     }
-    public List<Classes> getClassByIds(Integer courseId,List<Integer> ids) {
+    public List<Classes> getClassByIds(Integer courseId, Collection<Integer> ids) {
         LambdaQueryWrapper<Classes> queryWrapper=new LambdaQueryWrapper();
         queryWrapper.eq(Classes::getCourseId,courseId);
         queryWrapper.in(Classes::getId,ids);

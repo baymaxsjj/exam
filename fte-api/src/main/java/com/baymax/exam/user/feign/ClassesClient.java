@@ -1,12 +1,14 @@
 package com.baymax.exam.user.feign;
 
 import com.baymax.exam.common.core.result.Result;
+import com.baymax.exam.user.model.Classes;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author ：Baymax
@@ -25,5 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value = "exam-user",contextId = "ClassesClient",path = "/classes")
 public interface ClassesClient {
     @GetMapping("/info/{classId}")
-    public Result classInfo(@PathVariable String classId);
+    public Result<Classes> classInfo(@PathVariable String classId);
+
+    @PostMapping("/{courseId}/part/list")
+    public Result<List<Classes>> getClassListByIds(
+            @RequestBody Collection<Integer> classIds,
+            @PathVariable Integer courseId
+    );
 }

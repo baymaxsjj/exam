@@ -64,6 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LambdaUpdateWrapper<User> updateWrapper=new LambdaUpdateWrapper();
         updateWrapper.eq(User::getId,id);
         updateWrapper.set(User::getPassword,new BCryptPasswordEncoder().encode(password));
+        update(updateWrapper);
     }
 
     /**

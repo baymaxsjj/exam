@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baymax.exam.center.model.ExamClass;
 import com.baymax.exam.center.mapper.ExamClassMapper;
-import com.baymax.exam.center.model.ExamInfo;
 import com.baymax.exam.center.service.IExamClassService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,5 +37,11 @@ public class ExamClassServiceImpl extends ServiceImpl<ExamClassMapper, ExamClass
         Map<SFunction<ExamClass, ?>, Object> queryMap= Map.of(ExamClass::getClassId,classId,ExamClass::getExamInfoId,examInfoId);
         queryWrapper.allEq(queryMap);
         return examClassMapper.delete(queryWrapper);
+    }
+
+    public List<ExamClass> getExamClassIds(int examInfoId){
+        LambdaQueryWrapper<ExamClass> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(ExamClass::getExamInfoId,examInfoId);
+        return list(queryWrapper);
     }
 }

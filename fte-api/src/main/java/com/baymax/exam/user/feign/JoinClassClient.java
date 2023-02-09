@@ -10,6 +10,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.Set;
+
 /**
  * @author ：Baymax
  * @date ：Created in 2022/12/1 9:52
@@ -31,6 +34,7 @@ public interface JoinClassClient {
              @PathVariable Integer classId,
              @RequestParam(required = false,defaultValue = "1") Long currentPage,
              @RequestParam(required = false,defaultValue = "10") Long pageSize);
-
+     @PostMapping("/student/number")
+     public Result<Long> getStudentNumberByIds(@RequestBody Collection<Integer> classIds);
 
 }

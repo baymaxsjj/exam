@@ -22,4 +22,18 @@
             jc.student_id = #{userId}
           AND c.course_id =#{courseId}
     </select>
+    <select id="getStudentNumberByIds" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            ec_join_class ejc
+                JOIN ec_classes ec ON ( ejc.class_id - ec.id )
+        WHERE
+            ec.teacher_id=#{userId}
+          AND
+            ec.id in
+            <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+    </select>
 </mapper>

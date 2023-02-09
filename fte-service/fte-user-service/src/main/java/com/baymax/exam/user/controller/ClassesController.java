@@ -12,6 +12,7 @@ import com.baymax.exam.user.service.impl.CoursesServiceImpl;
 import com.baymax.exam.user.service.impl.JoinClassServiceImpl;
 import com.baymax.exam.user.utils.CourseClassCodeUtil;
 import com.baymax.exam.user.vo.ClassCodeVo;
+import com.baymax.exam.web.annotation.Inner;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,9 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>
@@ -90,7 +89,7 @@ public class ClassesController {
     }
     @Operation(summary = "获取班级信息")
     @GetMapping("/info/{classId}")
-    public Result info(
+    public Result<Classes> info(
             @Schema(description = "班级id")@PathVariable Integer classId){
         Classes classes = classesService.getById(classId);
          Integer userId = UserAuthUtil.getUserId();
@@ -126,20 +125,21 @@ public class ClassesController {
 
         return Result.success(list);
     }
+    @Inner
     @Operation(summary = "获取班级列表")
     @PostMapping("/{courseId}/part/list")
     public Result<List<Classes>> getClassListByIds(
-            @RequestBody List<Integer> classIds,
+            @RequestBody Collection<Integer> classIds,
             @PathVariable Integer courseId
         ){
-        Integer userId = UserAuthUtil.getUserId();
-        Courses courses = coursesService.getById(courseId);
-        List<Classes> list = null;
-        if(courses==null|| !Objects.equals(courses.getUserId(), userId)){
-            return  Result.failed(ResultCode.PARAM_ERROR);
-        }
+//        Integer userId = UserAuthUtil.getUserId();
+//        Courses courses = coursesService.getById(courseId);
+//        List<Classes> list = null;
+//        if(courses==null|| !Objects.equals(courses.getUserId(), userId)){
+//            return  Result.failed(ResultCode.PARAM_ERROR);
+//        }
         //老师获取班级列表;
-        list=classesService.getClassByIds(courseId,classIds);
+        List<Classes> list=classesService.getClassByIds(courseId,classIds);
         return Result.success(list);
     }
 
