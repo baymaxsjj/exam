@@ -138,19 +138,21 @@ public class ExamInfoController {
             ExamClass examClass = new ExamClass();
             examClass.setClassId(cId);
             examClass.setExamInfoId(examInfo.getId());
-            MessageInfo messageInfo = new MessageInfo();
-            messageInfo.setTitle(examInfo.getTitle());
-            final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            messageInfo.setIntroduce(examInfo.getStartTime().format(dateTimeFormatter)+"~"+examInfo.getEndTime().format(dateTimeFormatter));
-            messageInfo.setUserId(userId);
-            messageInfo.setClientId(UserAuthUtil.getUser().getClientId());
-            messageInfo.setTargetId(cId);
-            VueRouteLocationRaw vueRouteLocationRaw = new VueRouteLocationRaw();
-            vueRouteLocationRaw.setName("ExamManage");
-            vueRouteLocationRaw.setParams(Map.of("",examInfo.getCourseId()));
-            messageInfo.setPath(vueRouteLocationRaw.getJson());
-            log.info("考试通知消息内容：{}", JSONUtil.toJsonStr(messageInfo));
-            messageServiceClient.systemCourseMessage(messageInfo);
+            if(examInfo.getStartTime()!=null){
+                MessageInfo messageInfo = new MessageInfo();
+                messageInfo.setTitle(examInfo.getTitle());
+                final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                messageInfo.setIntroduce(examInfo.getStartTime().format(dateTimeFormatter)+"~"+examInfo.getEndTime().format(dateTimeFormatter));
+                messageInfo.setUserId(userId);
+                messageInfo.setClientId(UserAuthUtil.getUser().getClientId());
+                messageInfo.setTargetId(cId);
+                VueRouteLocationRaw vueRouteLocationRaw = new VueRouteLocationRaw();
+                vueRouteLocationRaw.setName("ExamManage");
+                vueRouteLocationRaw.setParams(Map.of("",examInfo.getCourseId()));
+                messageInfo.setPath(vueRouteLocationRaw.getJson());
+                log.info("考试通知消息内容：{}", JSONUtil.toJsonStr(messageInfo));
+                messageServiceClient.systemCourseMessage(messageInfo);
+            }
             return examClass;
         }).collect(Collectors.toList());
         examClassService.saveBatch(list);
@@ -245,5 +247,4 @@ public class ExamInfoController {
         }
         return Result.success(PageResult.setResult(record));
     }
-
 }

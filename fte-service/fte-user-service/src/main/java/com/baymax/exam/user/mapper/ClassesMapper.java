@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2022-10-11
  */
 public interface ClassesMapper extends BaseMapper<Classes> {
-
+    Classes getClassByUserId(int courseId,int userId);
 }

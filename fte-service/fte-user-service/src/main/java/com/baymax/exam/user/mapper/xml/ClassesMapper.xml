@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.baymax.exam.user.mapper.ClassesMapper">
 
+    <select id="getClassByUserId" resultType="com.baymax.exam.user.model.Classes">
+        SELECT
+            *
+        FROM
+            ec_classes c
+                JOIN ec_join_class jc ON ( c.id = jc.class_id )
+        WHERE
+            jc.student_id = #{userId}
+          AND c.course_id =#{courseId}
+    </select>
 </mapper>

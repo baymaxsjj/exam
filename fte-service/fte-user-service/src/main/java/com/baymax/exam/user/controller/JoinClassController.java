@@ -58,6 +58,7 @@ public class JoinClassController {
         IPage<UserAuthInfo> classUsers = joinClassService.getClassUsers(classId, currentPage, pageSize);
         return Result.success(PageResult.setResult(classUsers));
     }
+
     @Inner
     @Operation(summary = "批量获取班级学生")
     @PostMapping("/students/list")

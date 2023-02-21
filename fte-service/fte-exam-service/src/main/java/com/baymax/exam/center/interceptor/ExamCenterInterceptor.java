@@ -36,6 +36,7 @@ public class ExamCenterInterceptor implements HandlerInterceptor {
     public static final String EXAM_INFO_KEY="examInfo";
     @Autowired
     ExamCenterServiceImpl examInfoService;
+    @Lazy
     @Autowired
     ExamAnswerLogServiceImpl examAnswerLogService;
     @Lazy

@@ -10,7 +10,12 @@ import com.baymax.exam.center.vo.ExamAnswerInfoVo;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.redis.utils.RedisUtils;
+import com.baymax.exam.user.feign.ClassesClient;
+import com.baymax.exam.user.feign.CourseClient;
+import com.baymax.exam.user.feign.JoinClassClient;
 import com.baymax.exam.user.feign.UserClient;
+import com.baymax.exam.user.model.Classes;
+import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,6 +67,9 @@ public class ExamCenterController {
     RedisUtils redisUtils;
     @Autowired
     ExamAnswerLogServiceImpl examAnswerLogService;
+
+    @Autowired
+    ClassesClient classesClient;
 
 
 
@@ -134,7 +142,7 @@ public class ExamCenterController {
         //2.题目类型分类
         //题目类型排序
         TreeMap<QuestionTypeEnum, List<QuestionInfoVo>> questionOrderGroup= examCenterService.getGroupQuestionList(cacheQuestionsInfo);
-        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.START,UserAuthUtil.getUserIp());
+        examAnswerLogService.writeLog(userId,null,examInfo,ExamAnswerLogEnum.START,UserAuthUtil.getUserIp());
         Map<String,Object> result=new HashMap<>();
         result.put("examInfo",examInfo);
         result.put("systemTime",LocalDateTime.now());
@@ -180,7 +188,7 @@ public class ExamCenterController {
         final Boolean isMonitor = examInfo.getIsMonitor();
         if(isMonitor){
             Integer userId = UserAuthUtil.getUserId();
-            examAnswerLogService.writeLog(userId,examInfo,answerLog.getStatus(),answerLog.getInfo());
+            examAnswerLogService.writeLog(userId,null,examInfo,answerLog.getStatus(),answerLog.getInfo());
         }
         //放入缓存，提交答案的时候在存到数据库
         return Result.success("提交成功");
@@ -198,7 +206,8 @@ public class ExamCenterController {
     public void submit(int userId,ExamInfo examInfo){
         //提交记录
         //获取题目
-        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.SUBMIT,UserAuthUtil.getUserIp());
+        Classes classes = classesClient.getClassByUserId(examInfo.getCourseId(), userId);
+        examAnswerLogService.writeLog(userId,classes.getId(),examInfo,ExamAnswerLogEnum.SUBMIT,UserAuthUtil.getUserIp());
         List<QuestionInfoVo> questionsInfo = examCenterService.getCacheQuestionsInfo(examInfo.getId(), examInfo.getExamId());
         String redisAnswerKey= ExamRedisKey.examStudentAnswerKey(examInfo.getId(),userId);
         List<ExamAnswerResult> answerResults=new ArrayList<>();
@@ -220,13 +229,17 @@ public class ExamCenterController {
         }
         List<ExamAnswerInfoVo> examAnswerInfo = examCenterService.answerCompare(questionsInfo, answerResults);
         List<ExamAnswerResult> answerResult = examAnswerInfo.stream().flatMap(info -> info.getAnswerResult().stream()).collect(Collectors.toList());
-        List<ExamScoreRecord> scoreRecords = examAnswerInfo.stream().map(info -> info.getScoreRecord()).collect(Collectors.toList());
+        List<ExamScoreRecord> scoreRecords = examAnswerInfo.stream().map(result->{
+            final ExamScoreRecord scoreRecord = result.getScoreRecord();
+            scoreRecord.setClassId(classes.getId());
+            return scoreRecord;
+        }).collect(Collectors.toList());
         scoreRecordService.saveBatch(scoreRecords);
         answerResultService.saveBatch(answerResult);
 //        examAnswerLogService.writeLog(userId,examInfo,ExamAnswerLogEnum.ROBOT_REVIEW,null);
         examAnswerLogService.saveReviewStatus(examInfo.getId(),userId,ExamAnswerLogEnum.ROBOT_REVIEW);
-        //删除缓存
         String questionsKey = ExamRedisKey.examStudentQuestionsInfoKey(examInfo.getId(), userId);
+
         redisUtils.deleteObject(redisAnswerKey);
         redisUtils.deleteObject(questionsKey);
     }

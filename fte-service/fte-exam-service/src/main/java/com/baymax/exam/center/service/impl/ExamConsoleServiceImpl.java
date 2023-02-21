@@ -1,7 +1,9 @@
 package com.baymax.exam.center.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baymax.exam.center.enums.ExamAnswerLogEnum;
 import com.baymax.exam.center.model.ExamAnswerLog;
+import com.baymax.exam.center.model.ExamClass;
 import com.baymax.exam.center.model.ExamInfo;
 import com.baymax.exam.center.model.ExamScoreRecord;
 import com.baymax.exam.center.vo.QuestionInfoVo;
@@ -17,9 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,6 +44,8 @@ public class ExamConsoleServiceImpl {
     @Autowired
     ExamInfoServiceImpl examInfoService;
     @Autowired
+    ExamClassServiceImpl examClassService;
+    @Autowired
     JoinClassClient joinClassClient;
     @Autowired
     QuestionServiceImpl questionService;
@@ -50,7 +57,7 @@ public class ExamConsoleServiceImpl {
 
     public PageResult getReViewList(
             String reviewType,
-            Set<Integer> classIds,
+            Integer classId,
             Integer examInfoId,
             Long page,
             Long pageSize){
@@ -71,17 +78,11 @@ public class ExamConsoleServiceImpl {
                 break;
         }
         if(answerLogEnum!=null){
-            List<ExamAnswerLog> distinctLogList = examAnswerLogService.getDistinctLogList(examInfoId, answerLogEnum);
-            studentIds=distinctLogList.stream().map(i->i.getStudentId()).collect(Collectors.toSet());
+            List<ExamAnswerLog> distinctLogList = examAnswerLogService.getLogListByAction(examInfoId, answerLogEnum);
+            studentIds=distinctLogList.stream().map(ExamAnswerLog::getStudentId).collect(Collectors.toSet());
         }
-
-        CourseUserPo courseUserPo=new CourseUserPo();
-        courseUserPo.setClassIds(classIds);
-        courseUserPo.setCourseId(examInfo.getCourseId());
-        courseUserPo.setStudentIds(studentIds);
-        //学生列表
-        PageResult batchClassUser = joinClassClient.getBatchClassUser(courseUserPo, isIsList, page,pageSize);
-        List<UserAuthInfo> studentList = batchClassUser.getList();
+        final PageResult<UserAuthInfo> userInfo = getUserInfo(examInfoId, examInfo.getCourseId(), classId, studentIds, isIsList, page, pageSize);
+        List<UserAuthInfo> studentList = userInfo.getList();
         //题目选项
         List<QuestionInfoVo> questionInfoVos = questionService.examQuestionInfo(examInfo.getExamId());
         List<StudentReviewVo> studentsActionInfo = studentList.stream().map(studentInfo -> {
@@ -100,13 +101,30 @@ public class ExamConsoleServiceImpl {
                     studentReviewVo.setSubmitTime(answerLog.getCreatedAt());
                 });
                 if(studentReviewVo.getAnswerStatus()!=ExamAnswerLogEnum.START){
-                    List<ExamScoreRecord> scoreList = scoreRecordService.getScoreList(examInfoId, studentInfo.getUserId());
+                    List<ExamScoreRecord> scoreList = scoreRecordService.getScoreListByUserId(examInfoId, studentInfo.getUserId());
                     examCenterService.statisticalAnswerInfo(studentReviewVo,scoreList,questionInfoVos);
                 }
             }
             return studentReviewVo;
         }).collect(Collectors.toList());
-        batchClassUser.setList(studentsActionInfo);
-        return batchClassUser;
+        return PageResult.copyPageResult(userInfo,studentsActionInfo);
     }
+    public PageResult<UserAuthInfo> getUserInfo(int examId,int courseId,Integer classId,Set<Integer> stuIds,boolean isIsList,long page,long pageSize){
+        Set<Integer> ids;
+        if(classId!=null){
+           ids=new HashSet<>();
+           ids.add(classId);
+        }else{
+           ids = examClassService.getExamClassIds(examId).stream().map(ExamClass::getClassId).collect(Collectors.toSet());
+        }
+
+        CourseUserPo courseUserPo=new CourseUserPo();
+        courseUserPo.setClassIds(ids);
+        courseUserPo.setCourseId(courseId);
+        courseUserPo.setStudentIds(stuIds);
+        //学生列表
+        return joinClassClient.getBatchClassUser(courseUserPo, isIsList, page,pageSize);
+    }
+
+
 }

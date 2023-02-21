@@ -5,10 +5,7 @@ import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
 import com.baymax.exam.user.model.User;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +23,8 @@ public interface UserClient {
      User findUser(@RequestParam String username);
     @GetMapping("/base/info")
     Result<User> getBaseUserInfo();
+    @GetMapping("/{userId}/info")
+    User getBaseUserInfoById(@PathVariable Integer userId);
     @PostMapping ("/batchUser")
     List<User> getBatchUser(@RequestBody Collection<Integer> ids);
 }

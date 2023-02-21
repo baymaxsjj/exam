@@ -15,6 +15,7 @@ import com.baymax.exam.user.vo.ClassCodeVo;
 import com.baymax.exam.web.annotation.Inner;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -125,6 +126,8 @@ public class ClassesController {
 
         return Result.success(list);
     }
+
+
     @Inner
     @Operation(summary = "获取班级列表")
     @PostMapping("/{courseId}/part/list")
@@ -141,6 +144,15 @@ public class ClassesController {
         //老师获取班级列表;
         List<Classes> list=classesService.getClassByIds(courseId,classIds);
         return Result.success(list);
+    }
+
+    @Inner
+    @Operation(summary = "获取用户所在班级")
+    @PostMapping("/{courseId}/user/class")
+    public Classes getClassByUserId(
+            @PathVariable Integer courseId,
+            @RequestParam Integer userId){
+        return classesService.getBaseMapper().getClassByUserId(courseId,userId);
     }
 
     @Operation(summary = "获取班级码")

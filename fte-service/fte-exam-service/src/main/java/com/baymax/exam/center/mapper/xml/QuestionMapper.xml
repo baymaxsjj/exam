@@ -35,4 +35,13 @@
         WHERE
             eq.exam_id =#{examId}
     </select>
+    <select id="examQuestion" resultType="com.baymax.exam.center.model.Question">
+        SELECT
+            q.*
+        FROM
+            ee_exam_question eq
+                JOIN eq_question q ON ( eq.question_id = q.id )
+        WHERE
+            eq.exam_id =#{examId}
+    </select>
 </mapper>

@@ -84,7 +84,7 @@ public class JoinClassServiceImpl extends ServiceImpl<JoinClassMapper, JoinClass
     @Override
     public IPage<UserAuthInfo> getBatchClassUsers(CourseUserPo courseUserPo, Boolean isInList, long currPage, long pageSize) {
         Page<UserAuthInfo> page=new Page<>(currPage,pageSize);
-        QueryWrapper queryWrapper=new QueryWrapper();
+        QueryWrapper<JoinClass> queryWrapper=new QueryWrapper<>();
         log.info("getBatchClassUsers:{}",courseUserPo);
         queryWrapper.eq("c.course_id",courseUserPo.getCourseId());
         queryWrapper.in("jc.class_id",courseUserPo.getClassIds());

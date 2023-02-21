@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -109,7 +110,7 @@ public class ExamPaperController {
     public Result detail(@PathVariable Integer examId){
         ExamPaper examPaper = examService.getById(examId);
         Integer userId = UserAuthUtil.getUserId();
-        if(examPaper ==null|| examPaper.getTeacherId()!=userId){
+        if(examPaper ==null|| !Objects.equals(examPaper.getTeacherId(), userId)){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         LambdaQueryWrapper<ExamQuestion> queryWrapper=new LambdaQueryWrapper<>();
@@ -117,7 +118,7 @@ public class ExamPaperController {
         List<ExamQuestion> list = examQuestionService.list(queryWrapper);
         ExamPaperVo paper=new ExamPaperVo();
         paper.setExamPaper(examPaper);
-        paper.setQuestions(list.stream().map(item->item.getQuestionId()).collect(Collectors.toSet()));
+        paper.setQuestions(list.stream().map(ExamQuestion::getQuestionId).collect(Collectors.toSet()));
         return Result.success(paper);
     }
     @Operation(summary = "获取试卷信息")

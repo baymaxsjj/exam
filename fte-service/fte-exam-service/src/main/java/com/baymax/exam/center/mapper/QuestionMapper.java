@@ -23,4 +23,5 @@ import java.util.List;
 public interface QuestionMapper extends BaseMapper<Question> {
     QuestionInfoVo questionInfo(Integer id);
     List<QuestionInfoVo> examQuestionInfo(Integer examId);
+    List<Question> examQuestion(Integer examId);
 }

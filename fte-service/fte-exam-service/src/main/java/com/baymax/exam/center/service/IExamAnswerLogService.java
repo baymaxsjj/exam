@@ -17,10 +17,11 @@ public interface IExamAnswerLogService extends IService<ExamAnswerLog> {
     /**
      * 写日志
      *
-     * @param stuId      斯图id
-     * @param logEnum    日志枚举
-     * @param info       信息
-     * @param examInfoId 考试信息id
+     * @param stuId    斯图id
+     * @param logEnum  日志枚举
+     * @param info     信息
+     * @param classId  类id
+     * @param examInfo 考试信息
      */
-    void writeLog(Integer stuId, ExamInfo examInfo, ExamAnswerLogEnum logEnum, String info);
+    public void writeLog(Integer stuId,Integer classId, ExamInfo examInfo, ExamAnswerLogEnum logEnum, String info) ;
 }

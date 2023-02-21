@@ -21,7 +21,6 @@ import com.baymax.exam.user.feign.CourseClient;
 import com.baymax.exam.user.feign.JoinClassClient;
 import com.baymax.exam.user.feign.UserAuthInfoClient;
 import com.baymax.exam.user.model.UserAuthInfo;
-import com.baymax.exam.user.po.CourseUserPo;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,6 +38,7 @@ import java.rmi.server.ExportException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -88,13 +88,13 @@ public class ExamConsoleController {
     @PostMapping("/outline-monitor")
     public Result getOutline(
             @PathVariable Integer examInfoId,
-            @RequestBody Set<Integer> classIds,
+            @RequestParam(required = false) Integer classId,
             @RequestParam AnswerStatusEnum status,
-            @RequestParam(defaultValue = "1") Long page,
-            @RequestParam(required = false,defaultValue = "10") Long pageSize){
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         ExamInfo examInfo = examInfoService.getById(examInfoId);
         Integer userId = UserAuthUtil.getUserId();
-        if(examInfo==null||examInfo.getTeacherId()!=userId){
+        if(examInfo==null|| !Objects.equals(examInfo.getTeacherId(), userId)){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         //TODO:判断班级是不是自己的
@@ -112,26 +112,21 @@ public class ExamConsoleController {
                 answerLogEnum=ExamAnswerLogEnum.SUBMIT;
                 break;
         }
-        List<ExamAnswerLog> distinctLogList = examAnswerLogService.getDistinctLogList(examInfoId, answerLogEnum);
+        List<ExamAnswerLog> distinctLogList = examAnswerLogService.getDistinctLogList(examInfoId, answerLogEnum,page,pageSize).getRecords();
         //查全部
         if(status!=AnswerStatusEnum.ALL){
-            studentIds=distinctLogList.stream().map(i->i.getStudentId()).collect(Collectors.toSet());
+            studentIds=distinctLogList.stream().map(ExamAnswerLog::getStudentId).collect(Collectors.toSet());
         }
         //获取学生信息列表
-        CourseUserPo courseUserPo=new CourseUserPo();
-        courseUserPo.setClassIds(classIds);
-        courseUserPo.setCourseId(examInfo.getCourseId());
-        courseUserPo.setStudentIds(studentIds);
-        PageResult batchClassUser = joinClassClient.getBatchClassUser(courseUserPo, isIsList, page,pageSize);
+        PageResult<UserAuthInfo> batchClassUser =examConsoleService.getUserInfo(examInfoId,examInfo.getCourseId(),null,null,isIsList,page,pageSize);
         //整合行为列表
         List<UserAuthInfo> studentList = batchClassUser.getList();
         List<StudentActionVo> studentsActionInfo = studentList.stream().map(studentInfo -> {
             StudentActionVo studentActionVo = new StudentActionVo();
             studentActionVo.setUserAuthInfo(studentInfo);
             //如果存在日志,就返回后10条
-            boolean present = distinctLogList.stream().anyMatch(fi -> Objects.equals(fi.getStudentId(), studentInfo.getUserId()));
-            if(present){
-                 IPage<ExamAnswerLog> userLog = examAnswerLogService.getLogListByUserId(examInfoId,studentInfo.getUserId(),1,10);
+            IPage<ExamAnswerLog> userLog = examAnswerLogService.getLogListByUserId(examInfoId,studentInfo.getUserId(),1,10);
+            if(!userLog.getRecords().isEmpty()){
                 Collections.reverse(userLog.getRecords());
                  studentActionVo.setActionPage(PageResult.setResult(userLog));
                  userLog.getRecords().stream().filter(log->log.getStatus()==ExamAnswerLogEnum.SUBMIT).findFirst().ifPresentOrElse(log->{
@@ -145,14 +140,13 @@ public class ExamConsoleController {
             }
             return studentActionVo;
         }).collect(Collectors.toList());
-        batchClassUser.setList(studentsActionInfo);
-        return Result.success(batchClassUser);
+        return Result.success(PageResult.copyPageResult(batchClassUser,studentsActionInfo));
     }
     @Operation(summary = "获取批阅列表")
     @PostMapping("/review/list")
     public Result getReViewList(
             @RequestParam(required = false,defaultValue = "all") String reviewType,
-            @RequestBody Set<Integer> classIds,
+            @RequestParam(required = false) Integer classId,
             @PathVariable Integer examInfoId,
             @RequestParam(defaultValue = "1") Long page,
             @RequestParam(required = false,defaultValue = "10") Long pageSize){
@@ -161,14 +155,14 @@ public class ExamConsoleController {
         if(examInfo==null||examInfo.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
-        return Result.success(examConsoleService.getReViewList(reviewType,classIds,examInfoId,page,pageSize));
+        return Result.success(examConsoleService.getReViewList(reviewType,classId,examInfoId,page,pageSize));
     }
     @Operation(summary = "导出批阅列表")
     @PostMapping("/review/list/export")
     public void reviewListExport(
             HttpServletResponse res,
             @RequestParam(required = false,defaultValue = "all") String reviewType,
-            @RequestBody Set<Integer> classIds,
+            @RequestParam(required = false) Integer classId,
             @PathVariable Integer examInfoId) throws IOException {
         ExamInfo examInfo = examInfoService.getById(examInfoId);
         Integer userId = UserAuthUtil.getUserId();
@@ -197,7 +191,7 @@ public class ExamConsoleController {
             AtomicInteger joinNumber= new AtomicInteger();
             long page=1;
             do{
-                reviewList= examConsoleService.getReViewList(reviewType, classIds, examInfoId, page, 100L);
+                reviewList= examConsoleService.getReViewList(reviewType, classId, examInfoId, page, 100L);
                 if(reviewList!=null){
                      List<StudentReviewExcel> reviewExcels = reviewList.getList().stream().map(studentReviewVo -> {
                          if(studentReviewVo.getAnswerStatus()!=null){
@@ -240,12 +234,12 @@ public class ExamConsoleController {
         List<QuestionInfoVo> questionInfoVos = questionService.examQuestionInfo(examInfo.getExamId());
         log.info("学生作答/题目信息：{}",questionInfoVos);
         //获取作答
-        final List<ExamAnswerResult> answerResultList = answerResultService.getAnswerResultList(examInfoId, studentId);
+        final List<ExamAnswerResult> answerResultList = answerResultService.getAnswerResultListByUserId(examInfoId, studentId);
        if(answerResultList.isEmpty()){
            return Result.msgWaring("未获取到作答信息");
        }
         //获取批阅
-        final List<ExamScoreRecord> scoreList = scoreRecordService.getScoreList(examInfoId, studentId);
+        final List<ExamScoreRecord> scoreList = scoreRecordService.getScoreListByUserId(examInfoId, studentId);
         //整合
         List<AnswerQuestionResultVo>  answerQuestionResultList = questionInfoVos.stream().map(questionInfo -> {
             AnswerQuestionResultVo answerQuestionResult = new AnswerQuestionResultVo();
@@ -283,5 +277,91 @@ public class ExamConsoleController {
         }
         List<ExamClass> examClassIds = examClassService.getExamClassIds(examInfoId);
         return joinClassClient.getStudentNumberByIds(examClassIds.stream().map(examClass -> examClass.getClassId()).collect(Collectors.toSet()));
+    }
+    /*
+    * 1.题型正确率
+    * 2.题目正确率
+    * 3.平均分
+    * 3.最高分，最低分
+    * 3.方差
+    *
+    * */
+    @GetMapping ("/exam/result-statistical")
+    Result getExamResultStatistical(@RequestParam(required = false) Integer classId, @PathVariable Integer examInfoId){
+        //获取用户列表
+        ExamInfo examInfo = examInfoService.getById(examInfoId);
+        Integer userId = UserAuthUtil.getUserId();
+        if(examInfo==null|| !Objects.equals(examInfo.getTeacherId(), userId)){
+            return Result.failed(ResultCode.PARAM_ERROR);
+        }
+        List<ExamScoreRecord> scoreList;
+        if(classId!=null){
+            scoreList=scoreRecordService.getScoreListByClassId(examInfoId,classId);
+        }else{
+            scoreList= scoreRecordService.getScoreListByExamId(examInfoId);
+        }
+        if(scoreList.isEmpty()){
+            return Result.success();
+        }
+        //获取考试题目
+        List<Question> questionInfoVos = questionService.examQuestion(examInfo.getExamId());
+        Map<String,ExamResultStatistic.AnswerStatisticInfo> questionStatistics=new HashMap<>();
+        Map<QuestionTypeEnum,ExamResultStatistic.AnswerStatisticInfo> typeStatistics=new HashMap<>();
+        //统计题目正确率
+        scoreList.stream().collect(Collectors.groupingBy(ExamScoreRecord::getQuestionId)).forEach((k,v)->{
+            //获取题目
+             questionInfoVos.stream().filter(q -> q.getId().equals(k)).findFirst().ifPresent(question->{
+                 log.info("题目：{}",k);
+                 v.forEach(scoreRecord -> {
+                     Float score = scoreRecord.getScore();
+                     log.info("分数：{},成绩：{},相等：{}",question.getScore(),score,question.getScore()==score);
+                     String content=question.getContent();
+                     QuestionTypeEnum type=question.getType();
+                     questionStatistics.computeIfAbsent(content,key->new ExamResultStatistic.AnswerStatisticInfo()).autoAddTotalNumber();
+                     typeStatistics.computeIfAbsent(type,key->new ExamResultStatistic.AnswerStatisticInfo()).autoAddTotalNumber();
+                     if(Math.abs(question.getScore()-score)<=0){
+                         questionStatistics.get(content).autoAddCorrectNumber();
+                         typeStatistics.get(type).autoAddCorrectNumber();
+                     }
+                 });
+             });
+            //统计正确率
+        });
+       //统计平均分
+        Double totalScore=scoreList.stream().mapToDouble(ExamScoreRecord::getScore).sum();
+        Long number=scoreList.stream().mapToInt(ExamScoreRecord::getUserId).distinct().count();
+        //统计
+        AtomicReference<Integer> maxScoreUserId = new AtomicReference<>();
+        AtomicReference<Integer> minScoreUserId = new AtomicReference<>();
+        AtomicReference<Float> maxScore= new AtomicReference<>(0F);
+        AtomicReference<Float> minScore= new AtomicReference<>(0F);
+        final Map<Integer, Float> scoreCollect = scoreList.stream().collect(Collectors.toMap(ExamScoreRecord::getUserId, ExamScoreRecord::getScore, Float::sum));
+        for(Integer id :scoreCollect.keySet()){
+            float score=scoreCollect.get(id);
+            if(score> maxScore.get()){
+                maxScore.set(score);
+                maxScoreUserId.set(id);
+            }
+            if(score< minScore.get()||minScore.get()==0F){
+                minScore.set(score);
+                minScoreUserId.set(id);
+            }
+        }
+        ExamResultStatistic.MostScoreInfo maxScoreInfo=new ExamResultStatistic.MostScoreInfo();
+        ExamResultStatistic.MostScoreInfo minScoreInfo=new ExamResultStatistic.MostScoreInfo();
+        if(minScoreUserId.get()!=null){
+            maxScoreInfo.setUser(userAuthInfoClient.getStudentInfo(minScoreUserId.get()));
+            maxScoreInfo.setScore(maxScore.get());
+
+            minScoreInfo.setUser(userAuthInfoClient.getStudentInfo(maxScoreUserId.get()));
+            minScoreInfo.setScore(minScore.get());
+        }
+        ExamResultStatistic statistics=new ExamResultStatistic();
+        statistics.setAverageScore(Math.round(totalScore/number));
+        statistics.setMaxScoreInfo(maxScoreInfo);
+        statistics.setMinScoreInfo(minScoreInfo);
+        statistics.setQuestionStatistic(questionStatistics);
+        statistics.setQuestionTypeStatistic(typeStatistics);
+        return Result.success(statistics);
     }
 }

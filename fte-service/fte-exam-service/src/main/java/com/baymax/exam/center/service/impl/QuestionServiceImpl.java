@@ -100,4 +100,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     public List<QuestionInfoVo> examQuestionInfo(Integer examId) {
         return questionMapper.examQuestionInfo(examId);
     }
+    public List<Question> examQuestion(Integer examPaperId) {
+        return questionMapper.examQuestion(examPaperId);
+    }
 }

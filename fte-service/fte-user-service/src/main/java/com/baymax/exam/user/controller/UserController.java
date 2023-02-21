@@ -55,6 +55,11 @@ public class UserController {
         Integer userId = UserAuthUtil.getUserId();
         return Result.success(userService.getById(userId));
     }
+    @Inner
+    @GetMapping("/{userId}/info")
+    User getBaseUserInfoById(@PathVariable Integer userId){
+        return userService.getById(userId);
+    }
     @Operation(summary = "更新头像")
     @PostMapping("/upload-avatar")
     Result<String> uploadAvatar(@RequestPart("file") MultipartFile file) throws ResultException {

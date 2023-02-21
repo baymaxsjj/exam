@@ -35,6 +35,8 @@ public class ExamAnswerLog extends BaseEntity {
 
     @Schema(description = "学生id")
     private Integer studentId;
+    @Schema(description = "班级id")
+    private Integer classId;
 
     @Null(message = "状态不能为考")
     @Schema(description = "状态：0:开始、2：交卷")

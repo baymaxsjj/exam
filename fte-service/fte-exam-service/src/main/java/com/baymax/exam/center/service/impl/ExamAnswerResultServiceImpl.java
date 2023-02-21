@@ -19,10 +19,18 @@ import java.util.List;
  */
 @Service
 public class ExamAnswerResultServiceImpl extends ServiceImpl<ExamAnswerResultMapper, ExamAnswerResult> implements IExamAnswerResultService {
-    public List<ExamAnswerResult> getAnswerResultList(int examInfoId,int userId){
+    private List<ExamAnswerResult> getAnswerResultList(int examInfoId,Integer userId){
         LambdaQueryWrapper<ExamAnswerResult> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(ExamAnswerResult::getExamInfoId,examInfoId);
-        queryWrapper.eq(ExamAnswerResult::getUserId,userId);
+        if(userId!=null){
+            queryWrapper.eq(ExamAnswerResult::getUserId,userId);
+        }
         return list(queryWrapper);
+    }
+    public List<ExamAnswerResult> getAnswerResultListByExamId(int examInfoId){
+        return getAnswerResultList(examInfoId,null);
+    }
+    public List<ExamAnswerResult> getAnswerResultListByUserId(int examInfoId,int userId){
+        return getAnswerResultList(examInfoId,userId);
     }
 }

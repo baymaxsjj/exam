@@ -20,10 +20,24 @@ import java.util.List;
 @Service
 public class ExamScoreRecordServiceImpl extends ServiceImpl<ExamScoreRecordMapper, ExamScoreRecord> implements IExamScoreRecordService {
 
-    public List<ExamScoreRecord> getScoreList(int examInfoId,int userId){
+    private List<ExamScoreRecord> getScoreList(int examInfoId,Integer userId){
         LambdaQueryWrapper<ExamScoreRecord> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(ExamScoreRecord::getExamInfoId,examInfoId);
-        queryWrapper.eq(ExamScoreRecord::getUserId,userId);
+        if(userId!=null){
+            queryWrapper.eq(ExamScoreRecord::getUserId,userId);
+        }
         return list(queryWrapper);
+    }
+    public List<ExamScoreRecord> getScoreListByExamId(int examInfoId){
+        return getScoreList(examInfoId,null);
+    }
+    public List<ExamScoreRecord> getScoreListByClassId(int examInfoId,int classId){
+        LambdaQueryWrapper<ExamScoreRecord> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(ExamScoreRecord::getExamInfoId,examInfoId);
+        queryWrapper.eq(ExamScoreRecord::getClassId,classId);
+        return  list(queryWrapper);
+    }
+    public List<ExamScoreRecord> getScoreListByUserId(int examInfoId,int userId){
+        return getScoreList(examInfoId,userId);
     }
 }

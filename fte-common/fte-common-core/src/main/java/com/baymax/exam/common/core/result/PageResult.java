@@ -33,5 +33,13 @@ public class PageResult<T> implements Serializable {
         result.setCurrent(page.getCurrent());
         return result;
     }
+    public static <T> PageResult<T> copyPageResult(PageResult result,List<T> list){
+        PageResult<T> pageResult=new PageResult<>();
+        pageResult.setList(list);
+        pageResult.setPages(result.getPages());
+        pageResult.setTotal(result.getTotal());
+        pageResult.setCurrent(result.getCurrent());
+        return pageResult;
+    }
 
 }

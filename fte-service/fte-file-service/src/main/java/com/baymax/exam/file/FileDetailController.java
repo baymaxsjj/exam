@@ -66,4 +66,7 @@ public class FileDetailController {
         String url = fileStorage.upload().getUrl();
         return Result.success(url);
     }
+    public void saveImage( MultipartFile file,String path,String id,String type){
+
+    }
 }

@@ -35,7 +35,8 @@ public class ExamScoreRecord implements Serializable {
 
     @Schema(description = "用户id")
     private Integer userId;
-
+    @Schema(description = "班级id")
+    private Integer classId;
     @Schema(description = "考试信息id")
     private Integer examInfoId;
 

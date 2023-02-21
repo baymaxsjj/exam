@@ -45,7 +45,7 @@ public class ExamAnswerLogController {
         if(examInfo==null|| examInfo.getTeacherId()!=userId){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
-        final List<ExamAnswerLog> list = examAnswerLogService.getLogListByStatus(examInfoId,null);
+        final List<ExamAnswerLog> list = examAnswerLogService.getLogListByExamId(examInfoId);
         Map<ExamAnswerLogEnum, Set<Integer>> normalAction=new HashMap<>();
         Map<ExamAnswerLogEnum,Integer> abnormalAction=new HashMap<>();
         AtomicInteger abnormalCount= new AtomicInteger();
@@ -90,7 +90,7 @@ public class ExamAnswerLogController {
             return Result.success(PageResult.setResult(new Page<>()));
         }
         //防止非法访问
-        if(studentLogOne.getExamId()!=examInfoId){
+        if(!Objects.equals(studentLogOne.getExamId(), examInfoId)){
             return Result.failed(ResultCode.PARAM_ERROR);
         }
         final IPage<ExamAnswerLog> logList = examAnswerLogService.getLogListByUserId(examInfoId, studentId, page, pageSize);

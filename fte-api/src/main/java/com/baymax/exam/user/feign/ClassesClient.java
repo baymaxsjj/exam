@@ -4,6 +4,7 @@ import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.user.model.Classes;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.user.model.JoinClass;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,4 +35,8 @@ public interface ClassesClient {
             @RequestBody Collection<Integer> classIds,
             @PathVariable Integer courseId
     );
+    @PostMapping("/{courseId}/user/class")
+    public Classes getClassByUserId(
+            @PathVariable Integer courseId,
+            @RequestParam Integer userId);
 }
