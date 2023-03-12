@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -61,13 +62,14 @@ public class TagsController {
         //防止小人
         if(tags.getId()!=null){
             Tags tag = tagsService.getById(tags.getId());
-            if(tag==null||tag.getTeacherId()!=userId){
+            if(tag==null|| !Objects.equals(tag.getTeacherId(), userId)){
                 return Result.failed(ResultCode.PARAM_ERROR);
             }
             //禁止转移到到其他课程
             tags.setCourseId(null);
             info="更新成功";
         }
+        //TODO:标签嵌套不能超过三层，1：->1.1->1.1.1
         tags.setTeacherId(userId);
         tagsService.saveOrUpdate(tags);
         return Result.msgSuccess(info);

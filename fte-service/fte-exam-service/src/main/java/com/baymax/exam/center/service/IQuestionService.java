@@ -3,11 +3,13 @@ package com.baymax.exam.center.service;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.model.Question;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.user.vo.CourseInfoVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -37,4 +39,5 @@ public interface IQuestionService extends IService<Question> {
     QuestionInfoVo questionInfo(Integer questionId);
 
     List<QuestionInfoVo> examQuestionInfo(Integer examId);
+    List<Question> getQuestionsByTags(int userId, int courseId, Collection<Integer> tagList, Collection<QuestionTypeEnum> typeList);
 }

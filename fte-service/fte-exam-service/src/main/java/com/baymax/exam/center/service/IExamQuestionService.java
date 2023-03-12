@@ -4,6 +4,7 @@ import com.baymax.exam.center.model.ExamQuestion;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baymax.exam.center.model.Question;
 
+import java.util.Collection;
 import java.util.List;
 
 /**

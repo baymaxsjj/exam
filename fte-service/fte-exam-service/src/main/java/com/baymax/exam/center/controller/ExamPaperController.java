@@ -8,14 +8,15 @@ import com.baymax.exam.center.model.ExamQuestion;
 import com.baymax.exam.center.model.Question;
 import com.baymax.exam.center.service.impl.ExamQuestionServiceImpl;
 import com.baymax.exam.center.service.impl.ExamPaperServiceImpl;
+import com.baymax.exam.center.service.impl.GeneratePaperService;
 import com.baymax.exam.center.service.impl.QuestionServiceImpl;
+import com.baymax.exam.center.vo.AutomaticPaperRuleVo;
 import com.baymax.exam.center.vo.ExamPaperVo;
 import com.baymax.exam.center.vo.QuestionInfoVo;
 import com.baymax.exam.common.core.result.PageResult;
 import com.baymax.exam.common.core.result.Result;
 import com.baymax.exam.common.core.result.ResultCode;
 import com.baymax.exam.user.feign.CourseClient;
-import com.baymax.exam.user.feign.UserClient;
 import com.baymax.exam.user.model.Courses;
 import com.baymax.exam.web.utils.UserAuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,10 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -132,8 +130,8 @@ public class ExamPaperController {
         return Result.success(examPaper);
     }
     @Operation(summary = "获取试卷题目信息")
-    @GetMapping("/quesiton/{examId}")
-    public Result quesiton(@PathVariable Integer examId){
+    @GetMapping("/question/{examId}")
+    public Result question(@PathVariable Integer examId){
         ExamPaper examPaper = examService.getById(examId);
         Integer userId = UserAuthUtil.getUserId();
         if(examPaper ==null|| examPaper.getTeacherId()!=userId){
@@ -179,6 +177,17 @@ public class ExamPaperController {
         result.put("questionStatistics",questionStatistics);
         result.put("totalScore",total);
         return Result.success(result);
+    }
+    @PostMapping("/{courseId}/automatic")
+    public Result automaticPaper(@RequestBody @Validated AutomaticPaperRuleVo rule,
+                                 @PathVariable Integer courseId){
+        //查询题目，先简单些，先不找子目录的题目了。
+        List<Question> list=questionService.getQuestionsByTags(UserAuthUtil.getUserId(),courseId,rule.getTags(),rule.getQuestionType());
+        if(list.size()<rule.getTotalNumber()){
+            return Result.msgInfo("组卷失败：题库题目数量不够");
+        }
+        GeneratePaperService generatePaperService=new GeneratePaperService(list,rule);
+        return Result.success(generatePaperService.generatePaper());
     }
 
 }

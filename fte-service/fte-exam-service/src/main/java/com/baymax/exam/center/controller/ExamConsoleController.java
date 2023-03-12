@@ -179,7 +179,7 @@ public class ExamConsoleController {
         res.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         //设置响应的格式说明
 //        res.setHeader("Content-Disposition", "attachment;filename="+fileName);
-        res.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
+        res.setHeader("Content-disposition", "attachment;filename*=" + fileName);
         //读取响应文件的模板
         File file= ResourceUtils.getFile("classpath:template/考试成绩模板.xlsx");
         //替换模板的数据
@@ -191,7 +191,7 @@ public class ExamConsoleController {
             AtomicInteger joinNumber= new AtomicInteger();
             long page=1;
             do{
-                reviewList= examConsoleService.getReViewList(reviewType, classId, examInfoId, page, 100L);
+                reviewList= examConsoleService.getReViewList(reviewType, classId, examInfoId, page, 200L);
                 if(reviewList!=null){
                      List<StudentReviewExcel> reviewExcels = reviewList.getList().stream().map(studentReviewVo -> {
                          if(studentReviewVo.getAnswerStatus()!=null){

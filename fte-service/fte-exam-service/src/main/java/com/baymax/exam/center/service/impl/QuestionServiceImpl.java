@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,6 +101,21 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     public List<QuestionInfoVo> examQuestionInfo(Integer examId) {
         return questionMapper.examQuestionInfo(examId);
     }
+
+    @Override
+    public List<Question> getQuestionsByTags(int userId,int courseId, Collection<Integer> tagList, Collection<QuestionTypeEnum> typeList) {
+        LambdaQueryWrapper<Question> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(Question::getTeacherId,userId);
+        queryWrapper.eq(Question::getCourseId,courseId);
+        if(tagList.contains(0)){
+            queryWrapper.or().isNotNull(Question::getType);
+            tagList.remove(0);
+        }
+        queryWrapper.in(Question::getTagId,tagList);
+        queryWrapper.in(Question::getType,tagList);
+        return list(queryWrapper);
+    }
+
     public List<Question> examQuestion(Integer examPaperId) {
         return questionMapper.examQuestion(examPaperId);
     }
