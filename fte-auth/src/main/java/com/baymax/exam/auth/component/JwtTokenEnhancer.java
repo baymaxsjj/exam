@@ -3,6 +3,7 @@ package com.baymax.exam.auth.component;
 import cn.hutool.core.lang.func.Func1;
 import com.baymax.exam.auth.base.SecurityUser;
 import com.baymax.exam.auth.model.LoginUser;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -19,11 +20,13 @@ import java.util.Map;
  * @modified By：
  * @version:
  */
+@Slf4j
 @Component
 public class JwtTokenEnhancer implements TokenEnhancer {
 
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+        log.info("认证信息：{}",authentication.getPrincipal());
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
         Map<String, Object> info = new HashMap<>();
         //把用户ID设置到JWT中

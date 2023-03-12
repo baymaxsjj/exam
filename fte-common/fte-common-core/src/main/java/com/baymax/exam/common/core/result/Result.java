@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 结果
@@ -20,10 +22,9 @@ import java.io.Serializable;
 public class Result<T> implements Serializable {
 
     private String code;
-
     private T data;
-
     private String msg;
+    private LocalDateTime time= LocalDateTime.now();
     //正常：啥也不提示
     public static <T> Result<T> success() {
         return success(null);
@@ -89,7 +90,7 @@ public class Result<T> implements Serializable {
     }
 
     private static <T> Result<T> result(String code, String msg, T data) {
-        Result<T> result = new Result<>();
+        Result<T> result = new Result<T>();
         result.setCode(code);
         result.setData(data);
         result.setMsg(msg);

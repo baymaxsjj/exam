@@ -49,14 +49,14 @@ public class Oauth2ServerConfig extends AuthorizationServerConfigurerAdapter {
                 .withClient(ClientIdEnum.ADMIN_CLIENT_ID.getValue())
                 .secret(passwordEncoder.encode("123456"))
                 .scopes("all")
-                .authorizedGrantTypes("password", "refresh_token")
+                .authorizedGrantTypes("password", "refresh_token","client_credentials")
                 .accessTokenValiditySeconds(3600*24*30*12)
                 .refreshTokenValiditySeconds(3600*24*7*30*12)
                 .and()
                 .withClient(ClientIdEnum.PORTAL_CLIENT_ID.getValue())
                 .secret(passwordEncoder.encode("123456"))
                 .scopes("all")
-                .authorizedGrantTypes("password", "refresh_token")
+                .authorizedGrantTypes("password", "refresh_token","client_credentials")
                 .accessTokenValiditySeconds(3600*24*30*12)
                 .refreshTokenValiditySeconds(3600*24*30*12);
     }
@@ -89,7 +89,7 @@ public class Oauth2ServerConfig extends AuthorizationServerConfigurerAdapter {
     @Bean
     public KeyPair keyPair() {
         //从classpath下的证书中获取秘钥对
-        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("jwt.jks"), "123456".toCharArray());
-        return keyStoreKeyFactory.getKeyPair("jwt", "123456".toCharArray());
+        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("jwt.jks"), "weikao".toCharArray());
+        return keyStoreKeyFactory.getKeyPair("jwt", "weikao".toCharArray());
     }
 }

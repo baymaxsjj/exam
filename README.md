@@ -59,6 +59,18 @@
 - [x] 考试数据导出
 
 - [ ] 考生数据统计分析
+### 使用说明
+#### 更换 公钥和私钥
+```shell
+keytool -genkeypair -alias jwt -validity 3650 -keyalg RSA -dname "CN=jwt,OU=jtw,O=jwt,L=zurich,S=zurich, C=CH" -keypass 12345 -keystore jwt.jks -storepass 12345
+```
+把这个文件放到认证服务器的resouces目录下
+
+```shell
+keytool -list -rfc --keystore jwt.jks | openssl x509 -inform pem -pubkey
+```
+复制公钥到资源服务器的resouces目录下，public.cert
+#### 更换 第三方登录信息
 
   
 
