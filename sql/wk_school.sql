@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 02/02/2023 16:08:52
+ Date: 14/03/2023 16:37:45
 */
 
 SET NAMES utf8mb4;
@@ -33,7 +33,7 @@ CREATE TABLE `ec_classes`  (
   INDEX `teacher_id`(`teacher_id`) USING BTREE,
   CONSTRAINT `ec_classes_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `ec_courses` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `ec_classes_ibfk_2` FOREIGN KEY (`teacher_id`) REFERENCES `es_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ec_classes
@@ -50,6 +50,14 @@ INSERT INTO `ec_classes` VALUES (14, '+66', 9, 10, '2022-10-16 15:37:45', '2022-
 INSERT INTO `ec_classes` VALUES (15, '机械班', 9, 10, '2022-12-03 20:02:06', '2022-12-03 20:28:03');
 INSERT INTO `ec_classes` VALUES (17, '物流321', 6, 10, '2022-10-16 19:52:04', '2022-10-16 19:52:04');
 INSERT INTO `ec_classes` VALUES (18, '毕业班', 7, 10, '2022-10-23 20:18:55', '2022-10-23 20:18:55');
+INSERT INTO `ec_classes` VALUES (19, '测试班级', 10, 10, '2023-02-05 19:54:57', '2023-02-05 19:54:57');
+INSERT INTO `ec_classes` VALUES (20, '计算机', 11, 10, '2023-02-07 14:34:05', '2023-02-07 14:34:05');
+INSERT INTO `ec_classes` VALUES (21, '66666666666', 12, 14, '2023-02-07 15:20:37', '2023-02-07 15:20:37');
+INSERT INTO `ec_classes` VALUES (22, '6666666666', 13, 10, '2023-02-08 10:25:18', '2023-02-08 10:25:18');
+INSERT INTO `ec_classes` VALUES (23, '计算机', 14, 10, '2023-02-08 14:01:20', '2023-02-08 14:01:20');
+INSERT INTO `ec_classes` VALUES (24, '计算机211', 15, 10, '2023-02-08 14:45:53', '2023-02-08 14:45:53');
+INSERT INTO `ec_classes` VALUES (25, '计算机211', 16, 10, '2023-02-08 14:56:25', '2023-02-08 14:56:25');
+INSERT INTO `ec_classes` VALUES (26, '演示班级', 17, 10, '2023-02-22 16:37:17', '2023-02-22 16:37:17');
 
 -- ----------------------------
 -- Table structure for ec_courses
@@ -68,20 +76,28 @@ CREATE TABLE `ec_courses`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
   CONSTRAINT `ec_courses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `es_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '课程信息' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '课程信息' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ec_courses
 -- ----------------------------
-INSERT INTO `ec_courses` VALUES (1, 'SpringCloud课程设计', 'https://pic.616pic.com/bg_w1180/00/01/57/CetpiQ3xVI.jpg!/both/561x313', 'hello hello ', 1, 1, 10, '2022-10-13 17:12:39', '2022-10-15 15:52:10');
-INSERT INTO `ec_courses` VALUES (2, '点边对价管向日', 'https://pic.616pic.com/bg_w1180/00/01/57/CetpiQ3xVI.jpg!/both/561x313', 'sunt Lorem', 0, 0, 10, '2022-10-13 19:22:51', '2022-10-15 15:52:08');
-INSERT INTO `ec_courses` VALUES (3, '格义又成单音务', 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F8%2F57a2ffa73a41e.jpg&refer=http%3A%2F%2Fpic1.win4000.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1668473671&t=78c2227ae4dde72232ed04b099544b35', 'cillum Ut', 0, 1, 10, '2022-10-13 19:23:55', '2022-10-16 08:54:40');
+INSERT INTO `ec_courses` VALUES (1, 'SpringCloud课程设计', 'https://pic.616pic.com/bg_w1180/00/01/57/CetpiQ3xVI.jpg!/both/561x313', 'hello hello ', 1, 0, 10, '2022-10-13 17:12:39', '2022-10-15 15:52:10');
+INSERT INTO `ec_courses` VALUES (2, '点边对价管向日', '/10/course/63df90b80747b047cea866d4.jpeg', 'sunt Lorem', 0, 0, 10, '2022-10-13 19:22:51', '2022-10-15 15:52:08');
+INSERT INTO `ec_courses` VALUES (3, '格义又成单音务', 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F8%2F57a2ffa73a41e.jpg&refer=http%3A%2F%2Fpic1.win4000.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1668473671&t=78c2227ae4dde72232ed04b099544b35', 'cillum Ut', 0, 0, 10, '2022-10-13 19:23:55', '2022-10-16 08:54:40');
 INSERT INTO `ec_courses` VALUES (4, '修改测试哈哈哈', 'https://pic.616pic.com/bg_w1180/00/01/57/CetpiQ3xVI.jpg!/both/561x313', 'nulla esse Excepteur', 0, 1, 8, '2022-10-14 21:17:08', '2022-10-15 15:52:05');
 INSERT INTO `ec_courses` VALUES (5, '修改测试哈哈哈', 'https://pic.616pic.com/bg_w1180/00/01/57/CetpiQ3xVI.jpg!/both/561x313', 'nulla esse Excepteur', 0, 1, 10, '2022-10-14 21:18:55', '2022-10-15 15:51:44');
-INSERT INTO `ec_courses` VALUES (6, '基于Spring Vue的考试系统', 'https://pic.616pic.com/bg_w1180/00/01/57/CetpiQ3xVI.jpg!/both/561x313', '6666你好spring ', 1, 0, 10, '2022-10-15 18:37:41', '2022-10-15 18:37:41');
-INSERT INTO `ec_courses` VALUES (7, '安科毕业论文答辩', 'https://pic.616pic.com/bg_w1180/00/00/15/JdzVtay3MN.jpg!/both/561x313', '66666666', 0, 0, 10, '2022-10-15 19:05:06', '2022-10-16 08:53:48');
+INSERT INTO `ec_courses` VALUES (6, '基于Spring Vue的考试系统', '/10/course/63df90c60747b047cea866d5.jpg', '6666你好spring ', 0, 0, 10, '2022-10-15 18:37:41', '2022-10-15 18:37:41');
+INSERT INTO `ec_courses` VALUES (7, '安科毕业论文答辩', '/10/course/63df90da0747b047cea866d6.jpg', '66666666', 0, 0, 10, '2022-10-15 19:05:06', '2022-10-16 08:53:48');
 INSERT INTO `ec_courses` VALUES (8, 'java 666', 'https://pic.616pic.com/bg_w1180/00/01/57/CetpiQ3xVI.jpg!/both/561x313', '22222', 1, 1, 10, '2022-10-15 19:05:50', '2022-10-15 19:05:50');
-INSERT INTO `ec_courses` VALUES (9, 'Java高级基础', 'https://pic.616pic.com/bg_w1180/00/01/57/CetpiQ3xVI.jpg!/both/561x313', '111111', 0, 0, 10, '2022-10-16 08:52:51', '2022-10-16 08:52:51');
+INSERT INTO `ec_courses` VALUES (9, 'Java高级基础', '/10/course/64102c05e61eba67fc8ffa5b.jpg', '111111', 0, 0, 10, '2022-10-16 08:52:51', '2022-10-16 08:52:51');
+INSERT INTO `ec_courses` VALUES (10, '测试课程', '/10/course/63df900f0747b047cea866d3.jpg', '测试课程', 0, 0, 10, '2023-02-05 19:16:47', '2023-02-05 19:16:47');
+INSERT INTO `ec_courses` VALUES (11, '测试课程', '/10/course/63e1f0ce07470d9cb60b84b4.png', '了了了了了了', 0, 1, 10, '2023-02-07 14:33:52', '2023-02-07 14:33:52');
+INSERT INTO `ec_courses` VALUES (12, 'tttttttt', '/14/course/63e1fb6507470d9cb60b84b5.png', 'tttttttttt', 0, 1, 14, '2023-02-07 15:19:03', '2023-02-07 15:19:03');
+INSERT INTO `ec_courses` VALUES (13, '测试课程', '/10/course/63e3080107470d9cb60b84b6.png', '66666666666', 0, 1, 10, '2023-02-08 10:25:08', '2023-02-08 10:25:08');
+INSERT INTO `ec_courses` VALUES (14, '测试课程', '/10/course/63e33c7007470d9cb60b84b9.jpeg', '测试课程', 0, 1, 10, '2023-02-08 14:01:08', '2023-02-08 14:01:08');
+INSERT INTO `ec_courses` VALUES (15, '为考测试课程', '/10/course/63e3451407470d9cb60b84ba.jpeg', '为考测试课程', 0, 1, 10, '2023-02-08 14:45:42', '2023-02-08 14:45:42');
+INSERT INTO `ec_courses` VALUES (16, '为考测试课程', '/10/course/63e3478e07470d9cb60b84bb.jpeg', '为考测试课程', 0, 0, 10, '2023-02-08 14:56:15', '2023-02-08 14:56:15');
+INSERT INTO `ec_courses` VALUES (17, '演示课程', '/10/course/63f56be28690d65beb327a25.jpg', '数据演示', 0, 0, 10, '2022-10-16 08:52:51', '2022-10-16 08:52:51');
 
 -- ----------------------------
 -- Table structure for ec_join_class
@@ -98,7 +114,7 @@ CREATE TABLE `ec_join_class`  (
   INDEX `class_id`(`class_id`) USING BTREE,
   CONSTRAINT `ec_join_class_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `es_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `ec_join_class_ibfk_2` FOREIGN KEY (`class_id`) REFERENCES `ec_classes` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 171 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 361 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ec_join_class
@@ -203,6 +219,96 @@ INSERT INTO `ec_join_class` VALUES (167, 13, 107, '2022-12-03 20:32:33', '2022-1
 INSERT INTO `ec_join_class` VALUES (168, 14, 108, '2022-12-03 20:32:33', '2022-12-03 20:32:33');
 INSERT INTO `ec_join_class` VALUES (169, 15, 109, '2022-12-03 20:32:33', '2022-12-03 20:32:33');
 INSERT INTO `ec_join_class` VALUES (170, 13, 110, '2022-12-03 20:32:33', '2022-12-03 20:32:33');
+INSERT INTO `ec_join_class` VALUES (171, 18, 14, '2023-02-02 17:06:45', '2023-02-02 17:06:45');
+INSERT INTO `ec_join_class` VALUES (172, 18, 13, '2023-02-02 17:08:31', '2023-02-02 17:08:31');
+INSERT INTO `ec_join_class` VALUES (173, 19, 14, '2023-02-06 12:44:01', '2023-02-06 12:44:01');
+INSERT INTO `ec_join_class` VALUES (174, 20, 14, '2023-02-07 14:34:15', '2023-02-07 14:34:15');
+INSERT INTO `ec_join_class` VALUES (175, 23, 14, '2023-02-08 14:01:29', '2023-02-08 14:01:29');
+INSERT INTO `ec_join_class` VALUES (176, 24, 14, '2023-02-08 14:46:00', '2023-02-08 14:46:00');
+INSERT INTO `ec_join_class` VALUES (177, 25, 14, '2023-02-08 14:56:34', '2023-02-08 14:56:34');
+INSERT INTO `ec_join_class` VALUES (178, 13, 113, '2023-02-21 18:02:06', '2023-02-21 18:02:06');
+INSERT INTO `ec_join_class` VALUES (299, 26, 11, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (300, 26, 12, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (301, 26, 13, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (302, 26, 14, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (303, 26, 15, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (304, 26, 16, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (305, 26, 17, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (306, 26, 18, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (307, 26, 19, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (308, 26, 20, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (309, 26, 21, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (310, 26, 22, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (311, 26, 23, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (312, 26, 24, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (313, 26, 25, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (314, 26, 26, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (315, 26, 27, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (316, 26, 28, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (317, 26, 29, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (318, 26, 30, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (319, 26, 31, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (320, 26, 32, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (321, 26, 33, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (322, 26, 34, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (323, 26, 35, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (324, 26, 36, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (325, 26, 37, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (326, 26, 38, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (327, 26, 39, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (328, 26, 40, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (329, 26, 41, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (330, 26, 42, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (331, 26, 43, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (332, 26, 44, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (333, 26, 45, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (334, 26, 46, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (335, 26, 47, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (336, 26, 48, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (337, 26, 49, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (338, 26, 50, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (339, 26, 51, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (340, 26, 52, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (341, 26, 53, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (342, 26, 54, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (343, 26, 55, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (344, 26, 56, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (345, 26, 57, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (346, 26, 58, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (347, 26, 59, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (348, 26, 60, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (349, 26, 61, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (350, 26, 62, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (351, 26, 63, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (352, 26, 64, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (353, 26, 65, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (354, 26, 66, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (355, 26, 67, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (356, 26, 68, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (357, 26, 69, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (358, 26, 70, '2023-02-22 16:46:22', '2023-02-22 16:46:22');
+INSERT INTO `ec_join_class` VALUES (359, 26, 10, '2023-02-22 18:08:46', '2023-02-22 18:08:46');
+INSERT INTO `ec_join_class` VALUES (360, 12, 14, '2023-02-28 10:10:38', '2023-02-28 10:10:38');
+
+-- ----------------------------
+-- Table structure for es_login_manger
+-- ----------------------------
+DROP TABLE IF EXISTS `es_login_manger`;
+CREATE TABLE `es_login_manger`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `login_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '登录类型',
+  `login_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '登录名',
+  `enable` timestamp NULL DEFAULT NULL COMMENT '是否启用',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '登录表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of es_login_manger
+-- ----------------------------
+INSERT INTO `es_login_manger` VALUES (2, 116, 'gitee', '7350424', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for es_school
@@ -305,28 +411,29 @@ CREATE TABLE `es_user`  (
   `bg_picture` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '背景图像',
   `autograph` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '签名',
   `phone` char(11) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '手机号',
-  `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '邮箱',
+  `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '邮箱',
   `auth_id` int(11) NULL DEFAULT NULL COMMENT '认证id',
   `role` char(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT '0：学生 1：教师',
   `enable` tinyint(1) NOT NULL DEFAULT 1 COMMENT '状态，0：启用，>0:封禁',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-  PRIMARY KEY (`id`, `username`, `email`) USING BTREE,
+  PRIMARY KEY (`id`, `username`) USING BTREE,
+  UNIQUE INDEX `email`(`email`) USING BTREE,
   INDEX `id`(`id`) USING BTREE,
   INDEX `auth_id`(`auth_id`) USING BTREE,
   CONSTRAINT `es_user_ibfk_1` FOREIGN KEY (`auth_id`) REFERENCES `es_school_auth` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 113 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '用户信息' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 117 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '用户信息' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of es_user
 -- ----------------------------
 INSERT INTO `es_user` VALUES (8, '马明111', '刘丽', '$2a$10$XQM1Qu/zNScKUBRmhJYvHO4hZztDiZbJhFG/FE0J5y4nO3iiBnhki', NULL, NULL, NULL, NULL, 'r.dfs@qq.com', NULL, '0', 1, '2022-10-08 18:40:43', '2022-12-07 17:02:00');
 INSERT INTO `es_user` VALUES (9, '马明-马明', '刘丽1111', '$2a$10$Qnu0vwIelSnyo1P4L3RBnufZG9EWmcFo0bwHwA4O5NFuWHvl3sZXy', NULL, NULL, NULL, NULL, 'r.nmhyi@qq.com', NULL, '0', 1, '2022-10-09 15:38:04', '2022-12-07 17:02:00');
-INSERT INTO `es_user` VALUES (10, 'baymax', 'baymax', '$2a$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'https://avatars.githubusercontent.com/u/62382059?v=4', NULL, NULL, NULL, '123456@qq.sjj', 1, '0', 1, '2022-10-11 14:58:23', '2022-12-14 09:16:49');
-INSERT INTO `es_user` VALUES (11, '薛军=薛军', '熊刚111', '$2a$10$lVUGnxb39BEOZHAffDJ90.5UITvj9tPme/XUxjorfiNoKHDGA1UTe', NULL, NULL, NULL, NULL, 'd.lsmgpa@qq.com', NULL, '0', 1, '2022-10-12 19:32:17', '2022-12-07 17:02:00');
+INSERT INTO `es_user` VALUES (10, 'baymax', 'baymax', '$2a$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', '/10/avatar/63e0592e0747b047cea866da.jpg', NULL, NULL, NULL, '123456@qq.sjj', 1, '0', 1, '2022-10-11 14:58:23', '2023-02-06 09:34:38');
+INSERT INTO `es_user` VALUES (11, '薛军=薛军', '熊刚111', '$2a$10$lVUGnxb39BEOZHAffDJ90.5UITvj9tPme/XUxjorfiNoKHDGA1UTe', '/10/avatar/63e0592e0747b047cea866da.jpg', NULL, NULL, NULL, 'd.lsmgpa@qq.com', NULL, '0', 1, '2022-10-12 19:32:17', '2023-02-22 20:12:44');
 INSERT INTO `es_user` VALUES (12, 'testbaymax', 'testbaymax', '$2a$10$4TZQDF.e0yozNroyOstsquKM0J56lH1rxYt7g.qkkW/3Vxiij3rcy', NULL, NULL, NULL, NULL, 'n.yxmj@qq.com', NULL, '0', 1, '2022-10-19 20:38:17', '2022-12-07 17:02:00');
 INSERT INTO `es_user` VALUES (13, 'Steven', 'Michael Wilson', '$2a$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'http://dummyimage.com/200x200/f28379&text=Elizabeth Thomas', NULL, NULL, NULL, 'h.rlnpwclmj@nampbc.pa', NULL, '0', 1, '2022-12-03 19:58:55', '2023-02-02 11:09:05');
-INSERT INTO `es_user` VALUES (14, 'Scott Jones', 'John Rodriguez', '$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'http://dummyimage.com/200x200/7992f2&text=Anthony White', NULL, NULL, NULL, 'u.jsktbv@sieokbirx.bd', NULL, '0', 1, '2022-12-03 19:58:55', '2022-12-07 17:02:00');
+INSERT INTO `es_user` VALUES (14, 'Scott', 'John Rodriguez', '$2a$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', '/14/avatar/63e059bf0747b047cea866db.png', NULL, NULL, NULL, 'u.jsktbv@sieokbirx.bd', NULL, '0', 1, '2022-12-03 19:58:55', '2023-02-06 09:37:03');
 INSERT INTO `es_user` VALUES (15, 'Angela Perez', 'Christopher Anderson', '$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'http://dummyimage.com/200x200/b5f279&text=Carol Gonzalez', NULL, NULL, NULL, 'w.lcimmo@awfryfkcjb.az', NULL, '0', 1, '2022-12-03 19:58:55', '2022-12-07 17:02:00');
 INSERT INTO `es_user` VALUES (16, 'Michael Gonzalez', 'Helen Gonzalez', '$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'http://dummyimage.com/200x200/f279d9&text=Laura Perez', NULL, NULL, NULL, 'h.enmgwwsop@lgomkkxux.sg', NULL, '0', 1, '2022-12-03 19:58:55', '2022-12-07 17:02:00');
 INSERT INTO `es_user` VALUES (17, 'Karen Thompson', 'Anna Jackson', '$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'http://dummyimage.com/200x200/79f2e7&text=Maria Johnson', NULL, NULL, NULL, 'h.sudqfkk@iufxujjt.fk', NULL, '0', 1, '2022-12-03 19:58:55', '2022-12-07 17:02:00');
@@ -425,6 +532,10 @@ INSERT INTO `es_user` VALUES (109, 'Sharon Young', 'Eric Williams', '$10$EgY/iP1
 INSERT INTO `es_user` VALUES (110, 'George Williams', 'Sarah Robinson', '$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'http://dummyimage.com/200x200/f27994&text=Jason Allen', NULL, NULL, NULL, 'u.iyyyw@qikrc.ao', NULL, '0', 1, '2022-12-03 19:59:11', '2022-12-07 17:02:00');
 INSERT INTO `es_user` VALUES (111, 'Michael Miller', 'Cynthia Wilson', '$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'http://dummyimage.com/200x200/79b7f2&text=Joseph Clark', NULL, NULL, NULL, 'u.pxi@mdwidcsor.cd', NULL, '0', 1, '2022-12-03 19:59:11', '2022-12-07 17:02:00');
 INSERT INTO `es_user` VALUES (112, 'Karen Garcia', 'Elizabeth Young', '$10$EgY/iP1EGtX80SJpM9qUYuX7IAb1UOwIH596o.FZaOQ5wF5vDRPyK', 'http://dummyimage.com/200x200/daf279&text=Joseph Taylor', NULL, NULL, NULL, 'w.fbtrnkus@xvi.ms', NULL, '0', 1, '2022-12-03 19:59:11', '2022-12-07 17:02:00');
+INSERT INTO `es_user` VALUES (113, 'baymax1', '你好中国啊', '$2a$10$mi1/TU3uImlYlqt5AkUmues8ggytTYyoDmGva11oA6xDgbaRa7O/.', '/113/avatar/63f49e0097005d24651af658.jpeg', NULL, NULL, NULL, '1936955617@qq.com', NULL, '0', 1, '2023-02-06 19:18:30', '2023-02-21 18:33:36');
+INSERT INTO `es_user` VALUES (114, 'GITEE7350424pn82', 'baymaxsjj', '$2a$10$IxfTfoZoGx9sAUEqdcLaZ.OzmA8q3QbqALlEqCGlQ8WLOSH853MJm', NULL, NULL, NULL, NULL, NULL, NULL, '0', 1, '2023-02-06 19:29:53', '2023-02-06 19:29:53');
+INSERT INTO `es_user` VALUES (115, 'GITEE7350424ul8k', 'baymaxsjj', '$2a$10$mVAKr7VA3XS.RicRGl0aEuezd8ApxgMZGUxMDvgG2J3pB1DG6i0lm', NULL, NULL, NULL, NULL, NULL, NULL, '0', 1, '2023-02-06 19:30:18', '2023-02-06 19:30:18');
+INSERT INTO `es_user` VALUES (116, 'GITEE_7350424_0ddo', 'baymaxsjj', '$2a$10$17DBXX7KQi7niuzrPgujuegh3XN2644qzTItruhNPbb9UB.4lqGWC', 'https://portrait.gitee.com/uploads/avatars/user/2450/7350424_baymaxsjj_1608168346.png', NULL, NULL, NULL, NULL, NULL, '0', 1, '2023-02-06 19:35:22', '2023-02-06 19:35:22');
 
 -- ----------------------------
 -- View structure for es_user_auth_info
