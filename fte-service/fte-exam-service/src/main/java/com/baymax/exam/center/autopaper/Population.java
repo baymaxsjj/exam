@@ -86,6 +86,9 @@ public class Population {
                         }else {
                             iterator.remove();
                         }
+                        if(surplusNumber==0){
+                            break;
+                        }
                     }
                 }
                 assignmentNumber.forEach((type,number)->{
