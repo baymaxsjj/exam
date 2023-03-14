@@ -103,7 +103,7 @@ public class GeneratePaperService {
         //保留个体
         int index;
         for(index=0;index<retainNumber;index++){
-            paper.saveQuestion(index,currentPaper.getQuestion(index));
+            paper.addQuestion(currentPaper.getQuestion(index));
         }
         //个体交叉
         for(index=retainNumber;index<nextPaper.getQuestionSize();index++){
@@ -116,7 +116,7 @@ public class GeneratePaperService {
                     index--;
                 }
             }
-            paper.saveQuestion(temIndex,question);
+            paper.addQuestion(question);
         }
         return paper;
     }

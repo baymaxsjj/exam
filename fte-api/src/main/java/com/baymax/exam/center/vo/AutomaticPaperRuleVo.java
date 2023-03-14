@@ -4,10 +4,7 @@ import com.baymax.exam.center.enums.QuestionTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,13 +24,13 @@ public class AutomaticPaperRuleVo {
     @Schema(defaultValue = "题目分布")
     private Map<QuestionTypeEnum,Float> percentage;
 
-    @Size(min = 0,max = 5,message = "题目难度应在1~5")
+    @Max(value = 5,message = "题目难度应在0~5")
     @Schema(defaultValue = "题目难度")
-    private Byte difficulty;
+    private Integer difficulty=3;
 
     @Schema(defaultValue = "题目标签")
     private Set<Integer> tags;
-    @NotEmpty(message = "题目数量不能为空")
+    @NotNull(message = "题目数量不能为空")
     @Schema(defaultValue = "题目数量")
     private Integer totalNumber;
     @Schema(defaultValue = "题目总分吧")

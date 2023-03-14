@@ -36,7 +36,7 @@ public class Paper {
     /**
      * 个体包含的试题集合
      */
-    private List<Question> questionList = new ArrayList<>();
+    private List<Question> questionList = new LinkedList<>();
 
     public double getTotalScore() {
         if(totalScore==0){
@@ -53,12 +53,14 @@ public class Paper {
     }
 
     public void setTagCoverage(Set<Integer> tags) {
-        if(tagCoverage==0){
+        if(tagCoverage==0&&!tags.isEmpty()){
             Set<Integer> result = new HashSet<>(tags);
             Set<Integer> another = questionList.stream().map(Question::getTagId).collect(Collectors.toSet());
             // 交集操作
             result.retainAll(another);
-            tagCoverage =result.size() / tags.size();
+            tagCoverage =(double) result.size() / tags.size();
+        }else{
+            tagCoverage=0.5;
         }
     }
 

@@ -3,6 +3,7 @@ package com.baymax.exam.center.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baymax.exam.center.enums.QuestionTypeEnum;
 import com.baymax.exam.center.model.ExamPaper;
 import com.baymax.exam.center.model.ExamQuestion;
 import com.baymax.exam.center.model.Question;
@@ -185,6 +186,15 @@ public class ExamPaperController {
         List<Question> list=questionService.getQuestionsByTags(UserAuthUtil.getUserId(),courseId,rule.getTags(),rule.getQuestionType());
         if(list.size()<rule.getTotalNumber()){
             return Result.msgInfo("组卷失败：题库题目数量不够");
+        }
+        Map<QuestionTypeEnum, Float> percentage = rule.getPercentage();
+        if(percentage!=null){
+            percentage.entrySet().removeIf(entry->entry.getValue()==0);
+           //重新分配，
+            float sum= (float) percentage.values().stream().mapToDouble(v->v).sum();
+            for(QuestionTypeEnum key : percentage.keySet()){
+                percentage.put(key,percentage.get(key)/sum);
+            }
         }
         GeneratePaperService generatePaperService=new GeneratePaperService(list,rule);
         return Result.success(generatePaperService.generatePaper());

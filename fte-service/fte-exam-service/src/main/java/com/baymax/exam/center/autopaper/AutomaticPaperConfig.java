@@ -37,17 +37,17 @@ public class AutomaticPaperConfig {
     }
     public void setMediumScale(){
         targetExpand=0.85;
-        populationSize=50;
-        maxGeneration=100;
-        mutationRate=0.7;
-        crossoverRate=0.7;
+        populationSize=40;
+        maxGeneration=40;
+        mutationRate=0.85;
+        crossoverRate=0.85;
     }
     public void setLargeScale(){
         targetExpand=0.9;
-        populationSize=100;
-        maxGeneration=150;
-        mutationRate=0.6;
-        crossoverRate=0.6;
+        populationSize=60;
+        maxGeneration=60;
+        mutationRate=0.9;
+        crossoverRate=0.9;
     }
 
     /**

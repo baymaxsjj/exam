@@ -107,12 +107,16 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         LambdaQueryWrapper<Question> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(Question::getTeacherId,userId);
         queryWrapper.eq(Question::getCourseId,courseId);
-        if(tagList.contains(0)){
-            queryWrapper.or().isNotNull(Question::getType);
-            tagList.remove(0);
+        if(tagList!=null&&!tagList.isEmpty()){
+            if(tagList.contains(0)){
+                queryWrapper.or().isNotNull(Question::getType);
+                tagList.remove(0);
+            }
+            queryWrapper.in(Question::getTagId,tagList);
         }
-        queryWrapper.in(Question::getTagId,tagList);
-        queryWrapper.in(Question::getType,tagList);
+        if(typeList!=null&&!typeList.isEmpty()){
+            queryWrapper.in(Question::getType,typeList);
+        }
         return list(queryWrapper);
     }
 
