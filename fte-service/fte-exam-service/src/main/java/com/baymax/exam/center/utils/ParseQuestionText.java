@@ -73,7 +73,7 @@ public class ParseQuestionText {
                 continue;
             }
 
-                //2.4 确定题型
+            //2.4 确定题型
             if(optionList.isEmpty()){
                 if(answerList.size()==1){
                     type=QuestionTypeEnum.SUBJECTIVE;
@@ -92,9 +92,9 @@ public class ParseQuestionText {
                 }
             }
             questionInfo.setType(type);
+            //2.5获取题目选项
             questionInfo.setOptions(getItem(type,answerList,optionList));
             list.add(questionInfo);
-            //判断答案可视
         }
         return list;
     }
